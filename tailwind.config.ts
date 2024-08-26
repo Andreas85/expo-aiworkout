@@ -5,6 +5,7 @@ module.exports = {
     extend: {
       colors: {
         NAVBAR_BACKGROUND: '#252425',
+        WORKOUT_PURPLE: '#A27DE1',
       },
     },
   },
