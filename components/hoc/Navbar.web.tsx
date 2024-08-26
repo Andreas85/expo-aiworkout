@@ -1,21 +1,20 @@
 import React from 'react';
-import { Link, Slot } from 'expo-router';
+import { Link, router, Slot } from 'expo-router';
 import { tailwind } from '@/utils/tailwind';
-import { View, Text } from '../Themed';
+import { Text, View } from '../Themed';
+import { ActionButton } from '../atoms/ActionButton';
 
 const Navbar = () => {
   return (
     <>
       <View
         style={tailwind(
-          'bg-NAVBAR_BACKGROUND flex h-24 flex-row items-center justify-between gap-4 px-24',
+          'flex h-24 flex-row items-center justify-between gap-4 bg-NAVBAR_BACKGROUND px-24',
         )}>
         <Text>
-          <Link href="/">Home</Link>
+          <Link href="/">logo</Link>
         </Text>
-        <Text>
-          <Link href="/two">Two</Link>
-        </Text>
+        <ActionButton label={'Sign in'} onPress={() => router.push('/signin')} />
       </View>
       <Slot />
     </>
