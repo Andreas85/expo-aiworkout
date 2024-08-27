@@ -20,7 +20,7 @@ const GradientBackground = (props: IGradientBackground) => {
           width: '100%',
           zIndex: 9999999999,
         }}>
-        <Container style={tailwind('p-4')} className="px-4 py-6  lg:px-32">
+        <Container style={tailwind('flex-1 p-4')} className="min-h-full px-4  py-6 lg:px-32">
           {children}
         </Container>
       </ImageBackground>

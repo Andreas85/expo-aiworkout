@@ -3,11 +3,13 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import 'react-native-reanimated';
 import '../style.css';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import Navbar from '@/components/hoc/Navbar';
+// import { ToastProvider } from 'react-native-toast-notifications';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -48,14 +50,27 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const queryClient = new QueryClient();
 
   const renderRoot = () => {
     return <Navbar />;
   };
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      {renderRoot()}
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        {/* <ToastProvider
+          placement="bottom"
+          duration={2000}
+          animationType="slide-in"
+          animationDuration={250}
+          successColor="green"
+          dangerColor="red"
+          warningColor="orange"
+          normalColor="gray"> */}
+        {renderRoot()}
+        {/* </ToastProvider> */}
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
