@@ -26,6 +26,8 @@ export function useThemeColor(
   if (colorFromProps) {
     return colorFromProps;
   } else {
+    // return ' ';
+    // return theme === 'dark' ? '' : Colors[theme][colorName];
     return Colors[theme][colorName];
   }
 }

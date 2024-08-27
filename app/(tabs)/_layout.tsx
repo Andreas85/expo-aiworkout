@@ -6,6 +6,7 @@ import { Platform, Pressable } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { useAuthStore } from '@/store/authStore';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -17,6 +18,7 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { isAuthenticated } = useAuthStore();
   const renderer = () => {
     if (Platform.OS === 'web') {
       // Use a basic custom layout on web.
@@ -34,7 +36,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Tab One',
+            title: 'Home',
             tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
             headerRight: () => (
               <Link href="/modal" asChild>
@@ -53,9 +55,12 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="two"
+          name="signin"
           options={{
-            title: 'Tab Two',
+            title: 'Sign in',
+            tabBarItemStyle: {
+              display: isAuthenticated ? 'none' : 'flex',
+            },
             tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           }}
         />
