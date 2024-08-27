@@ -1,5 +1,7 @@
 import { ImageBackground } from 'react-native';
 import { IMAGES } from '@/utils/images';
+import Container from './Container';
+import { tailwind } from '@/utils/tailwind';
 
 interface IGradientBackground {
   children?: React.ReactNode;
@@ -18,7 +20,9 @@ const GradientBackground = (props: IGradientBackground) => {
           width: '100%',
           zIndex: 9999999999,
         }}>
-        {children}
+        <Container style={tailwind('p-4')} className="px-4 py-6  lg:px-32">
+          {children}
+        </Container>
       </ImageBackground>
     </>
   );

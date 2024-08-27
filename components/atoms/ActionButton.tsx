@@ -36,7 +36,7 @@ export function ActionButton({
       disabled={disabled}
       style={hovered => [
         tailwind(
-          `bg-WORKOUT_PURPLE h-10 flex-row items-center justify-center rounded-full px-6 py-3 ${disabled ? 'bg-gray-500' : ''}`,
+          `h-10 flex-row items-center justify-center rounded-full bg-WORKOUT_PURPLE px-6 py-3 ${disabled ? 'bg-gray-500' : ''}`,
         ),
         hovered && tailwind(''),
         style,
