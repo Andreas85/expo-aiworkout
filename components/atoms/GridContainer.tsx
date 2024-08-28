@@ -6,11 +6,12 @@ export default function GridContainer(props: {
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>; // for native styling
   data: any[];
-  listNumColumns?: number;
+  listNumColumnsNative?: number;
   className?: string; // for web styling (used in .web.tsx)
   renderListItemInNative: (data: any) => React.ReactElement;
+  keyExtractorNative: ((item: any, index: number) => string) | undefined;
 }) {
-  const { data, listNumColumns, renderListItemInNative } = props;
+  const { data, listNumColumnsNative, renderListItemInNative, keyExtractorNative } = props;
 
   const renderItem: ListRenderItem<any> = ({ item }: { item: any }) => renderListItemInNative(item);
 
@@ -26,9 +27,9 @@ export default function GridContainer(props: {
   return (
     <FlatList
       data={data}
-      numColumns={listNumColumns}
+      numColumns={listNumColumnsNative}
       renderItem={renderItem}
-      keyExtractor={item => item.id}
+      keyExtractor={keyExtractorNative}
       columnWrapperStyle={{
         flex: 1,
         justifyContent: 'space-around',

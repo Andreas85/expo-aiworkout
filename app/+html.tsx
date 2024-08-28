@@ -30,6 +30,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
 const responsiveBackground = `
 body {
   background-color: #fff;
+  background-image: url('../assets/images/gradient-bg.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
 }
 @media (prefers-color-scheme: dark) {
   body {

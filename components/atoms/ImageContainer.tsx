@@ -1,12 +1,13 @@
 import React from 'react';
-import { Image, ImageResizeMode, ImageSourcePropType, ImageStyle, StyleProp } from 'react-native';
+import { ImageSourcePropType, ImageStyle, StyleProp } from 'react-native';
+import { Image, ImageContentFit } from 'expo-image';
 
 export default function ImageContainer(props: {
   source: ImageSourcePropType;
   styleNative?: StyleProp<ImageStyle>;
   styleWeb?: StyleProp<ImageStyle>;
-  resizeMode?: ImageResizeMode;
+  contentFit?: ImageContentFit;
 }) {
-  const { source, resizeMode, styleNative } = props;
-  return <Image source={source} style={styleNative} resizeMode={resizeMode} />;
+  const { source, contentFit, styleNative } = props;
+  return <Image source={source} style={styleNative} contentFit={contentFit} />;
 }

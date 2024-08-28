@@ -1,4 +1,15 @@
-// export const API_BASE_URL = 'https://us-central1-fantasy-sports-pr.cloudfunctions.net';
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const API_ENPOINTS = {};
+export const API_ENPOINTS = {
+  PUBLIC_EXERCISES: '/public/exercises',
+  EXERCISES: '/exercises/',
+  WORKOUT: '/public/workouts',
+  MY_WORKOUT: '/workouts',
+  EXERCISE_SEARCH: '/public/exercises/search/',
+  REGISTER: '/auth/signup',
+  LOGIN: '/auth/send-signin-otp',
+  FORGET: '/auth/forgot-password',
+  RESET: '/auth/reset-password',
+  SIGNIN_USING_OTP: '/auth/signin-using-otp',
+  WORKOUT_SESSION: '/workout-sessions',
+};

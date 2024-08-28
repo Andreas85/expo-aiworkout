@@ -1,4 +1,4 @@
-import { ImageBackground } from 'react-native';
+import { ImageBackground, Platform } from 'react-native';
 import { IMAGES } from '@/utils/images';
 import Container from './Container';
 import { tailwind } from '@/utils/tailwind';
@@ -13,7 +13,7 @@ const GradientBackground = (props: IGradientBackground) => {
   return (
     <>
       <ImageBackground
-        source={IMAGES.gradientBg}
+        source={Platform.OS === 'web' ? '' : IMAGES.gradientBg}
         resizeMode="cover"
         style={{
           flex: 1,

@@ -1,0 +1,83 @@
+export interface ICreateWorkoutFormData {
+  name: string;
+}
+
+export interface IAddExerciseToWorkout {
+  exerciseId: string | number;
+  duration: number;
+  reps?: any;
+}
+
+export interface IUpdateExerciseToWorkout {
+  index: number;
+  exercise: {
+    duration: number;
+    reps?: number;
+  };
+}
+
+export interface IPayloadCreateWorkout {
+  formData: ICreateWorkoutFormData;
+}
+
+export interface IPayloadWorkoutDetail {
+  id: any;
+}
+
+export interface IRemoveExerciseToWorkout {
+  index: any;
+}
+
+export interface IPayloadUpdateWorkoutData {
+  formData: ICreateWorkoutFormData;
+  queryParams: { id: any };
+}
+
+export interface IPayloadAddExerciseToWorkout {
+  formData: IAddExerciseToWorkout;
+  queryParams: { id: any };
+}
+
+export interface IPayloadRemoveExerciseToWorkout {
+  formData: IRemoveExerciseToWorkout;
+  queryParams: { id: any };
+}
+
+export interface IPayloadUpdateExerciseToWorkout {
+  formData: any;
+  queryParams: { id: any };
+}
+
+export interface IPayloadSortExercises {
+  formData: any;
+  queryParams: { id: any };
+}
+
+export interface IPayloadWorkoutSessions {
+  formData: { id: string };
+}
+
+export interface IPayloadWorkoutSessionsUpdate {
+  id: string;
+  formData: {
+    exerciseId: string;
+    repsTaken?: number;
+    durationTaken: number;
+    isCompleted: boolean;
+  };
+}
+
+export interface IPayloadWorkoutSessionUserData {
+  workoutId?: string;
+}
+
+export interface IPayloadWorkoutSessionsUpdateFinished {
+  id: string;
+  formData: {
+    status: string;
+  };
+}
+
+export interface ICreateWorkoutCopy {
+  id: string;
+}
