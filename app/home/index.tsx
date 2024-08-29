@@ -65,7 +65,9 @@ export default function HomeIndexPage() {
 
   return (
     <>
-      <Container style={tailwind('mb-4 gap-y-4 px-4')} className="mb-4 flex flex-1 flex-col gap-2">
+      <Container
+        style={tailwind('mb-4 gap-y-4 px-4')}
+        className="mb-4 flex w-full flex-1 flex-col gap-2">
         <Container
           style={tailwind('flex h-14 gap-y-4')}
           className="flex items-center justify-between">
@@ -75,9 +77,98 @@ export default function HomeIndexPage() {
             )}>
             Public workout
           </Text>
-          <Text>Version</Text>
+          <Container
+            style={{ display: 'none' }}
+            className="bg-WORKOUT_VERSION_BACKGROUND flex w-fit items-center justify-end gap-2 rounded-full">
+            <Container
+              className="bg-WORKOUT_VERSION_BACKGROUND_ACTIVE min-w-fit  self-center rounded-s-full p-4"
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                // backgroundColor: '#9C79C9',
+                borderColor: '#00000008',
+                borderRadius: 16,
+                borderWidth: 1,
+                paddingVertical: 16,
+              }}>
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: 13,
+                }}>
+                {'Full version'}
+              </Text>
+            </Container>
+            <Container
+              className=" min-w-fit  self-center rounded-s-full p-4"
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                backgroundColor: '#9C79C9',
+                borderColor: '#00000008',
+                borderRadius: 16,
+                borderWidth: 1,
+                paddingVertical: 16,
+              }}>
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: 13,
+                }}>
+                {'Short version'}
+              </Text>
+            </Container>
+          </Container>
         </Container>
         <Container style={tailwind('border border-white')} className="border border-white" />
+        <Container
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#493B42',
+            borderRadius: 16,
+            marginBottom: 2,
+          }}
+          className="bg-WORKOUT_VERSION_BACKGROUND hidden w-fit items-center justify-end gap-2 rounded-full">
+          <Container
+            className="bg-WORKOUT_VERSION_BACKGROUND_ACTIVE self-center  rounded-s-full p-4"
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              // backgroundColor: '#9C79C9',
+              borderColor: '#00000008',
+              borderRadius: 16,
+              borderWidth: 1,
+              paddingVertical: 16,
+            }}>
+            <Text
+              style={{
+                color: '#FFFFFF',
+                fontSize: 13,
+              }}>
+              {'Full version'}
+            </Text>
+          </Container>
+          <Container
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              backgroundColor: '#9C79C9',
+              borderColor: '#00000008',
+              borderRadius: 16,
+              borderWidth: 1,
+              paddingVertical: 16,
+            }}>
+            <Text
+              style={{
+                color: '#FFFFFF',
+                fontSize: 13,
+              }}>
+              {'Short version'}
+            </Text>
+          </Container>
+        </Container>
       </Container>
       {renderWorkingListing()}
     </>

@@ -1,10 +1,10 @@
 import GradientBackground from '@/components/atoms/GradientBackground';
-import HomeIndexPage from '../home';
+import TextContainer from '@/components/atoms/TextContainer';
 
-export default function TabOneScreen() {
+export default function PublicScreen() {
   return (
     <GradientBackground>
-      <HomeIndexPage />
+      <TextContainer data={'dafsd'} />
     </GradientBackground>
   );
 }

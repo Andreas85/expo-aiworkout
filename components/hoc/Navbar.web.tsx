@@ -4,26 +4,51 @@ import { tailwind } from '@/utils/tailwind';
 import { ActionButton } from '../atoms/ActionButton';
 import { Image, ScrollView } from 'react-native';
 import { IMAGES } from '@/utils/images';
+import { useAuthStore } from '@/store/authStore';
 
 const Navbar = () => {
+  const activeClass = 'border-2 border-x-0 border-t-0 border-b-WORKOUT_PURPLE';
+  const { isAuthenticated } = useAuthStore();
+
+  const renderActionButtonAndLinks = () => {
+    if (isAuthenticated) {
+      return <ActionButton label={'Sign in'} onPress={() => router.push('/signin')} />;
+    }
+    return (
+      <div className="flex items-center justify-between gap-24">
+        <div
+          className={`relative text-center  font-normal leading-[30px] tracking-[0] text-white [font-family:'Inter-Regular',Helvetica] ${activeClass}`}>
+          My Exercise
+        </div>
+        <div className="relative   text-center  font-normal leading-[30px] tracking-[0] text-white [font-family:'Inter-Regular',Helvetica]">
+          Workout Session
+        </div>
+        <div className="relative  text-center  font-normal leading-[30px] tracking-[0] text-white [font-family:'Inter-Regular',Helvetica]">
+          Profile
+        </div>
+      </div>
+    );
+  };
   return (
     <>
+      <div
+        className={
+          'fixed left-0 right-0 top-0 z-50 mb-36 flex h-24 flex-row items-center justify-between gap-4 bg-NAVBAR_BACKGROUND px-4 lg:px-32'
+        }>
+        <span>
+          <Link href="/">
+            <Image
+              source={IMAGES.logo}
+              style={tailwind('aspect-video h-16 w-20 w-auto md:h-auto')}
+            />
+          </Link>
+        </span>
+        {renderActionButtonAndLinks()}
+      </div>
       <ScrollView>
-        <div
-          className={
-            'flex h-24 flex-row items-center justify-between gap-4 bg-NAVBAR_BACKGROUND px-4 lg:px-32'
-          }>
-          <span>
-            <Link href="/">
-              <Image
-                source={IMAGES.logo}
-                style={tailwind('aspect-video h-16 w-20 w-auto md:h-auto')}
-              />
-            </Link>
-          </span>
-          <ActionButton label={'Sign in'} onPress={() => router.push('/signin')} />
+        <div className="my-36">
+          <Slot />
         </div>
-        <Slot />
       </ScrollView>
     </>
   );

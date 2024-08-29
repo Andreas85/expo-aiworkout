@@ -6,6 +6,8 @@ module.exports = {
       colors: {
         NAVBAR_BACKGROUND: '#252425',
         WORKOUT_PURPLE: '#A27DE1',
+        WORKOUT_VERSION_BACKGROUND: '#493B42',
+        WORKOUT_VERSION_BACKGROUND_ACTIVE: '#9C79C9',
       },
     },
   },

@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
 import {
   type TouchableWithoutFeedbackProps,
-  View,
   StyleProp,
   Pressable,
   ViewStyle,
   ActivityIndicator,
+  GestureResponderEvent,
 } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { Text } from '../Themed';
+import Container from './Container';
 
 export function ActionButton({
   label,
@@ -27,7 +28,7 @@ export function ActionButton({
   uppercase?: boolean;
   labelStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
-  onPress?(): void;
+  onPress: (event?: GestureResponderEvent) => void | any;
 } & TouchableWithoutFeedbackProps) {
   return (
     <Pressable
@@ -36,12 +37,12 @@ export function ActionButton({
       disabled={disabled}
       style={hovered => [
         tailwind(
-          `h-10 flex-row items-center justify-center rounded-full bg-WORKOUT_PURPLE px-6 py-3 ${disabled ? 'bg-gray-500' : ''}`,
+          `min-h-10 flex-row items-center justify-center rounded-full bg-WORKOUT_PURPLE px-6 py-3 ${disabled ? 'bg-gray-500' : ''}`,
         ),
         hovered && tailwind(''),
         style,
       ]}>
-      <View style={tailwind('flex-row items-center')}>
+      <Container style={tailwind('flex-row items-center')}>
         {left}
         <Text
           style={[
@@ -51,7 +52,7 @@ export function ActionButton({
           ]}>
           {isLoading ? <ActivityIndicator /> : label}
         </Text>
-      </View>
+      </Container>
     </Pressable>
   );
 }
