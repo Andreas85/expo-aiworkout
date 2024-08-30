@@ -79,9 +79,9 @@ export default function HomeIndexPage() {
           </Text>
           <Container
             style={{ display: 'none' }}
-            className="bg-WORKOUT_VERSION_BACKGROUND flex w-fit items-center justify-end gap-2 rounded-full">
+            className="flex w-fit items-center justify-end gap-2 rounded-full bg-WORKOUT_VERSION_BACKGROUND">
             <Container
-              className="bg-WORKOUT_VERSION_BACKGROUND_ACTIVE min-w-fit  self-center rounded-s-full p-4"
+              className="min-w-fit self-center  rounded-s-full bg-WORKOUT_VERSION_BACKGROUND_ACTIVE p-4"
               style={{
                 flex: 1,
                 alignItems: 'center',
@@ -130,9 +130,9 @@ export default function HomeIndexPage() {
             borderRadius: 16,
             marginBottom: 2,
           }}
-          className="bg-WORKOUT_VERSION_BACKGROUND hidden w-fit items-center justify-end gap-2 rounded-full">
+          className="hidden w-fit items-center justify-end gap-2 rounded-full bg-WORKOUT_VERSION_BACKGROUND">
           <Container
-            className="bg-WORKOUT_VERSION_BACKGROUND_ACTIVE self-center  rounded-s-full p-4"
+            className="self-center rounded-s-full  bg-WORKOUT_VERSION_BACKGROUND_ACTIVE p-4"
             style={{
               flex: 1,
               alignItems: 'center',

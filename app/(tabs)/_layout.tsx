@@ -7,7 +7,8 @@ import Svg, { ClipPath, Defs, G, Path } from 'react-native-svg';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-// import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/authStore';
+import { StatusBar } from 'expo-status-bar';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -19,7 +20,7 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  // const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const renderer = () => {
     if (Platform.OS === 'web') {
       // Use a basic custom layout on web.
@@ -36,11 +37,14 @@ export default function TabLayout() {
           tabBarItemStyle: {
             marginBottom: 5,
           },
+          tabBarInactiveTintColor: '#fff',
         }}>
         <Tabs.Screen
           name="(workout)"
           options={{
             title: 'Workout',
+            headerTransparent: true,
+            headerShown: false,
             // tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 29 29" fill={color}>
@@ -61,26 +65,13 @@ export default function TabLayout() {
                 </Defs>
               </Svg>
             ),
-            headerRight: () => (
-              <Link href="/modal" asChild>
-                <Pressable>
-                  {({ pressed }) => (
-                    <FontAwesome
-                      name="info-circle"
-                      size={25}
-                      color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-              </Link>
-            ),
           }}
         />
         <Tabs.Screen
           name="my-exercise"
           options={{
             title: 'My exercise',
+            headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 18 23" fill={color}>
                 <G clipPath="url(#clip0_775_5045)">
@@ -116,6 +107,7 @@ export default function TabLayout() {
           name="workout-session"
           options={{
             title: 'Workout Session',
+            headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 27 23" fill={color}>
                 <G clipPath="url(#clip0_775_5052)">
@@ -151,7 +143,11 @@ export default function TabLayout() {
           name="profile"
           options={{
             title: 'Profile',
-
+            headerShown: false,
+            tabBarItemStyle: {
+              display: isAuthenticated ? 'flex' : 'none',
+              marginBottom: 5,
+            },
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 34 23" fill={color}>
                 <G clipPath="url(#clip0_775_5059)">
@@ -173,11 +169,21 @@ export default function TabLayout() {
           name="signin"
           options={{
             title: 'Sign in',
+            headerShown: false,
+            tabBarItemStyle: {
+              display: isAuthenticated ? 'none' : 'flex',
+              marginBottom: 5,
+            },
             tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           }}
         />
       </Tabs>
     );
   };
-  return <>{renderer()}</>;
+  return (
+    <>
+      {renderer()}
+      <StatusBar style={'auto'} />
+    </>
+  );
 }

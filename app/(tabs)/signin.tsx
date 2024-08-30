@@ -4,7 +4,7 @@ import SignInIndexPage from '../signin';
 
 const Signin = () => {
   return (
-    <GradientBackground>
+    <GradientBackground styleWeb="!p-0 lg:dynamic-height overflow-y !mt-0">
       <SignInIndexPage />
     </GradientBackground>
   );

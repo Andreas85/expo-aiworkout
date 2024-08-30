@@ -97,10 +97,10 @@ export default function MyWorkout() {
       <View
         style={Platform.select({
           native: tailwind(
-            'bg-WORKOUT_VERSION_BACKGROUND my-4 flex-row items-center justify-between rounded-2xl',
+            'my-4 flex-row items-center justify-between rounded-2xl bg-WORKOUT_VERSION_BACKGROUND',
           ),
           web: tailwind(
-            'bg-WORKOUT_VERSION_BACKGROUND my-4 ml-auto w-72 flex-row items-center justify-end rounded-2xl',
+            'my-4 ml-auto w-72 flex-row items-center justify-end rounded-2xl bg-WORKOUT_VERSION_BACKGROUND',
           ),
         })}>
         <Pressable style={tailwind('flex-1')} onPress={() => setSelectedVersion('full')}>
@@ -145,7 +145,7 @@ export default function MyWorkout() {
   return (
     <Container style={tailwind('flex-1 p-4')}>
       {renderTopHeader()}
-      {renderVersionTab()}
+      {!isAuthenticated && renderVersionTab()}
       {renderWorkingListing()}
     </Container>
   );
