@@ -1,4 +1,8 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
+import { Asset } from 'expo-asset';
+
+// Load the background image using Expo's asset management system.
+const backgroundImage = Asset.fromModule(require('../assets/images/gradient-bg.png')).uri;
 
 // This file is web-only and used to configure the root HTML for every
 // web page during static rendering.
@@ -30,7 +34,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
 const responsiveBackground = `
 body {
   background-color: #fff;
-  background-image: url('../assets/images/gradient-bg.png');
+  background-image: url('${backgroundImage}?v=1.0');
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center;

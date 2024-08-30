@@ -42,7 +42,9 @@
     "twrnc": "^4.5.1",
     "yup": "^1.4.0",
     "zustand": "^4.5.5",
-    "react-native-svg": "15.2.0"
+    "react-native-svg": "15.2.0",
+    "expo-asset": "~10.0.10",
+    "expo-updates": "~0.25.24"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
