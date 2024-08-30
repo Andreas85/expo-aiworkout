@@ -28,7 +28,9 @@ export default function Layout() {
 
             return {
               tabBarStyle: Platform.select({
-                web: tailwind('rounded-t-4 mx-auto w-72 bg-WORKOUT_VERSION_BACKGROUND capitalize'),
+                web: tailwind(
+                  'rounded-t-4 mx-auto mt-28 w-72 bg-WORKOUT_VERSION_BACKGROUND capitalize',
+                ),
                 native: {
                   backgroundColor: '#493B42', // Set the background color based on the selected tab
                   borderTopLeftRadius: 24,

@@ -24,6 +24,7 @@ const Navbar = () => {
           return (
             <Link
               href={item.path}
+              key={index}
               className={`relative text-center  font-normal leading-[30px] tracking-[0] text-white [font-family:'Inter-Regular',Helvetica] ${isActiveRoute}`}>
               {item.label}
             </Link>

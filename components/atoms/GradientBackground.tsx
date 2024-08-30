@@ -24,7 +24,7 @@ const GradientBackground = (props: IGradientBackground) => {
         }}>
         <Container
           style={[tailwind('flex-1'), styleNative]}
-          className={`mt-24 min-h-full px-4 pb-6 lg:px-32 ${styleWeb}`}>
+          className={`mt-28 min-h-full px-4 pb-6 lg:px-32 ${styleWeb}`}>
           {children}
         </Container>
       </ImageBackground>

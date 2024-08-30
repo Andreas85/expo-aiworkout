@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function WorkoutIndex() {
   return (
-    <GradientBackground>
+    <GradientBackground styleWeb="!mt-0">
       <MyWorkout />
     </GradientBackground>
   );
