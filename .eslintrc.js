@@ -9,6 +9,7 @@ module.exports = {
     'no-undef': 'off',
     'react-hooks/rules-of-hooks': 'off',
     'import/no-unresolved': 'off',
-    'no-extra-boolean-cast': 'off'
+    'no-extra-boolean-cast': 'off',
+    'import/namespace': 'off',
   },
 };

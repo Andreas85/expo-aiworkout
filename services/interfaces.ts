@@ -81,3 +81,16 @@ export interface IPayloadWorkoutSessionsUpdateFinished {
 export interface ICreateWorkoutCopy {
   id: string;
 }
+
+export interface User {
+  _id: string;
+  deleted: boolean;
+  email: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  roles: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+}

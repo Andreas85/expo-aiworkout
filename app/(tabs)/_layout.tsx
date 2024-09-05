@@ -9,6 +9,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useAuthStore } from '@/store/authStore';
 import { StatusBar } from 'expo-status-bar';
+import useBreakPoints from '@/hooks/useBreakPoints';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -21,6 +22,7 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { isAuthenticated } = useAuthStore();
+  const { isMediumScreen } = useBreakPoints();
   const renderer = () => {
     if (Platform.OS === 'web') {
       // Use a basic custom layout on web.
@@ -45,6 +47,7 @@ export default function TabLayout() {
             title: 'Workout',
             headerTransparent: true,
             headerShown: false,
+            tabBarLabelPosition: isMediumScreen ? 'below-icon' : 'beside-icon',
             // tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 29 29" fill={color}>
@@ -170,6 +173,7 @@ export default function TabLayout() {
           options={{
             title: 'Sign in',
             headerShown: false,
+            unmountOnBlur: true,
             tabBarItemStyle: {
               display: isAuthenticated ? 'none' : 'flex',
               marginBottom: 5,

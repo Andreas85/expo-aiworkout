@@ -44,7 +44,7 @@ export const getUserAndToken = async (): Promise<{
   token: string | null;
 }> => {
   try {
-    const data = await AsyncStorage.getItem('auth');
+    const data = await AsyncStorage.getItem(STORE_KEY);
     return data ? JSON.parse(data) : { user: null, token: null };
   } catch (error) {
     console.error('Failed to get user and token from AsyncStorage', error);
@@ -55,7 +55,7 @@ export const getUserAndToken = async (): Promise<{
 // Function to set user and token in AsyncStorage
 export const setUserAndToken = async (user: string, token: string): Promise<void> => {
   try {
-    await AsyncStorage.setItem('auth', JSON.stringify({ user, token }));
+    await AsyncStorage.setItem(STORE_KEY, JSON.stringify({ user, token }));
   } catch (error) {
     console.error('Failed to set user and token in AsyncStorage', error);
   }

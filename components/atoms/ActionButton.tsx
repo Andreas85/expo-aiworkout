@@ -34,7 +34,7 @@ export function ActionButton({
     <Pressable
       {...rest}
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       style={hovered => [
         tailwind(
           `min-h-10 flex-row items-center justify-center rounded-full bg-WORKOUT_PURPLE px-6 py-3 ${disabled ? 'bg-gray-500' : ''}`,
