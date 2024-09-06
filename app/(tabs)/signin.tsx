@@ -1,10 +1,10 @@
 import GradientBackground from '@/components/atoms/GradientBackground';
+import SignInIndexPage from '@/components/screens/SignInScreen';
 import React from 'react';
-import SignInIndexPage from '../signin';
 
 const Signin = () => {
   return (
-    <GradientBackground styleWeb="!p-0 lg:dynamic-height overflow-y !mt-0">
+    <GradientBackground styleWeb="!mt-0 ">
       <SignInIndexPage />
     </GradientBackground>
   );

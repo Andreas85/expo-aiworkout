@@ -6,12 +6,14 @@ import { Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { Text } from '@/components/Themed';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import useBreakPoints from '@/hooks/useBreakPoints';
 // import { useAuthStore } from '@/store/authStore';
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Layout() {
   const insets = useSafeAreaInsets();
+  const { isLargeScreen } = useBreakPoints();
   // const { isAuthenticated } = useAuthStore();
   return (
     <SafeAreaView style={[tailwind('flex-1'), { marginTop: insets.top }]}>
@@ -29,7 +31,7 @@ export default function Layout() {
             return {
               tabBarStyle: Platform.select({
                 web: tailwind(
-                  'rounded-t-4 mx-auto mt-28 w-72 bg-WORKOUT_VERSION_BACKGROUND capitalize',
+                  `rounded-t-4 mx-auto ${isLargeScreen ? '' : 'mt-16'} w-72 bg-WORKOUT_VERSION_BACKGROUND capitalize `,
                 ),
                 native: {
                   backgroundColor: '#493B42', // Set the background color based on the selected tab

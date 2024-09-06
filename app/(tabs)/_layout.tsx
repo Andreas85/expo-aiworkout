@@ -1,6 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Slot, Tabs } from 'expo-router';
+import { Link, Tabs } from 'expo-router';
 import { Platform, Pressable } from 'react-native';
 import Svg, { ClipPath, Defs, G, Path } from 'react-native-svg';
 
@@ -10,6 +10,7 @@ import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useAuthStore } from '@/store/authStore';
 import { StatusBar } from 'expo-status-bar';
 import useBreakPoints from '@/hooks/useBreakPoints';
+import { tailwind } from '@/utils/tailwind';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -22,13 +23,8 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { isAuthenticated } = useAuthStore();
-  const { isMediumScreen } = useBreakPoints();
+  const { isLargeScreen } = useBreakPoints();
   const renderer = () => {
-    if (Platform.OS === 'web') {
-      // Use a basic custom layout on web.
-      return <Slot />;
-    }
-
     return (
       <Tabs
         screenOptions={{
@@ -40,14 +36,21 @@ export default function TabLayout() {
             marginBottom: 5,
           },
           tabBarInactiveTintColor: '#fff',
+          tabBarStyle: Platform.select({
+            web: tailwind(
+              `${isLargeScreen ? '' : `bg-BACKGROUND absolute left-0 right-0 top-0 mx-auto flex  w-full flex-row items-center  justify-between ${isLargeScreen ? 'px-80' : 'px-96'}`}`,
+            ),
+            default: tailwind(''),
+          }),
         }}>
         <Tabs.Screen
           name="(workout)"
           options={{
             title: 'Workout',
             headerTransparent: true,
+            unmountOnBlur: true,
             headerShown: false,
-            tabBarLabelPosition: isMediumScreen ? 'below-icon' : 'beside-icon',
+            tabBarLabelPosition: isLargeScreen ? 'below-icon' : 'beside-icon',
             // tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 29 29" fill={color}>

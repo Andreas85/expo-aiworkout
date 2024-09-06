@@ -18,6 +18,3 @@
   @apply !h-full;
 }
 
-.signup-cover img {
-  @apply !relative  sm:!h-full !h-96;
-}
