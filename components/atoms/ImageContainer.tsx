@@ -7,7 +7,11 @@ export default function ImageContainer(props: {
   styleNative?: StyleProp<ImageStyle>;
   styleWeb?: StyleProp<ImageStyle>;
   contentFit?: ImageContentFit;
+  blurRadius?: number;
+  prefixClassWeb?: string; // used in its corresponding .web file
 }) {
-  const { source, contentFit, styleNative } = props;
-  return <Image source={source} style={styleNative} contentFit={contentFit} />;
+  const { source, contentFit, styleNative, blurRadius } = props;
+  return (
+    <Image source={source} style={styleNative} contentFit={contentFit} blurRadius={blurRadius} />
+  );
 }

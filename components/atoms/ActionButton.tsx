@@ -37,16 +37,16 @@ export function ActionButton({
       disabled={disabled || isLoading}
       style={hovered => [
         tailwind(
-          `min-h-10 flex-row items-center justify-center rounded-full bg-WORKOUT_PURPLE px-6 py-3 ${disabled ? 'bg-gray-500' : ''}`,
+          `min-h-10 flex-row items-center justify-center rounded-full bg-WORKOUT_PURPLE px-6 py-2 ${disabled ? 'bg-gray-500' : ''}`,
         ),
         hovered && tailwind(''),
         style,
       ]}>
-      <Container style={tailwind('flex-row items-center')}>
+      <Container style={tailwind('flex-row items-center gap-x-2 self-center')}>
         {left}
         <Text
           style={[
-            tailwind('text-4 font-bold leading-6 text-white'),
+            tailwind('text-4  leading-6 text-white'),
             labelStyle,
             { textTransform: uppercase ? 'uppercase' : 'capitalize' },
           ]}>

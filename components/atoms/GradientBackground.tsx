@@ -1,4 +1,4 @@
-import { ImageBackground, Platform, StyleProp, ViewStyle } from 'react-native';
+import { ImageBackground, StyleProp, ViewStyle } from 'react-native';
 import { IMAGES } from '@/utils/images';
 import Container from './Container';
 import { tailwind } from '@/utils/tailwind';
@@ -10,23 +10,20 @@ interface IGradientBackground {
 }
 
 const GradientBackground = (props: IGradientBackground) => {
-  const { children, styleNative, styleWeb } = props;
+  const { children, styleNative } = props;
 
   return (
     <>
       <ImageBackground
-        source={Platform.OS === 'web' ? '' : IMAGES.gradientBg}
-        resizeMode="cover"
+        source={IMAGES.gradientBg}
+        resizeMode="stretch"
         style={{
           flex: 1,
           width: '100%',
+          height: '100%',
           zIndex: 9999999999,
         }}>
-        <Container
-          style={[tailwind('flex-1'), styleNative]}
-          className={`mt-28 min-h-full px-4 pb-6 lg:px-32 ${styleWeb}`}>
-          {children}
-        </Container>
+        <Container style={[tailwind('flex-1'), styleNative]}>{children}</Container>
       </ImageBackground>
     </>
   );

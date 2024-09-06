@@ -1,6 +1,6 @@
 import Container from '@/components/atoms/Container';
 import GradientBackground from '@/components/atoms/GradientBackground';
-import TextContainer from '@/components/atoms/TextContainer';
+import NoDataSvg from '@/components/svgs/NoDataSvg';
 import { tailwind } from '@/utils/tailwind';
 import { ScrollView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,7 +14,7 @@ export default function MyExerciseScreen() {
         <ScrollView
           contentContainerStyle={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Container>
-            <TextContainer data={'My Exercise'} />
+            <NoDataSvg label="No exercises " />
           </Container>
         </ScrollView>
       </GradientBackground>

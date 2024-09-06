@@ -57,7 +57,6 @@ export default function SignInIndexPage() {
     },
     onError: (error: string) => {
       console.log(error, 'Erre');
-
       setResponseError(error);
     },
   });
@@ -99,7 +98,7 @@ export default function SignInIndexPage() {
       <Container
         style={[
           tailwind(
-            `h-full w-full flex-1 grow justify-center gap-y-4 self-center px-4 ${!isMediumScreen && 'px-24'}`,
+            `h-full w-full flex-1 grow justify-center gap-y-4 self-center px-4 ${!isMediumScreen && 'px-40'}`,
           ),
         ]}
         className="items-center1 flex  w-96 flex-col gap-8 ">
@@ -166,7 +165,7 @@ export default function SignInIndexPage() {
     return (
       <Container
         style={tailwind(
-          `h-full w-full flex-1 grow justify-center gap-y-4 self-center px-4 ${!isMediumScreen && 'px-24'}`,
+          `h-full w-full flex-1 grow justify-center gap-y-4 self-center px-4 ${!isMediumScreen && 'px-56'}`,
         )}
         className="items-center1 flex flex-col gap-8 lg:w-1/2">
         <TextContainer

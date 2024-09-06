@@ -82,11 +82,11 @@ export const removeUserAndToken = async (): Promise<void> => {
 // Request interceptor to add the token to headers if it exists
 axiosInstance.interceptors.request.use(
   async (config: any) => {
-    const token = await getToken();
+    const data = await getUserAndToken();
+    const { token } = data;
     if (!!token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   error => {

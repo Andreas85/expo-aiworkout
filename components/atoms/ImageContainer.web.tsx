@@ -6,7 +6,12 @@ export default function ImageContainer(props: {
   source: ImageSourcePropType;
   styleWeb?: StyleProp<ImageStyle>;
   contentFit?: ImageContentFit;
+  prefixClassWeb?: string;
 }) {
-  const { source, contentFit, styleWeb } = props;
-  return <Image source={source} style={styleWeb} contentFit={contentFit} />;
+  const { source, contentFit, styleWeb, prefixClassWeb } = props;
+  return (
+    <em className={`${prefixClassWeb}`}>
+      <Image source={source} style={styleWeb} contentFit={contentFit} />
+    </em>
+  );
 }

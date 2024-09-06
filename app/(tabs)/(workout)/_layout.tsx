@@ -31,7 +31,7 @@ export default function Layout() {
             return {
               tabBarStyle: Platform.select({
                 web: tailwind(
-                  `rounded-t-4 mx-auto ${isLargeScreen ? '' : 'mt-16'} w-72 bg-WORKOUT_VERSION_BACKGROUND capitalize `,
+                  `rounded-t-4 mx-auto ${isLargeScreen ? 'mt-4' : 'mt-16'} w-80 bg-WORKOUT_VERSION_BACKGROUND capitalize `,
                 ),
                 native: {
                   backgroundColor: '#493B42', // Set the background color based on the selected tab
@@ -51,10 +51,6 @@ export default function Layout() {
                 const { children } = props;
                 return <Text>{children}</Text>;
               },
-              // tabBarC
-              // tabBarContentContainerStyle: Platform.select({
-              //   web: tailwind('max-w-72 bg-red-600 '),
-              // }),
             };
           }}>
           <Tab.Screen
