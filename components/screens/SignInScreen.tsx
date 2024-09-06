@@ -208,6 +208,13 @@ export default function SignInIndexPage() {
                   isLoading={loginOtpPending}
                   style={tailwind('rounded-lg')}
                 />
+                {/* <Container style={tailwind('flex justify-between')}>
+                  <Container>
+                    {{ formatTimeForMinutes(timePassed) }}
+                  </Container>
+                <Container style={tailwind('')} >
+                  Resend</Container>
+                </Container> */}
               </Container>
             )}
           </Formik>
