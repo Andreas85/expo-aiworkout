@@ -58,6 +58,7 @@ export default function GridContainer(props: {
       keyExtractor={keyExtractorNative}
       columnWrapperStyle={{
         flex: 1,
+        columnGap: 20,
         justifyContent: 'space-around',
       }}
       ItemSeparatorComponent={ItemSeparator}

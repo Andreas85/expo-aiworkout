@@ -10,12 +10,10 @@ import { fetchPublicWorkoutService } from '@/services/workouts';
 import { useAuthStore } from '@/store/authStore';
 import { tailwind } from '@/utils/tailwind';
 import { useEffect, useState } from 'react';
-import { Dimensions, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { ActionButton } from '../atoms/ActionButton';
 import { AntDesign } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
-const itemWidth = width / 2 - 32; // Adjust for margins and spacing
+import { IMAGES } from '@/utils/images';
 
 export default function MyWorkout() {
   const { isAuthenticated } = useAuthStore();
@@ -41,22 +39,17 @@ export default function MyWorkout() {
 
   const renderListItem = (item: any) => {
     if (item?.isPlaceholder) {
-      return (
-        <Container style={tailwind('flex-2 mx-4')} className="self-center rounded-lg"></Container>
-      );
+      return <Container style={tailwind('flex-2')}></Container>;
     }
     return (
-      <Container style={tailwind('mx-4 flex-1 ')} className="self-center rounded-lg">
+      <Container style={tailwind('relative h-full w-full flex-1 grow self-center')}>
         <ImageContainer
-          source={{ uri: item?.image ?? 'https://placehold.co/600x400?font=roboto&text=WORKOUT' }}
-          styleNative={[
-            tailwind(`z-10 self-center rounded`),
-            { width: itemWidth, height: itemWidth },
-          ]}
-          styleWeb={tailwind('h-64 w-full self-center rounded-lg')}
+          source={IMAGES.logo}
+          styleNative={[tailwind(`z-10 aspect-video  w-full  self-center rounded`)]}
+          styleWeb={tailwind(`aspect-video w-full self-center rounded`)}
           contentFit="contain"
         />
-        <TextContainer data={item?.name} style={tailwind('self-center')} className="text-center" />
+        <TextContainer data={item?.name} style={tailwind('h-full w-full flex-1 text-center ')} />
       </Container>
     );
   };
@@ -83,11 +76,7 @@ export default function MyWorkout() {
         listNumColumnsNative={isSmallScreen ? 2 : 4}
         keyExtractorNative={item => item?._id}
         renderListItemInNative={renderListItem}
-        className="grid grid-cols-2 gap-12  md:grid-cols-3 lg:grid-cols-4">
-        {productData?.map((item: any, index: number) => {
-          return <Container key={`web_${index}`}>{renderListItem(item)}</Container>;
-        })}
-      </GridContainer>
+      />
     );
   };
 
@@ -171,7 +160,7 @@ export default function MyWorkout() {
   };
 
   return (
-    <Container style={tailwind(`flex-1 p-4 ${!isLargeScreen ? 'px-28' : ''} `)}>
+    <Container style={tailwind(`h-full w-full flex-1 p-4 ${!isLargeScreen ? 'px-28' : ''} `)}>
       {renderVersionTab()}
       {renderWorkingListing()}
     </Container>
