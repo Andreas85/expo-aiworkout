@@ -14,7 +14,7 @@ import { loginService, loginUsingOTPService } from '@/services/auth';
 import { useAuthStore } from '@/store/authStore';
 import { router } from 'expo-router';
 import useBreakPoints from '@/hooks/useBreakPoints';
-import '@/style.css';
+import '@/input.css';
 
 interface Values {
   email: string;
@@ -25,7 +25,7 @@ const validationSchema = yup.object().shape({
 });
 
 export default function SignInIndexPage() {
-  const { isMediumScreen } = useBreakPoints();
+  const { isMediumScreen, isLargeScreen } = useBreakPoints();
   const [responseError, setResponseError] = useState<string>();
   const [otpSendSuccess, setOtpSendSuccess] = useState<boolean>(false);
   // const [otpCode, setOtpCode] = useState<string>('3291');
@@ -113,7 +113,7 @@ export default function SignInIndexPage() {
           data={'Sign in to your account'}
         />
         <Formik
-          initialValues={{ email: 'saurabhshukla3107@gmail.com' }}
+          initialValues={{ email: '' }}
           validationSchema={validationSchema}
           innerRef={e => (formikRef.current = e)}
           enableReinitialize={true}
@@ -125,7 +125,9 @@ export default function SignInIndexPage() {
                 placeholder="Enter your email"
                 onChangeText={handleChange('email')}
                 errorMessage={errors?.email}
+                keyboardType="email-address"
                 placeholderTextColor={'#fff'}
+                autoCapitalize="none"
                 containerStyle={{ marginBottom: 20 }}
               />
               {responseError && (
@@ -192,6 +194,7 @@ export default function SignInIndexPage() {
                   errorMessage={errors?.otpCode}
                   placeholderTextColor={'#fff'}
                   containerStyle={{ marginBottom: 20 }}
+                  maxLength={4}
                   keyboardType="phone-pad"
                 />
                 {responseError && (
@@ -227,7 +230,7 @@ export default function SignInIndexPage() {
     <>
       <ScrollView contentContainerStyle={{ flex: 1 }}>
         <Container
-          style={[styles.containerRowView, { flexDirection: isMediumScreen ? 'column' : 'row' }]}>
+          style={[styles.containerRowView, { flexDirection: isLargeScreen ? 'column' : 'row' }]}>
           <Container style={styles.card}>
             <Image
               resizeMode="cover"

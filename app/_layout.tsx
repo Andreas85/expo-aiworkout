@@ -5,7 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import 'react-native-reanimated';
-import '../style.css';
+import '../input.css';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import Navbar from '@/components/hoc/Navbar';

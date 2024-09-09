@@ -42,13 +42,16 @@ export default function MyWorkout() {
       return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
     }
     return (
-      <Container style={tailwind('relative h-full w-full flex-1 grow self-center')}>
+      <Container style={tailwind('relative h-full w-full flex-1 grow self-center ')}>
         <ImageContainer
           source={IMAGES.logo}
-          styleNative={[tailwind(`aspect-video  w-full  self-center rounded`)]}
-          contentFit="contain"
+          styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
+          contentFit="fill"
         />
-        <TextContainer data={item?.name} style={tailwind('h-full w-full flex-1 text-center ')} />
+        <TextContainer
+          data={item?.name}
+          style={tailwind('mt-4 h-full w-full flex-1 text-center')}
+        />
       </Container>
     );
   };

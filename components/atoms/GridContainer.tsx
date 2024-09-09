@@ -16,9 +16,9 @@ export default function GridContainer(props: {
     | undefined;
   listNumColumnsNative?: number;
   className?: string; // for web styling (used in .web.tsx)
-  renderListItemInNative: (data: any) => React.ReactElement;
+  renderListItemInNative: (data: any, index: number) => React.ReactElement;
   keyExtractorNative: ((item: any, index: number) => string) | undefined;
-  refreshingNative: boolean;
+  refreshingNative?: boolean;
   onRefresh?: () => void;
 }) {
   const {
@@ -32,7 +32,8 @@ export default function GridContainer(props: {
   } = props;
   const { isMediumScreen } = useBreakPoints();
   const insets = useSafeAreaInsets();
-  const renderItem: ListRenderItem<any> = ({ item }: { item: any }) => renderListItemInNative(item);
+  const renderItem: ListRenderItem<any> = ({ item, index }: { item: any; index: number }) =>
+    renderListItemInNative(item, index);
 
   // This component is used to separate items in the list
   const ItemSeparator = () => (

@@ -28,7 +28,6 @@ export default function useWebBreakPoints() {
   const isLargeScreen = width < BREAK_POINTS.EXTRA_DEVICE;
   const isMediumScreen = width < BREAK_POINTS.LARGE_DEVICE;
   const isSmallScreen = width < BREAK_POINTS.MEDIUM_DEVICE;
-  console.log(width, 'web-width');
 
   return {
     isLargeScreen,
