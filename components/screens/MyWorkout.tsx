@@ -37,16 +37,15 @@ export default function MyWorkout() {
     }
   }, [data]);
 
-  const renderListItem = (item: any) => {
+  const renderListItem = (item: any, index: number) => {
     if (item?.isPlaceholder) {
-      return <Container style={tailwind('flex-2')}></Container>;
+      return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
     }
     return (
       <Container style={tailwind('relative h-full w-full flex-1 grow self-center')}>
         <ImageContainer
           source={IMAGES.logo}
-          styleNative={[tailwind(`z-10 aspect-video  w-full  self-center rounded`)]}
-          styleWeb={tailwind(`aspect-video w-full self-center rounded`)}
+          styleNative={[tailwind(`aspect-video  w-full  self-center rounded`)]}
           contentFit="contain"
         />
         <TextContainer data={item?.name} style={tailwind('h-full w-full flex-1 text-center ')} />
@@ -62,11 +61,15 @@ export default function MyWorkout() {
     // Ensure bracketPrediction is iterable
     const iterableProductData = Array.isArray(productData) ? productData : [];
 
-    // Check if the length of the data is odd
-    const adjustedData =
-      iterableProductData.length % 4 !== 0
-        ? [...iterableProductData, { isPlaceholder: true }]
-        : (iterableProductData as any);
+    // Calculate how many placeholders are needed to make length a multiple of 4
+    const placeholdersNeeded =
+      iterableProductData.length % 4 === 0 ? 0 : 4 - (iterableProductData.length % 4);
+
+    // Add placeholders to fill the grid evenly
+    const adjustedData = [
+      ...iterableProductData,
+      ...Array(placeholdersNeeded).fill({ isPlaceholder: true }),
+    ];
     return (
       <GridContainer
         data={adjustedData}
