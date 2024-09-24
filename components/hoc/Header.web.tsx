@@ -46,7 +46,7 @@ const Header = () => {
     <>
       <div
         className={
-          'fixed left-0 right-0 top-0 z-50 mb-36 flex h-24 flex-row items-center justify-between gap-4 bg-NAVBAR_BACKGROUND px-4 lg:px-32'
+          'fixed left-0 right-0 top-0 z-50 flex h-24 flex-row items-center justify-between gap-4 bg-NAVBAR_BACKGROUND px-4 lg:px-32'
         }>
         <span>
           <Link href="/(tabs)/(workout)/">

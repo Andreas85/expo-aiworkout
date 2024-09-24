@@ -52,7 +52,7 @@ export default function GridContainer(props: {
       ListHeaderComponent={renderListHeaderComponent}
       key={listNumColumnsNative}
       contentContainerStyle={[
-        tailwind(`${isMediumScreen ? 'gap-y-4 py-4' : 'gap-y-4 py-2 '}`),
+        tailwind(`${isMediumScreen ? 'gap-y-4 py-4 pt-0' : 'gap-y-4 py-2 pt-0'}`),
         { paddingBottom: insets.bottom },
       ]}
       renderItem={renderItem}

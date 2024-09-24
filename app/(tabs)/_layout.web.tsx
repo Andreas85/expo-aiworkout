@@ -29,7 +29,7 @@ export default function TabLayout() {
   const renderer = () => {
     return (
       <>
-        <div className={` ${isLargeScreen ? 'hidden' : 'mb-36'}`}>
+        <div className={` ${isLargeScreen ? 'hidden' : 'mb-32'}`}>
           <Header />
         </div>
         <Tabs

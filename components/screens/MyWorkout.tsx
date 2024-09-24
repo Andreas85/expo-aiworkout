@@ -141,7 +141,7 @@ export default function MyWorkout() {
   };
 
   return (
-    <Container style={tailwind(`h-full w-full flex-1 p-4 ${!isLargeScreen ? 'px-28' : ''} `)}>
+    <Container style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
       {renderVersionTab()}
       {renderWorkingListing()}
     </Container>

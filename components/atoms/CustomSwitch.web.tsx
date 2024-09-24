@@ -4,8 +4,8 @@ import { ICustomSwitch } from '@/utils/interfaces';
 const CustomSwitch = (props: ICustomSwitch) => {
   const { isEnabled, toggleSwitch, label } = props;
   return (
-    <label className="mb-2 flex cursor-pointer items-center justify-end gap-2">
-      <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{label}</span>
+    <label className="my-4 flex cursor-pointer items-center justify-end gap-2">
+      <span className="ms-3 text-sm font-medium text-gray-300">{label}</span>
       <input type="checkbox" checked={isEnabled} onChange={toggleSwitch} className="peer sr-only" />
       <div
         className={`relative h-6 w-11 rounded-full border-gray-600 
