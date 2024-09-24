@@ -19,7 +19,7 @@ export default function MyWorkout() {
   const { isAuthenticated } = useAuthStore();
   const [productData, setProductData] = useState<any[]>([]);
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
   const toggleSwitch = () => setIsEnabled(!isEnabled);
 
@@ -44,15 +44,22 @@ export default function MyWorkout() {
       return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
     }
     return (
-      <Container style={tailwind('relative h-full w-full flex-1 grow self-center ')}>
-        <ImageContainer
-          source={IMAGES.logo}
-          styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
-          contentFit="fill"
-        />
+      <Container
+        style={[
+          tailwind(
+            `relative h-full w-full flex-1 grow self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
+          ),
+        ]}>
+        {!isEnabled && (
+          <ImageContainer
+            source={IMAGES.logo}
+            styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
+            contentFit="fill"
+          />
+        )}
         <TextContainer
           data={item?.name}
-          style={tailwind('mt-4 h-full w-full flex-1 text-center')}
+          style={tailwind(` h-full w-full flex-1 grow text-center ${isEnabled ? 'my-4' : 'mt-4'}`)}
         />
       </Container>
     );
@@ -128,7 +135,7 @@ export default function MyWorkout() {
   const renderVersionTab = () => {
     return (
       <>
-        <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short version" />
+        <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short Version" />
       </>
     );
   };
