@@ -3,23 +3,25 @@ import GridContainer from '@/components/atoms/GridContainer';
 import ImageContainer from '@/components/atoms/ImageContainer';
 import Loading from '@/components/atoms/Loading';
 import TextContainer from '@/components/atoms/TextContainer';
-import { Text, View } from '@/components/Themed';
+import { Text } from '@/components/Themed';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useFetchData } from '@/hooks/useFetchData';
 import { fetchPublicWorkoutService } from '@/services/workouts';
 import { useAuthStore } from '@/store/authStore';
 import { tailwind } from '@/utils/tailwind';
 import { useEffect, useState } from 'react';
-import { Pressable } from 'react-native';
 import { ActionButton } from '../atoms/ActionButton';
 import { AntDesign } from '@expo/vector-icons';
 import { IMAGES } from '@/utils/images';
+import CustomSwitch from '../atoms/CustomSwitch';
 
 export default function MyWorkout() {
   const { isAuthenticated } = useAuthStore();
   const [productData, setProductData] = useState<any[]>([]);
-  const [selectedVersion, setSelectedVersion] = useState('full');
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  const toggleSwitch = () => setIsEnabled(!isEnabled);
 
   // Function to handle refresh action
   const onRefresh = async () => {
@@ -125,43 +127,9 @@ export default function MyWorkout() {
 
   const renderVersionTab = () => {
     return (
-      <View
-        style={tailwind(
-          `my-4 flex-row items-center justify-between rounded-2xl bg-WORKOUT_VERSION_BACKGROUND ${!isLargeScreen ? 'w-72 self-end' : ''} `,
-        )}>
-        <Pressable style={tailwind('flex-1')} onPress={() => setSelectedVersion('full')}>
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: selectedVersion === 'full' ? '#9C79C9' : 'transparent',
-              borderColor: '#00000008',
-              borderRadius: 16,
-              borderWidth: 1,
-              paddingVertical: 16,
-            }}>
-            <Text style={tailwind('text-white')}>{'Full version'}</Text>
-          </View>
-        </Pressable>
-        <Pressable style={tailwind('flex-1 grow')} onPress={() => setSelectedVersion('short')}>
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: selectedVersion === 'short' ? '#9C79C9' : 'transparent',
-              borderColor: '#00000008',
-              borderRadius: 16,
-              borderWidth: 1,
-              paddingVertical: 16,
-            }}>
-            <Text
-              style={{
-                color: '#FFFFFF',
-                fontSize: 13,
-              }}>
-              {'Short version'}
-            </Text>
-          </View>
-        </Pressable>
-      </View>
+      <>
+        <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short version" />
+      </>
     );
   };
 

@@ -1,4 +1,4 @@
-import { INavbarTabs } from './interfaces';
+import { INavbarTabs, ITabItem } from './interfaces';
 
 export const STRING_DATA = {
   SHORT_VERSION: 'Short version',
@@ -25,3 +25,23 @@ export const BREAK_POINTS = {
   LARGE_DEVICE: 1024,
   EXTRA_DEVICE: 1280,
 };
+
+export const WORKOUT_TABS: ITabItem[] = [
+  {
+    key: 'my_workout',
+    value: 'My workout',
+    path: '/',
+  },
+  {
+    key: 'public_workout',
+    value: 'Public workout',
+    path: '/public',
+  },
+];
+
+export const headerOptions: ITabItem[] = [
+  { key: 'workout', value: 'Workout', path: '/(tabs)/(workout)/' },
+  { key: 'my-exercise', value: 'My Exercise', path: '/(tabs)/my-exercise' },
+  { key: 'workout-session', value: 'Workout Session', path: '/(tabs)/workout-session' },
+  { key: 'profile', value: 'Profile', path: '/(tabs)/profile' },
+];

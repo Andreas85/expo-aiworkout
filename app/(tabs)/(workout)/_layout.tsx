@@ -31,10 +31,10 @@ export default function Layout() {
             return {
               tabBarStyle: Platform.select({
                 web: tailwind(
-                  `rounded-t-4 mx-auto ${isLargeScreen ? 'mt-4' : 'mt-16'} w-80 bg-WORKOUT_VERSION_BACKGROUND capitalize `,
+                  `rounded-t-4 mx-auto ${isLargeScreen ? 'mt-4' : ''} w-80  capitalize `,
                 ),
                 native: {
-                  backgroundColor: '#493B42', // Set the background color based on the selected tab
+                  // backgroundColor: '#493B42', // Set the background color based on the selected tab
                   borderTopLeftRadius: 24,
                   borderTopRightRadius: 24,
                   marginHorizontal: 16,

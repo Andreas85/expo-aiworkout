@@ -13,3 +13,7 @@ export const formatTimeForMinutes = (seconds: number) => {
 
   return `${formattedMinutes}:${formattedSeconds}`;
 };
+
+export function removeParenthesisString(input: any) {
+  return input.toString().replace(/\(.*?\)\//g, '');
+}
