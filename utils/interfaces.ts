@@ -16,3 +16,11 @@ export interface ICustomSwitch {
   toggleSwitch: () => void;
   label: string;
 }
+
+export interface IAddWorkoutModalProps {
+  isModalVisible: boolean;
+  headerTitle: string;
+  closeModal: () => void;
+  children: React.ReactNode;
+  footerChildren?: React.ReactNode;
+}

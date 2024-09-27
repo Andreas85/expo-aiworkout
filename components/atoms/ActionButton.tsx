@@ -20,6 +20,7 @@ export function ActionButton({
   uppercase = false,
   onPress,
   disabled,
+  isOutline = false,
   ...rest
 }: {
   label: string;
@@ -28,6 +29,7 @@ export function ActionButton({
   uppercase?: boolean;
   labelStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
+  isOutline?: boolean;
   onPress: (event?: GestureResponderEvent) => void | any;
 } & TouchableWithoutFeedbackProps) {
   return (
@@ -37,7 +39,7 @@ export function ActionButton({
       disabled={disabled || isLoading}
       style={hovered => [
         tailwind(
-          `min-h-10 flex-row items-center justify-center rounded-full bg-WORKOUT_PURPLE px-6 py-2 ${disabled ? 'bg-gray-500' : ''}`,
+          `min-h-10 flex-row items-center justify-center rounded-full ${isOutline ? 'border border-WORKOUT_PURPLE ' : 'bg-WORKOUT_PURPLE '} px-6 py-2 ${disabled ? 'bg-gray-500' : ''}`,
         ),
         hovered && tailwind(''),
         style,

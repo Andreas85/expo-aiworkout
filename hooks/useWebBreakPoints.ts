@@ -29,10 +29,22 @@ export default function useWebBreakPoints() {
   const isMediumScreen = width < BREAK_POINTS.LARGE_DEVICE;
   const isSmallScreen = width < BREAK_POINTS.MEDIUM_DEVICE;
 
+  // Calculate breakpoints based on current width
+  const isExtraLargeScreenOnly = width >= BREAK_POINTS.EXTRA_DEVICE;
+  const isLargeAndMediumScreen =
+    width >= BREAK_POINTS.LARGE_DEVICE && width < BREAK_POINTS.EXTRA_DEVICE;
+  const isMediumAndSmallScreen =
+    width >= BREAK_POINTS.MEDIUM_DEVICE && width < BREAK_POINTS.LARGE_DEVICE;
+  const isExtraSmallScreenOnly = width < BREAK_POINTS.MEDIUM_DEVICE;
+
   return {
     isLargeScreen,
     isMediumScreen,
     isSmallScreen,
+    isExtraLargeScreenOnly,
+    isLargeAndMediumScreen,
+    isMediumAndSmallScreen,
+    isExtraSmallScreenOnly,
     width, // Return the current width for debugging or further logic
   };
 }

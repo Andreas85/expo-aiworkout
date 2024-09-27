@@ -14,11 +14,14 @@ import { ActionButton } from '../atoms/ActionButton';
 import { AntDesign } from '@expo/vector-icons';
 import { IMAGES } from '@/utils/images';
 import CustomSwitch from '../atoms/CustomSwitch';
+import AddWorkoutModal from '../modals/AddWorkoutModal';
+import useModal from '@/hooks/useModal';
 
 export default function MyWorkout() {
   const { isAuthenticated } = useAuthStore();
   const [productData, setProductData] = useState<any[]>([]);
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
+  const { hideModal, showModal, openModal } = useModal();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
   const toggleSwitch = () => setIsEnabled(!isEnabled);
@@ -27,8 +30,13 @@ export default function MyWorkout() {
   const onRefresh = async () => {
     await refetch();
   };
+
+  const getFetchFunction = async () => {
+    return await fetchPublicWorkoutService();
+  };
+
   const { data, error, isPending, refetch } = useFetchData({
-    queryFn: async () => await fetchPublicWorkoutService(),
+    queryFn: getFetchFunction,
     queryKey: ['workouts'],
     staleTime: 60 * 1000,
   });
@@ -38,6 +46,10 @@ export default function MyWorkout() {
       setProductData(data?.data);
     }
   }, [data]);
+
+  const handleAddWorkout = () => {
+    showModal();
+  };
 
   const renderListItem = (item: any, index: number) => {
     if (item?.isPlaceholder) {
@@ -115,11 +127,10 @@ export default function MyWorkout() {
               </Text>
               <ActionButton
                 label={'Add Workout'}
-                onPress={() => {}}
+                onPress={handleAddWorkout}
                 style={tailwind('rounded-xl')}
                 left={<AntDesign name="pluscircleo" size={20} color="white" />}
               />
-              {/* {renderVersionTab()} */}
             </Container>
           </Container>
           <Container
@@ -141,9 +152,13 @@ export default function MyWorkout() {
   };
 
   return (
-    <Container style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
-      {renderVersionTab()}
-      {renderWorkingListing()}
-    </Container>
+    <>
+      <Container
+        style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
+        {renderVersionTab()}
+        {renderWorkingListing()}
+      </Container>
+      {openModal && <AddWorkoutModal isModalVisible={openModal} closeModal={hideModal} />}
+    </>
   );
 }
