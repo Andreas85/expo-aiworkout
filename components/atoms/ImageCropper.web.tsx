@@ -3,8 +3,6 @@ import React, { useRef } from 'react';
 import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { ActionButton } from './ActionButton';
-// import ActionButton from './ActionButton';
-
 interface ImageCropperProps {
   image: string;
   onCrop?: (croppedImage: string) => void;
@@ -32,9 +30,8 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   const renderActionButton = () => {
     return (
       <>
-        <div className="flex w-full items-center justify-between gap-2">
-          {/* // <ActionButton text="Reset" onclick={resetImage} isDeleteButton={true} /> */}
-          <ActionButton label="Show preview" onPress={handleCrop} />
+        <div className="flex w-full items-center justify-end gap-2">
+          <ActionButton onPress={handleCrop} label="Show preview" />
         </div>
       </>
     );
@@ -50,16 +47,17 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
         aspectRatio={aspectRatio}
         guides={true}
         cropBoxResizable={cropBoxResizable}
-        viewMode={2}
-        background={false}
-        autoCropArea={1}
-        checkOrientation={false}
-        responsive={true}
+        preview=".img-preview"
         ref={cropperRef}
         dragMode="move"
-        minCropBoxHeight={10}
-        minCropBoxWidth={10}
         cropBoxMovable={true}
+        viewMode={1}
+        minCropBoxHeight={200}
+        minCropBoxWidth={200}
+        background={false}
+        responsive={true}
+        autoCropArea={1}
+        checkOrientation={false} // https://github.com/fengyuanchen/cropperjs/issues/671
       />
     </div>
   );

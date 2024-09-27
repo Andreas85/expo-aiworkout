@@ -34,6 +34,7 @@ const InputImage = () => {
   };
 
   const handleCancelUpload = () => {
+    setCroppedImage(undefined);
     setImage(undefined);
   };
 
@@ -42,12 +43,16 @@ const InputImage = () => {
       return (
         <>
           <div className="mb-2 flex flex-row items-center justify-between gap-2">
-            <ActionButton label="Upload" style={tailwind('grow')} onPress={handleUpload} />
             <ActionButton
               label="Cancel"
-              style={tailwind('grow')}
+              style={tailwind('grow rounded-md ')}
               onPress={handleCancelUpload}
               isOutline={true}
+            />
+            <ActionButton
+              label="Upload"
+              style={tailwind('grow rounded-md')}
+              onPress={handleUpload}
             />
           </div>
           <img src={croppedImage} alt={'workout image'} className="m-auto aspect-square h-56" />
@@ -56,12 +61,14 @@ const InputImage = () => {
     }
     if (image) {
       return (
-        <ImageCropper
-          image={image}
-          onCrop={handleCrop}
-          resetImage={handleResetImage}
-          aspectRatio={1} // Customize aspect ratio here
-        />
+        <>
+          <ImageCropper
+            image={image}
+            onCrop={handleCrop}
+            resetImage={handleResetImage}
+            aspectRatio={1} // Customize aspect ratio here
+          />
+        </>
       );
     }
   };
@@ -79,7 +86,11 @@ const InputImage = () => {
     return (
       <>
         <div className="m-auto max-w-fit">
-          <ActionButton label="Upload" onPress={handleUploadButtonClick} />
+          <ActionButton
+            label="Upload"
+            onPress={handleUploadButtonClick}
+            style={tailwind('rounded-md')}
+          />
         </div>
       </>
     );
