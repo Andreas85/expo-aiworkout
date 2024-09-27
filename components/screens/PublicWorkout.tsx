@@ -6,23 +6,18 @@ import TextContainer from '@/components/atoms/TextContainer';
 import { Text } from '@/components/Themed';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useFetchData } from '@/hooks/useFetchData';
-import { fetchMyWorkoutService } from '@/services/workouts';
-// import { useAuthStore } from '@/store/authStore';
+import { fetchPublicWorkoutService } from '@/services/workouts';
 import { tailwind } from '@/utils/tailwind';
 import { useEffect, useState } from 'react';
-import { ActionButton } from '../atoms/ActionButton';
-import { AntDesign } from '@expo/vector-icons';
 import { IMAGES } from '@/utils/images';
 import CustomSwitch from '../atoms/CustomSwitch';
-import AddWorkoutModal from '../modals/AddWorkoutModal';
-import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { useAuthStore } from '@/store/authStore';
 
-export default function MyWorkout() {
-  // const { isAuthenticated } = useAuthStore();
+export default function PublicWorkout() {
+  const { isAuthenticated } = useAuthStore();
   const [productData, setProductData] = useState<any[]>([]);
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
-  const { hideModal, showModal, openModal } = useModal();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
   const toggleSwitch = () => setIsEnabled(!isEnabled);
@@ -34,12 +29,12 @@ export default function MyWorkout() {
 
   const getFetchFunction = async () => {
     // return await fetchPublicWorkoutService();
-    return await fetchMyWorkoutService();
+    return await fetchPublicWorkoutService();
   };
 
   const { data, error, isPending, refetch } = useFetchData({
     queryFn: getFetchFunction,
-    queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+    queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT],
     staleTime: 60 * 1000,
   });
 
@@ -48,10 +43,6 @@ export default function MyWorkout() {
       setProductData(data?.data);
     }
   }, [data]);
-
-  const handleAddWorkout = () => {
-    showModal();
-  };
 
   const renderListItem = (item: any, index: number) => {
     if (item?.isPlaceholder) {
@@ -124,14 +115,8 @@ export default function MyWorkout() {
                   `text-4 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
                 ),
               ]}>
-              List of workouts
+              {isAuthenticated ? 'List of workouts' : 'Public workouts'}
             </Text>
-            <ActionButton
-              label={'Add Workout'}
-              onPress={handleAddWorkout}
-              style={tailwind('rounded-xl')}
-              left={<AntDesign name="pluscircleo" size={20} color="white" />}
-            />
           </Container>
         </Container>
         <Container
@@ -157,7 +142,6 @@ export default function MyWorkout() {
         {renderVersionTab()}
         {renderWorkingListing()}
       </Container>
-      {openModal && <AddWorkoutModal isModalVisible={openModal} closeModal={hideModal} />}
     </>
   );
 }

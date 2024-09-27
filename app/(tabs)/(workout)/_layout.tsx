@@ -7,18 +7,17 @@ import { tailwind } from '@/utils/tailwind';
 import { Text } from '@/components/Themed';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import useBreakPoints from '@/hooks/useBreakPoints';
-// import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Layout() {
   const insets = useSafeAreaInsets();
   const { isLargeScreen } = useBreakPoints();
-  // const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   return (
     <SafeAreaView style={[tailwind('flex-1'), { marginTop: insets.top }]}>
       <Container style={[tailwind('flex-1'), { marginTop: insets.bottom }]}>
-        {/* {isAuthenticated && ( */}
         <Tab.Navigator
           sceneContainerStyle={Platform.select({
             web: tailwind('bg-transparent'),
@@ -31,7 +30,11 @@ export default function Layout() {
             return {
               tabBarStyle: Platform.select({
                 web: tailwind(
-                  `rounded-t-4 mx-auto ${isLargeScreen ? 'mt-4' : ''} w-80  capitalize `,
+                  `rounded-t-4 mx-auto 
+                  ${isLargeScreen ? 'mt-4' : ''} 
+                  w-80  capitalize 
+                  ${!isAuthenticated && 'hidden'}
+                  `,
                 ),
                 native: {
                   // backgroundColor: '#493B42', // Set the background color based on the selected tab
@@ -53,13 +56,15 @@ export default function Layout() {
               },
             };
           }}>
-          <Tab.Screen
-            name="index"
-            component={WorkoutIndex}
-            options={({ route }) => ({
-              title: 'My workouts',
-            })}
-          />
+          {isAuthenticated && (
+            <Tab.Screen
+              name="index"
+              component={WorkoutIndex}
+              options={({ route }) => ({
+                title: 'My workouts',
+              })}
+            />
+          )}
           <Tab.Screen
             name="public"
             component={PublicScreen}
@@ -68,7 +73,6 @@ export default function Layout() {
             })}
           />
         </Tab.Navigator>
-        {/* )} */}
       </Container>
     </SafeAreaView>
   );

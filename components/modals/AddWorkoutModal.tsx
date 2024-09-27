@@ -9,6 +9,7 @@ import { AppTextInput } from '../atoms/AppTextInput';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addWorkoutService } from '@/services/workouts';
 import CustomImagePicker from '../atoms/CustomImagePicker';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
 function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => void }) {
   const { isModalVisible, closeModal } = props;
@@ -20,7 +21,7 @@ function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => voi
     onSuccess: async data => {
       closeModal();
       return await queryClient.invalidateQueries({
-        queryKey: ['workouts'],
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
       });
     },
     onError: (error: string) => {

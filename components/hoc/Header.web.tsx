@@ -23,7 +23,10 @@ const Header = () => {
     return (
       <div className="flex items-center justify-between gap-24">
         {navItems.map((item: ITabItem, index) => {
-          const isActive = activeTab === removeParenthesisString(item.path).replace('//', '/');
+          let isActive =
+            activeTab === removeParenthesisString(item.path).replace('//', '/') ||
+            (item.key === 'workout' && '/public' === activeTab);
+
           return (
             <Link key={index} href={item.path} style={tailwind('text-white')}>
               <div

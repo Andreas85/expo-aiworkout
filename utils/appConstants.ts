@@ -45,3 +45,8 @@ export const headerOptions: ITabItem[] = [
   { key: 'workout-session', value: 'Workout Session', path: '/(tabs)/workout-session' },
   { key: 'profile', value: 'Profile', path: '/(tabs)/profile' },
 ];
+
+export const REACT_QUERY_API_KEYS = {
+  PUBLIC_WORKOUT: 'public-workouts',
+  MY_WORKOUT: 'my-workouts',
+};
