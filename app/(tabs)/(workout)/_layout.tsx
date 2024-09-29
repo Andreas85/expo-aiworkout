@@ -41,6 +41,7 @@ export default function Layout() {
                   borderTopLeftRadius: 24,
                   borderTopRightRadius: 24,
                   marginHorizontal: 16,
+                  display: !isAuthenticated ? 'none' : 'flex',
                 },
               }),
               tabBarIndicatorStyle: {

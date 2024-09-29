@@ -2,11 +2,16 @@ import React from 'react';
 import { Text } from '../Themed';
 import { StyleProp, TextStyle } from 'react-native';
 
-export default function TextContainer(props: {
+export default function TextContainer(ITextContainerProps: {
   data?: any;
   style?: StyleProp<TextStyle>; // for native styling
   className?: string; // for web styling (used in .web.tsx)
+  onLayout?: (event: any) => void;
 }) {
-  const { data, style } = props;
-  return <Text style={style}>{data}</Text>;
+  const { data, style, ...rest } = ITextContainerProps;
+  return (
+    <Text {...rest} style={style}>
+      {data}
+    </Text>
+  );
 }

@@ -29,7 +29,10 @@ export default function TabLayout() {
   const renderer = () => {
     return (
       <>
-        <div className={` ${isLargeScreen ? 'hidden' : 'mb-32'}`}>
+        <div
+          className={` 
+            ${isLargeScreen ? 'hidden' : `${isAuthenticated ? 'mb-32' : 'mb-24'}`}
+            `}>
           <Header />
         </div>
         <Tabs

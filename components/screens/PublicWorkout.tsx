@@ -112,7 +112,7 @@ export default function PublicWorkout() {
             <Text
               style={[
                 tailwind(
-                  `text-4 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
+                  `text-5 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
                 ),
               ]}>
               {isAuthenticated ? 'List of workouts' : 'Public workouts'}
@@ -128,17 +128,15 @@ export default function PublicWorkout() {
   };
 
   const renderVersionTab = () => {
-    return (
-      <>
-        <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short Version" />
-      </>
-    );
+    return <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short Version" />;
   };
 
   return (
     <>
       <Container
-        style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
+        style={tailwind(
+          `h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} bg-transparent`,
+        )}>
         {renderVersionTab()}
         {renderWorkingListing()}
       </Container>

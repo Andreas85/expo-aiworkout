@@ -30,7 +30,7 @@ export function ActionButton({
   labelStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
   isOutline?: boolean;
-  onPress: (event?: GestureResponderEvent) => void | any;
+  onPress?: (event?: GestureResponderEvent) => void | any;
 } & TouchableWithoutFeedbackProps) {
   return (
     <Pressable

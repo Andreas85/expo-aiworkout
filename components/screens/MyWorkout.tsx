@@ -121,7 +121,7 @@ export default function MyWorkout() {
             <Text
               style={[
                 tailwind(
-                  `text-4 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
+                  `text-5 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
                 ),
               ]}>
               List of workouts
