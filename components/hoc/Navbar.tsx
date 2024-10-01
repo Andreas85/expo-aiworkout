@@ -5,6 +5,8 @@ const Navbar = () => {
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="workout/[slug]" options={{ headerShown: false }} />
+      <Stack.Screen name="workout/public/[slug]" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
     </Stack>
   );

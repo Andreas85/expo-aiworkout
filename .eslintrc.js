@@ -11,5 +11,6 @@ module.exports = {
     'import/no-unresolved': 'off',
     'no-extra-boolean-cast': 'off',
     'import/namespace': 'off',
+    'react-hooks/exhaustive-deps': 'off',
   },
 };

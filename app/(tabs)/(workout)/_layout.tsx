@@ -1,6 +1,5 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import WorkoutIndex from '.';
-import PublicScreen from './public';
+
 import Container from '@/components/atoms/Container';
 import { Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
@@ -8,6 +7,8 @@ import { Text } from '@/components/Themed';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useAuthStore } from '@/store/authStore';
+import WorkoutIndexRoute from './workouts';
+import PublicScreenRoute from './workouts/public';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -23,7 +24,7 @@ export default function Layout() {
             web: tailwind('bg-transparent'),
             native: tailwind('flex-1 bg-transparent'),
           })}
-          initialRouteName="index"
+          // initialRouteName="workout"
           screenOptions={({ route }) => {
             // console.log(route, 'route');
 
@@ -59,16 +60,16 @@ export default function Layout() {
           }}>
           {isAuthenticated && (
             <Tab.Screen
-              name="index"
-              component={WorkoutIndex}
+              name="workouts/index"
+              component={WorkoutIndexRoute}
               options={({ route }) => ({
                 title: 'My workouts',
               })}
             />
           )}
           <Tab.Screen
-            name="public"
-            component={PublicScreen}
+            name="workouts/public"
+            component={PublicScreenRoute}
             options={({ route }) => ({
               title: 'Public workouts',
             })}

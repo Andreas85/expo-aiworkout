@@ -25,7 +25,7 @@ const Header = () => {
         {navItems.map((item: ITabItem, index) => {
           let isActive =
             activeTab === removeParenthesisString(item.path).replace('//', '/') ||
-            (item.key === 'workout' && '/public' === activeTab);
+            (item.key === 'workout' && '/workouts/public' === activeTab);
 
           return (
             <Link key={index} href={item.path} style={tailwind('text-white')}>

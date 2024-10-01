@@ -7,9 +7,9 @@ export default function Container(props: {
   style?: StyleProp<ViewStyle>; // for native styling
   className?: string; // for web styling (used in .web.tsx)
 }) {
-  const { children, style } = props;
+  const { children, style, ...rest } = props;
   return (
-    <View style={style} darkColor={'transparent'}>
+    <View style={style} darkColor={'transparent'} {...rest}>
       {children}
     </View>
   );

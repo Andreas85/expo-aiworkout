@@ -30,17 +30,17 @@ export const WORKOUT_TABS: ITabItem[] = [
   {
     key: 'my_workout',
     value: 'My workout',
-    path: '/',
+    path: '/(tabs)/(workout)/workouts',
   },
   {
     key: 'public_workout',
     value: 'Public workout',
-    path: '/public',
+    path: '/(tabs)/(workout)/workouts/public',
   },
 ];
 
 export const headerOptions: ITabItem[] = [
-  { key: 'workout', value: 'Workout', path: '/(tabs)/(workout)/' },
+  { key: 'workout', value: 'Workout', path: '/(tabs)/(workout)/workouts' },
   { key: 'my-exercise', value: 'My Exercise', path: '/(tabs)/my-exercise' },
   { key: 'workout-session', value: 'Workout Session', path: '/(tabs)/workout-session' },
   { key: 'profile', value: 'Profile', path: '/(tabs)/profile' },
@@ -49,4 +49,6 @@ export const headerOptions: ITabItem[] = [
 export const REACT_QUERY_API_KEYS = {
   PUBLIC_WORKOUT: 'public-workouts',
   MY_WORKOUT: 'my-workouts',
+  MY_WORKOUT_DETAILS: 'my-workout-details',
+  PUBLIC_WORKOUT_DETAILS: 'public-workout-details',
 };

@@ -94,3 +94,35 @@ export interface User {
   updatedAt: Date;
   __v: number;
 }
+
+export interface Workout {
+  totalDuration: number;
+  _id: string;
+  deleted: boolean;
+  name: string;
+  totalExercises: number;
+  isPublic: boolean;
+  createdBy: string;
+  exercises: ExerciseElement[];
+  createdAt: Date;
+  updatedAt: Date;
+  slug: string;
+  __v: number;
+}
+
+export interface ExerciseElement {
+  name?: string;
+  _id: string;
+  exercise: ExerciseExercise;
+  reps: number;
+  rest: number;
+  weight: number;
+  duration: number;
+  order: number;
+}
+
+export interface ExerciseExercise {
+  _id: string;
+  name: string;
+  slug: string;
+}

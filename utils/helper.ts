@@ -17,3 +17,7 @@ export const formatTimeForMinutes = (seconds: number) => {
 export function removeParenthesisString(input: any) {
   return input.toString().replace(/\(.*?\)\//g, '');
 }
+
+export const pluralise = (count: any, value: any) => {
+  return count != 1 ? `${value}s` : `${value}`;
+};

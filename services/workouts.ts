@@ -48,9 +48,9 @@ export const fetchPublicWorkoutServiceById = async (payload: IPayloadWorkoutDeta
     const { data } = await getRequest({
       API: URL,
     });
-    return data;
-  } catch (error) {
-    return error;
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 
@@ -76,9 +76,9 @@ export const getWorkoutDetailById = async (payload: IPayloadWorkoutDetail) => {
       API: URL,
     });
 
-    return data;
-  } catch (error) {
-    return error;
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 

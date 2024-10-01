@@ -17,6 +17,8 @@ import CustomSwitch from '../atoms/CustomSwitch';
 import AddWorkoutModal from '../modals/AddWorkoutModal';
 import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { router } from 'expo-router';
+import { Platform, Pressable } from 'react-native';
 
 export default function MyWorkout() {
   // const { isAuthenticated } = useAuthStore();
@@ -53,29 +55,38 @@ export default function MyWorkout() {
     showModal();
   };
 
+  const handleCardClick = (item: any) => {
+    router.push(`/workout/${item?._id}`);
+  };
+
   const renderListItem = (item: any, index: number) => {
     if (item?.isPlaceholder) {
       return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
     }
     return (
-      <Container
-        style={[
-          tailwind(
-            `relative h-full w-full flex-1 grow self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
-          ),
-        ]}>
-        {!isEnabled && (
-          <ImageContainer
-            source={IMAGES.logo}
-            styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
-            contentFit="fill"
+      <Pressable style={tailwind('flex-1')} onPress={() => handleCardClick(item)}>
+        <Container
+          style={[
+            Platform.select({ web: tailwind('cursor-pointer') }),
+            tailwind(
+              `relative h-full w-full flex-1 grow self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
+            ),
+          ]}>
+          {!isEnabled && (
+            <ImageContainer
+              source={IMAGES.logo}
+              styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
+              contentFit="fill"
+            />
+          )}
+          <TextContainer
+            data={item?.name}
+            style={tailwind(
+              ` h-full w-full flex-1 grow text-center ${isEnabled ? 'my-4' : 'mt-4'}`,
+            )}
           />
-        )}
-        <TextContainer
-          data={item?.name}
-          style={tailwind(` h-full w-full flex-1 grow text-center ${isEnabled ? 'my-4' : 'mt-4'}`)}
-        />
-      </Container>
+        </Container>
+      </Pressable>
     );
   };
 
