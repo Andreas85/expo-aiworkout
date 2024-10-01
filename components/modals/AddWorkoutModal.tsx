@@ -8,8 +8,13 @@ import { Formik } from 'formik';
 import { AppTextInput } from '../atoms/AppTextInput';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addWorkoutService } from '@/services/workouts';
-import CustomImagePicker from '../atoms/CustomImagePicker';
+// import CustomImagePicker from '../atoms/CustomImagePicker';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import * as yup from 'yup';
+
+const validationSchema = yup.object().shape({
+  workoutName: yup.string().required('Workout name is required'),
+});
 
 function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => void }) {
   const { isModalVisible, closeModal } = props;
@@ -47,12 +52,13 @@ function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => voi
         closeModal={closeModal}>
         {/* <ScrollView contentContainerStyle={{ flex: 1 }}> */}
         <Container>
-          <Container style={tailwind('')}>
+          {/* <Container style={tailwind('')}>
             <CustomImagePicker />
-          </Container>
+          </Container> */}
           <Formik
             initialValues={{ workoutName: '' }}
             enableReinitialize={true}
+            validationSchema={validationSchema}
             onSubmit={handleAddWorkout}>
             {({ handleChange, handleSubmit, values, errors, isSubmitting }: any) => (
               <Container className="w-full space-y-4" style={tailwind('gap-y-4')}>

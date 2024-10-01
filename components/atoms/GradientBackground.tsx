@@ -15,7 +15,7 @@ const GradientBackground = (props: IGradientBackground) => {
   return (
     <>
       <ImageBackground
-        source={IMAGES.gradientBg}
+        source={IMAGES.gradientBg2}
         resizeMode="stretch"
         style={{
           flex: 1,
