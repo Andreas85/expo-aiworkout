@@ -3,10 +3,13 @@ import gradientBg from '@/assets/images/gradient-bg.png';
 import signinBanner from '@/assets/images/signin-banner.png';
 import gradientBg2 from '@/assets/images/gradient-bg-2.png';
 import gradientBg3 from '@/assets/images/gradient-bg-3.png';
+import dummyWorkout from '@/assets/images/dummy-workout.jpg';
+
 export const IMAGES = {
   logo,
   gradientBg,
   signinBanner,
   gradientBg2,
   gradientBg3,
+  dummyWorkout,
 };

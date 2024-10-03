@@ -2,33 +2,52 @@ import React, { useEffect, useState } from 'react';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
-import { router, useNavigation } from 'expo-router';
+import { useNavigation } from 'expo-router';
 
 import { IMAGES } from '@/utils/images';
 import ImageContainer from '../atoms/ImageContainer';
-import { Platform, Pressable, ScrollView } from 'react-native';
+import { Platform, ScrollView } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { ExerciseElement } from '@/services/interfaces';
 import { ActionButton } from '../atoms/ActionButton';
 import { pluralise } from '@/utils/helper';
 import { Text } from '../Themed';
 import CustomSwitch from '../atoms/CustomSwitch';
-import { AntDesign } from '@expo/vector-icons';
-import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
-const WorkoutDetail = () => {
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import NoDataSvg from '../svgs/NoDataSvg';
+import BackActionButton from '../atoms/BackActionButton';
+import LabelContainer from '../atoms/LabelContainer';
+import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { ICON_SIZE } from '@/utils/appConstants';
+
+const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
+  const { isPublicWorkout = false } = props;
   const navigation = useNavigation();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+  const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  const { isLargeScreen } = useWebBreakPoints();
+  const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
+  const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   const toggleSwitch = () => setIsEnabled(!isEnabled);
+  const toggleIsCurrentWorkoutPublic = () => setIsCurrentWorkoutPublic(!isCurrentWorkoutPublic);
 
   const renderVersionTab = () => {
-    return <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short Version" />;
+    if (hasExercise && isPublicWorkout) {
+      return (
+        <CustomSwitch
+          isEnabled={isEnabled}
+          toggleSwitch={toggleSwitch}
+          label="Short Version"
+          containerStyle={[tailwind('my-0 ')]}
+        />
+      );
+    }
   };
 
   useEffect(() => {
     if (workoutDetail) {
+      setIsCurrentWorkoutPublic(workoutDetail?.isPublic);
       navigation.setOptions({ title: `Workout: ${workoutDetail.name ?? ''}`, unmountOnBlur: true });
     }
   }, [workoutDetail]);
@@ -94,13 +113,14 @@ const WorkoutDetail = () => {
 
     return (
       <Container
-        style={tailwind('flex-1 flex-row gap-4 rounded-lg bg-NAVBAR_BACKGROUND p-4')}
+        style={tailwind('flex-1 flex-row gap-4 rounded-lg bg-NAVBAR_BACKGROUND px-3 py-2')}
         key={item._id}>
         {!isEnabled && (
           <ImageContainer
-            source={IMAGES.logo}
-            styleNative={[tailwind(`aspect-video h-28 flex-1 self-center rounded-2xl`)]}
-            contentFit="fill"
+            source={IMAGES.dummyWorkout}
+            styleNative={[tailwind(`aspect-video h-28 flex-1 self-center rounded-lg`)]}
+            contentFit="cover"
+            contentPosition={'right top'}
           />
         )}
         <Container style={tailwind('flex-1 gap-4')}>
@@ -113,29 +133,132 @@ const WorkoutDetail = () => {
   };
 
   const renderWorkoutExercises = () => {
-    if (workoutDetail?.exercises.length === 0) {
+    if (!hasExercise) {
       return (
-        <TextContainer
-          data="No exercises found"
-          style={tailwind('self-center py-20 text-sm font-bold')}
-        />
+        <Container style={tailwind('flex-1')}>
+          <NoDataSvg
+            label="No exercises "
+            message={!isPublicWorkout ? 'Start building your workout' : ''}
+          />
+        </Container>
       );
     }
     return (
       <>
-        {workoutDetail?.exercises.map((item: ExerciseElement, index: number) => {
-          return (
-            <Container style={[tailwind('')]} key={item._id}>
-              {renderListItem(item, index)}
-            </Container>
-          );
-        })}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            rowGap: 20,
+          }}>
+          {workoutDetail?.exercises.map((item: ExerciseElement, index: number) => {
+            return (
+              <Container style={[tailwind('')]} key={item._id}>
+                {renderListItem(item, index)}
+              </Container>
+            );
+          })}
+        </ScrollView>
       </>
     );
   };
 
-  const handleBackClick = () => {
-    router.back();
+  const renderStartWorkoutButton = () => {
+    if (hasExercise) {
+      return (
+        <Container
+          style={[
+            Platform.select({ web: tailwind('shadow-[0_-4px_10px_4px_rgba(95,63,102,0.50)]') }),
+            tailwind('absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 '),
+          ]}>
+          <ActionButton
+            label="Start workout"
+            uppercase
+            disabled
+            style={[
+              Platform.select({
+                web: tailwind('mx-auto w-56 cursor-pointer'),
+              }),
+              tailwind('rounded-lg'),
+            ]}
+          />
+        </Container>
+      );
+    }
+  };
+
+  const renderWorkoutController = () => {
+    if (isPublicWorkout) {
+      return;
+    }
+    return (
+      <Container
+        style={[tailwind('w-full flex-row flex-wrap items-center justify-between gap-4 ')]}>
+        <LabelContainer
+          label={workoutDetail?.name ?? ''}
+          labelStyle={[
+            Platform.select({
+              native: tailwind('text-xl font-bold'),
+            }),
+          ]}
+          containerStyle={[
+            Platform.select({
+              web: tailwind(`
+                ${isLargeScreen ? 'hidden' : 'text-xl font-bold'}  
+              `),
+              native: tailwind('hidden'),
+            }),
+          ]}
+          left={<FontAwesome5 name="edit" color="#A27DE1" size={ICON_SIZE} />}
+        />
+        <CustomSwitch
+          isEnabled={isCurrentWorkoutPublic}
+          toggleSwitch={toggleIsCurrentWorkoutPublic}
+          labelStyle={[tailwind('text-xl font-bold')]}
+          label="Public"
+        />
+        <LabelContainer
+          label={'Duplicate'}
+          labelStyle={[
+            Platform.select({
+              native: tailwind('text-xl font-bold'),
+            }),
+          ]}
+          containerStyle={[
+            Platform.select({
+              web: tailwind(''),
+              // native: tailwind('flex-1'),
+            }),
+          ]}
+          left={<Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />}
+        />
+        <LabelContainer
+          label={'Delete'}
+          labelStyle={[
+            Platform.select({
+              native: tailwind('text-xl font-bold'),
+            }),
+          ]}
+          containerStyle={[
+            Platform.select({
+              web: tailwind(''),
+              // native: tailwind('flex-1'),
+            }),
+          ]}
+          left={<FontAwesome6 name="trash-can" color="#A27DE1" size={ICON_SIZE} />}
+        />
+      </Container>
+    );
+  };
+
+  const renderExcerciseLabel = () => {
+    return (
+      <>
+        <TextContainer data={`Exercises`} style={tailwind(' self-left  text-lg font-bold')} />
+        <Container
+          style={[tailwind(`mb-4 ${isPublicWorkout ? '' : 'border-[0.35px] border-white'} `)]}
+        />
+      </>
+    );
   };
 
   return (
@@ -143,67 +266,82 @@ const WorkoutDetail = () => {
       <Container
         style={[
           Platform.select({
-            web: tailwind(`${isLargeScreen ? 'px-32' : 'px-64'}`),
-            native: tailwind(''),
-          }),
-          tailwind('flex-row items-center justify-between p-4'),
-        ]}>
-        <Pressable style={tailwind('mr-auto')} onPress={handleBackClick}>
-          <AntDesign
-            name="arrowleft"
-            style={tailwind('text-11 rounded-full bg-WORKOUT_VERSION_BACKGROUND')}
-            color={'#fff'}
-          />
-        </Pressable>
-        {renderVersionTab()}
-      </Container>
-      <Container
-        style={[
-          Platform.select({
-            web: tailwind('mx-auto w-3/5'),
-            native: tailwind('p-4'),
+            web: tailwind(`mx-auto flex w-full flex-col gap-2 px-32
+                ${isLargeScreen && 'px-4'}
+              `),
+            native: tailwind('flex flex-col gap-4 p-4'),
           }),
           tailwind('flex-1'),
         ]}>
-        <TextContainer
-          data={`Workout Name: ${workoutDetail?.name}`}
-          style={tailwind('self-center pb-4 text-2xl font-bold')}
-        />
-        <TextContainer data={`Exercises`} style={tailwind(' self-left pb-4 text-lg font-bold')} />
         <Container
           style={[
             Platform.select({
-              web: tailwind('mb-16 '),
-              native: tailwind('mb-10 '),
+              web: tailwind(` pt-4`),
+              native: tailwind('space-y-4'),
             }),
-            tailwind('flex-1 pb-8'),
+            tailwind('flex-row items-center justify-between'),
           ]}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              rowGap: 20,
-            }}>
-            {renderWorkoutExercises()}
-          </ScrollView>
+          <Container style={[tailwind('flex-1 flex-row flex-wrap items-center gap-2')]}>
+            <BackActionButton />
+            <LabelContainer
+              label={workoutDetail?.name ?? ''}
+              labelStyle={[
+                Platform.select({
+                  native: tailwind('text-xl font-bold'),
+                }),
+              ]}
+              containerStyle={[
+                Platform.select({
+                  web: tailwind(`
+                    ${isLargeScreen ? 'flex-1 justify-between' : 'hidden'}  
+                  `),
+                  native: tailwind('flex-1 justify-between'),
+                }),
+              ]}
+              left={isPublicWorkout ? '' : <Feather name="edit" color="#A27DE1" size={ICON_SIZE} />}
+            />
+          </Container>
+          {!isMediumScreen && renderVersionTab()}
         </Container>
-      </Container>
-      <Container
-        style={[
-          Platform.select({ web: tailwind('shadow-[0_-4px_10px_4px_rgba(95,63,102,0.50)]') }),
-          tailwind('absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 '),
-        ]}>
-        <ActionButton
-          label="Start workout"
-          uppercase
-          disabled
+
+        {renderWorkoutController()}
+        {isPublicWorkout && isMediumScreen && renderVersionTab()}
+        {isPublicWorkout && (
+          <TextContainer
+            data={`Workout Name: ${workoutDetail?.name}`}
+            style={[
+              Platform.select({
+                web: tailwind('self-center py-4 text-2xl font-bold'),
+                native: tailwind('hidden'),
+              }),
+            ]}
+          />
+        )}
+        {!isPublicWorkout && renderExcerciseLabel()}
+        <Container
           style={[
             Platform.select({
-              web: tailwind('mx-auto w-56 cursor-pointer'),
+              web: tailwind(`
+                mx-auto w-4/5
+              ${isLargeScreen && 'w-full'}
+            `),
             }),
-            tailwind('rounded-lg'),
-          ]}
-        />
+            tailwind('flex-1'),
+          ]}>
+          {isPublicWorkout && renderExcerciseLabel()}
+          <Container
+            style={[
+              Platform.select({
+                web: tailwind('mb-16 '),
+                native: tailwind('mb-10 '),
+              }),
+              tailwind('flex-1 pb-8'),
+            ]}>
+            {renderWorkoutExercises()}
+          </Container>
+        </Container>
       </Container>
+      {renderStartWorkoutButton()}
     </Container>
   );
 };

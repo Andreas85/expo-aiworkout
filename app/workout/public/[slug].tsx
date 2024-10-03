@@ -36,7 +36,7 @@ const PublicWorkoutDetailIndex = () => {
     if (isPending) {
       return <Loading />;
     }
-    return <WorkoutDetail />;
+    return <WorkoutDetail isPublicWorkout={true} />;
   };
   return (
     <SafeAreaView style={[tailwind('flex-1')]}>

@@ -1,4 +1,5 @@
 import { Href } from 'expo-router';
+import { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 export interface INavbarTabs {
   label: string;
@@ -15,6 +16,8 @@ export interface ICustomSwitch {
   isEnabled: boolean;
   toggleSwitch: () => void;
   label: string;
+  labelStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 export interface IAddWorkoutModalProps {

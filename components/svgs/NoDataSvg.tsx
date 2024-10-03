@@ -15,7 +15,7 @@ function NoDataSvg(props: IProps) {
   const { width, height, label, message } = props;
   return (
     <>
-      <Container style={tailwind('gap-y-4')}>
+      <Container style={tailwind('h-full flex-1 items-center justify-center gap-y-4 self-center')}>
         <Svg
           style={tailwind('self-center')}
           {...props}
@@ -29,8 +29,8 @@ function NoDataSvg(props: IProps) {
           />
         </Svg>
         <Container style={tailwind('gap-y-4')}>
-          <Text>{label}</Text>
-          <Text>{message}</Text>
+          <Text style={tailwind('self-center text-lg font-semibold')}>{label}</Text>
+          <Text style={tailwind(' self-center')}>{message}</Text>
         </Container>
       </Container>
     </>
