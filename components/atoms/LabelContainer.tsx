@@ -29,7 +29,7 @@ const LabelContainer = (props: {
         containerStyle,
       ]}>
       {/* <Container style={[tailwind('flex-row items-center gap-x-2 self-center '), containerStyle]}> */}
-      <TextContainer data={label} style={[labelStyle]} />
+      <TextContainer data={label} style={[labelStyle]} numberOfLines={1} />
       {left}
       {/* </Container> */}
     </Pressable>

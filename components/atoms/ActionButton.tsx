@@ -25,6 +25,7 @@ export function ActionButton({
 }: {
   label: string;
   left?: ReactNode;
+  type?: 'button' | 'submit' | 'reset';
   isLoading?: boolean;
   uppercase?: boolean;
   labelStyle?: StyleProp<ViewStyle>;

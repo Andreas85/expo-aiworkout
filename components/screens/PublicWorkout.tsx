@@ -4,7 +4,6 @@ import ImageContainer from '@/components/atoms/ImageContainer';
 import Loading from '@/components/atoms/Loading';
 import TextContainer from '@/components/atoms/TextContainer';
 import { Text } from '@/components/Themed';
-import useBreakPoints from '@/hooks/useBreakPoints';
 import { useFetchData } from '@/hooks/useFetchData';
 import { fetchPublicWorkoutService } from '@/services/workouts';
 import { tailwind } from '@/utils/tailwind';
@@ -15,11 +14,12 @@ import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useAuthStore } from '@/store/authStore';
 import { Platform, Pressable } from 'react-native';
 import { router } from 'expo-router';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 export default function PublicWorkout() {
   const { isAuthenticated } = useAuthStore();
   const [productData, setProductData] = useState<any[]>([]);
-  const { isSmallScreen, isLargeScreen } = useBreakPoints();
+  const { isSmallScreen, isLargeScreen } = useWebBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
   const toggleSwitch = () => setIsEnabled(!isEnabled);
@@ -72,9 +72,13 @@ export default function PublicWorkout() {
           )}
           <TextContainer
             data={item?.name}
-            style={tailwind(
-              ` h-full w-full flex-1 grow text-center ${isEnabled ? 'my-4' : 'mt-4'}`,
-            )}
+            style={[
+              Platform.select({
+                web: tailwind(`${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.125rem] '}`),
+                native: tailwind('text-[0.875rem] '),
+              }),
+              tailwind(` h-full w-full flex-1 grow text-center ${isEnabled ? 'my-4' : 'mt-4'}`),
+            ]}
           />
         </Container>
       </Pressable>
@@ -122,9 +126,11 @@ export default function PublicWorkout() {
             className="flex items-center justify-between">
             <Text
               style={[
-                tailwind(
-                  `text-5 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
-                ),
+                Platform.select({
+                  web: tailwind(`${isLargeScreen ? 'text-[1.125rem]' : 'text-[2rem]'}`),
+                  native: tailwind('text-[1.125rem]'),
+                }),
+                tailwind(` text-center capitalize not-italic leading-10 text-white `),
               ]}>
               {isAuthenticated ? 'List of workouts' : 'Public workouts'}
             </Text>

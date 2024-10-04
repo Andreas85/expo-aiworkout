@@ -164,6 +164,7 @@ export default function SignInIndexPage() {
                 label={'Log in using OTP'}
                 onPress={handleSubmit}
                 isLoading={isPending}
+                type="submit"
                 style={tailwind('rounded-lg')}
               />
               <Container className="text-center" style={tailwind('flex-row self-center')}>

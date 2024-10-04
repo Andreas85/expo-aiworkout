@@ -103,7 +103,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     const renderExerciseContainer = () => {
       return (
         <>
-          <Text style={tailwind('ftont-bold text-lg font-bold')}>
+          <Text style={tailwind('ftont-bold text-lg font-bold')} numberOfLines={1}>
             {item?.exercise?.name ?? item?.name}
             {item?.weight ? `(${item?.weight} kg)` : ''}
           </Text>
@@ -133,11 +133,11 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   };
 
   const renderWorkoutExercises = () => {
-    if (!hasExercise) {
+    if (true || !hasExercise) {
       return (
         <Container style={tailwind('flex-1')}>
           <NoDataSvg
-            label="No exercises "
+            label="No exercises (Coming Soon)"
             message={!isPublicWorkout ? 'Start building your workout' : ''}
           />
         </Container>
@@ -187,9 +187,6 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   };
 
   const renderWorkoutController = () => {
-    if (isPublicWorkout) {
-      return;
-    }
     return (
       <Container
         style={[tailwind('w-full flex-row flex-wrap items-center justify-between gap-4 ')]}>
