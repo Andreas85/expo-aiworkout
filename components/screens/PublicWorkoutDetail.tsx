@@ -271,7 +271,9 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                 tailwind(
                   'absolute bottom-0 left-0 right-0 mx-auto flex-1   bg-NAVBAR_BACKGROUND p-4 shadow-[0_-4px_10px_4px_rgba(95,63,102,0.50)]',
                 ),
-                styles.DESKTOP.START_BUTTON_CONTAINER,
+                isLargeScreen
+                  ? styles.MOBILE.START_BUTTON_CONTAINER
+                  : styles.DESKTOP.START_BUTTON_CONTAINER,
               ],
               native: tailwind(
                 'absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 ',
@@ -285,7 +287,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             style={[
               Platform.select({
                 // web: tailwind('mx-auto w-56 cursor-pointer'),
-                web: styles.DESKTOP.START_BUTTON,
+                web: isLargeScreen ? styles.MOBILE.START_BUTTON : styles.DESKTOP.START_BUTTON,
                 native: tailwind('rounded-lg'),
               }),
             ]}
@@ -402,7 +404,30 @@ export default PublicWorkoutDetail;
 
 const styles = {
   MOBILE: {
-    START_BUTTON: {},
+    START_BUTTON_CONTAINER: {
+      height: '92px',
+      flexShrink: '0',
+      boxShadow: '0px -12px 24px 4px rgba(95, 63, 102, 0.50)',
+      displex: 'flex',
+      justifyContent: 'center',
+    },
+    START_BUTTON: {
+      display: 'flex',
+      height: 44,
+      paddingTop: 12,
+      paddingRight: 10,
+      paddingBottom: 12,
+      paddingLeft: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 10,
+      flexShrink: 0,
+      alignSelf: 'stretch',
+      borderTopLeftRadius: 8,
+      borderTopRightRadius: 8,
+      borderBottomRightRadius: 8,
+      borderBottomLeftRadius: 8,
+    },
   },
   DESKTOP: {
     TITLE: {
