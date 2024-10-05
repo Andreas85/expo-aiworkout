@@ -13,6 +13,7 @@ import { ActionButton } from '../atoms/ActionButton';
 import { pluralise } from '@/utils/helper';
 import { Text } from '../Themed';
 import CustomSwitch from '../atoms/CustomSwitch';
+// import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import NoDataSvg from '../svgs/NoDataSvg';
@@ -20,6 +21,12 @@ import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { ICON_SIZE } from '@/utils/appConstants';
+// import {
+//   NestableDraggableFlatList,
+//   NestableScrollContainer,
+//   RenderItemParams,
+//   ScaleDecorator,
+// } from 'react-native-draggable-flatlist';
 
 const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
@@ -132,6 +139,11 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     );
   };
 
+  // const data = [...Array(10)].map((_, index) => ({
+  //   key: `item-${index}`,
+  //   label: `Item ${index + 1}`,
+  // }));
+  // const [data1, setData1] = useState(data);
   const renderWorkoutExercises = () => {
     if (true || !hasExercise) {
       return (
@@ -147,6 +159,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
       <>
         <ScrollView
           showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
           contentContainerStyle={{
             rowGap: 20,
           }}>
@@ -157,6 +170,32 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               </Container>
             );
           })}
+          {/* <GestureHandlerRootView style={{ flex: 1 }}>
+            <NestableScrollContainer>
+              <NestableDraggableFlatList
+                data={data1}
+                renderItem={({ item, drag, isActive }: RenderItemParams<any>) => (
+                  <ScaleDecorator>
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      onLongPress={drag}
+                      disabled={isActive}
+                      style={[
+                        styles.rowItem,
+                        { backgroundColor: isActive ? 'red' : item.backgroundColor },
+                      ]}>
+                      <Text style={styles.text}>{item.text}</Text>
+                    </TouchableOpacity>
+                  </ScaleDecorator>
+                )}
+                keyExtractor={item => item.key}
+                onDragEnd={({ data }) => {
+                  console.log(data, 'Drap');
+                  setData1(data);
+                }}
+              />
+            </NestableScrollContainer>
+          </GestureHandlerRootView> */}
         </ScrollView>
       </>
     );
@@ -344,3 +383,17 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
 };
 
 export default WorkoutDetail;
+
+// const styles = StyleSheet.create({
+//   rowItem: {
+//     height: 100,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   text: {
+//     color: 'white',
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     textAlign: 'center',
+//   },
+// });

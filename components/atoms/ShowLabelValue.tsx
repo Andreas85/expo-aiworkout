@@ -9,7 +9,15 @@ const ShowLabelValue = (props: { label: string; value?: string }) => {
   const { label, value } = props;
   const { isLargeScreen } = useWebBreakPoints();
   return (
-    <Container style={tailwind('flex-1 flex-row items-start')}>
+    <Container
+      style={[
+        tailwind('w-full flex-1 flex-row items-start'),
+        Platform.select({
+          web: tailwind(
+            `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} w-full `,
+          ),
+        }),
+      ]}>
       <TextContainer
         data={label}
         style={[

@@ -25,7 +25,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const navigation = useNavigation();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
-  const [isEnabled, setIsEnabled] = useState<boolean>(true);
+  const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   const toggleSwitch = () => setIsEnabled(!isEnabled);
   const [refreshing, setRefreshing] = useState(false);
@@ -81,7 +81,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
         <Container
           style={[
             Platform.select({
-              web: tailwind(`${isLargeScreen ? 'py-1' : 'pb-3'}`),
+              web: tailwind(`${isLargeScreen ? 'py-1' : 'py-2 pb-3'}`),
               native: tailwind('py-1'),
             }),
             tailwind('flex-1 flex-row items-start justify-between gap-3 '),
@@ -241,9 +241,14 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               colors={['#ff0000', '#00ff00', '#0000ff']} // Android specific
             />
           }
-          contentContainerStyle={{
-            rowGap: 10,
-          }}>
+          contentContainerStyle={[
+            Platform.select({
+              web: tailwind(`${isLargeScreen ? 'gap-[0.5rem]' : 'gap-[1.25rem]'} `),
+              native: {
+                rowGap: 10,
+              },
+            }),
+          ]}>
           {workoutDetail?.exercises.map((item: ExerciseElement, index: number) => {
             return (
               <Container style={[tailwind('flex-1')]} key={item._id}>
@@ -261,8 +266,17 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
       return (
         <Container
           style={[
-            Platform.select({ web: tailwind('shadow-[0_-4px_10px_4px_rgba(95,63,102,0.50)]') }),
-            tailwind('absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 '),
+            Platform.select({
+              web: [
+                tailwind(
+                  'absolute bottom-0 left-0 right-0 mx-auto flex-1   bg-NAVBAR_BACKGROUND p-4 shadow-[0_-4px_10px_4px_rgba(95,63,102,0.50)]',
+                ),
+                styles.DESKTOP.START_BUTTON_CONTAINER,
+              ],
+              native: tailwind(
+                'absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 ',
+              ),
+            }),
           ]}>
           <ActionButton
             label="Start workout"
@@ -270,9 +284,10 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             disabled
             style={[
               Platform.select({
-                web: tailwind('mx-auto w-56 cursor-pointer'),
+                // web: tailwind('mx-auto w-56 cursor-pointer'),
+                web: styles.DESKTOP.START_BUTTON,
+                native: tailwind('rounded-lg'),
               }),
-              tailwind('rounded-lg'),
             ]}
           />
         </Container>
@@ -288,9 +303,9 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             data={`Exercises`}
             style={[
               Platform.select({
-                web: tailwind(
-                  `${isLargeScreen ? 'text-[1rem] ' : 'mb-4  text-[2rem] not-italic'} font-bold`,
-                ),
+                web: isLargeScreen
+                  ? tailwind('self-left text-[1rem]')
+                  : styles.DESKTOP.EXERCISES_TITLE,
                 native: tailwind(' self-left  text-[1rem] font-bold'),
               }),
             ]}
@@ -341,9 +356,14 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
         {!isLargeScreen && (
           <TextContainer
             data={'Workout Name: ' + workoutDetail?.name}
-            style={tailwind(
-              ' mb-4  self-center text-center text-[2rem] font-bold not-italic leading-[150%]',
-            )}
+            style={[
+              Platform.select({
+                web: styles.DESKTOP.TITLE,
+                native: tailwind(
+                  ' mb-4  self-center text-center text-[2rem] font-bold not-italic leading-[150%]',
+                ),
+              }),
+            ]}
             numberOfLines={1}
           />
         )}
@@ -355,7 +375,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             Platform.select({
               web: tailwind(`
                 mx-auto 
-              ${isLargeScreen ? 'w-full' : 'w-[56rem]'}
+              ${isLargeScreen ? 'w-full' : 'h-[12.4375rem] w-[56rem]'}
             `),
             }),
             tailwind('flex-1'),
@@ -379,3 +399,56 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
 };
 
 export default PublicWorkoutDetail;
+
+const styles = {
+  MOBILE: {
+    START_BUTTON: {},
+  },
+  DESKTOP: {
+    TITLE: {
+      color: '#FFF',
+      textAlign: 'center',
+      fontSize: '32px',
+      fontStyle: 'normal',
+      fontWeight: '700',
+      lineHeight: '150%',
+    },
+    EXERCISES_TITLE: {
+      color: '#FFF',
+      textAlign: 'left',
+      fontSize: '32px',
+      fontStyle: 'normal',
+      fontWeight: '700',
+      lineHeight: '150%',
+    },
+    START_BUTTON: {
+      display: 'flex',
+      width: '23.0625rem',
+      height: '3.6875rem',
+      paddingTop: '0.75rem',
+      paddingRight: '0.625rem',
+      paddingBottom: '0.75rem',
+      paddingLeft: '0.625rem',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '0.625rem',
+      flexShrink: 0,
+      borderTopLeftRadius: '1rem',
+      borderTopRightRadius: '1rem',
+      borderBottomRightRadius: '1rem',
+      borderBottomLeftRadius: '1rem',
+    },
+    START_BUTTON_CONTAINER: {
+      display: 'flex',
+      height: '7.5rem',
+      paddingTop: '1.9375rem',
+      paddingRight: '0rem',
+      paddingBottom: '1.875rem',
+      paddingLeft: '0rem',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexShrink: 0,
+      boxShadow: '0px -12px 24px 4px rgba(95, 63, 102, 0.50)',
+    },
+  },
+};

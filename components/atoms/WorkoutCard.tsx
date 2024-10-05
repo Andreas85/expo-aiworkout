@@ -17,10 +17,10 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
     <Container
       style={[
         Platform.select({
-          web: tailwind(`${isLargeScreen ? 'gap-4' : ' gap-[4.5rem]'}`),
-          native: tailwind(' flex-1  gap-4'),
+          web: [isLargeScreen ? styles.MOBILE.cardContainer : styles.DESKTOP.cardContainer],
+          native: tailwind(' flex-1  gap-4 p-2 px-4'),
         }),
-        tailwind('flex-row rounded-lg bg-NAVBAR_BACKGROUND p-2 px-4'),
+        tailwind(' flex-row rounded-lg bg-NAVBAR_BACKGROUND '),
       ]}
       key={item._id}>
       {!isEnabled && (
@@ -28,10 +28,12 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
           source={IMAGES.dummyWorkout}
           styleNative={[
             Platform.select({
-              web: tailwind(`${isLargeScreen ? 'h-28' : 'shrink-0; h-[9.9375rem] w-[21.1875rem]'}`),
-              native: tailwind(''),
+              web: tailwind(
+                `${isLargeScreen ? 'h-[4.875rem] w-[8.1875rem]' : 'h-[9.9375rem] w-[21.1875rem] shrink-0'} flex-1.5 aspect-video rounded-lg`,
+              ),
+              native: tailwind('flex-1.5 aspect-video self-center rounded-lg'),
             }),
-            tailwind(`flex-1.5 aspect-video self-center rounded-lg`),
+            // tailwind(`flex-1.5 aspect-video self-center rounded-lg`),
           ]}
           contentFit="cover"
           contentPosition={'right top'}
@@ -40,37 +42,128 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
       <Container
         style={[
           Platform.select({
-            web: tailwind(),
+            // web: tailwind(
+            //   ` ${isLargeScreen ? styles.MOBILE.cardDetails : styles.MOBILE.cardDetails}`,
+            // ),
+            web: isLargeScreen ? styles.MOBILE.cardDetails : styles.DESKTOP.cardDetails,
             native: tailwind(''),
           }),
-          tailwind('flex-2 '),
+          tailwind('flex-2'),
         ]}>
-        <Container style={tailwind('h-full flex-1 flex-col justify-between')}>
-          <Container style={tailwind('flex-1 flex-row items-start')}>
-            <Text
-              style={[
-                Platform.select({
-                  web: tailwind(
-                    `${isLargeScreen ? 'text-[1rem]' : 'text-[1.625rem] font-bold not-italic'}`,
-                  ),
-                  native: tailwind('text-[1rem] font-extrabold'),
-                }),
-                tailwind('flex-1 items-center font-bold'),
-              ]}
-              numberOfLines={1}>
-              {item?.exercise?.name ?? item?.name}
-              {item?.weight ? `(${item?.weight} kg)` : ''}
-            </Text>
-          </Container>
+        {/* <Container
+          style={[
+            Platform.select({
+              web: tailwind(
+                `${!isLargeScreen ? styles.MOBILE.cardDetails : 'h-[8.3475rem] flex-col justify-between gap-[1.25rem]'}`,
+              ),
+              native: tailwind(`h-full flex-1 flex-col justify-between`),
+            }),
+          ]}> */}
+        <Container
+          style={[
+            Platform.select({
+              web: tailwind(`flex-1 flex-row items-center ${isLargeScreen ? '' : ''}`),
+              native: tailwind('flex-1 flex-row items-start'),
+            }),
+          ]}>
+          <Text
+            style={[
+              Platform.select({
+                web: tailwind(
+                  styles.customLineClamp +
+                    ' ' +
+                    `${isLargeScreen ? 'line-clamp-1 text-[1rem]' : 'text-[1.625rem] font-bold not-italic'} font-inter`,
+                ),
+                native: tailwind('text-[1rem] font-extrabold'),
+              }),
+              {
+                fontWeight: '700',
+              },
+            ]}
+            numberOfLines={1}>
+            {`${item?.exercise?.name || item?.name}${item?.weight ? ` (${item?.weight} kg)` : ''}`}
+          </Text>
+        </Container>
+        <Container
+          style={[
+            Platform.select({
+              web: isLargeScreen ? styles.MOBILE.labelValue : styles.DESKTOP.labelValue,
+              native: tailwind('flex-1 '),
+            }),
+          ]}>
           <ShowLabelValue label="No. of Reps" value={`${item?.reps ? item?.reps : '-'}`} />
           <ShowLabelValue
             label="Rest"
             value={`${item?.rest ? pluralise(item?.rest, `${item?.rest} second`) : '-'}`}
           />
         </Container>
+        {/* </Container> */}
       </Container>
     </Container>
   );
 };
 
 export default WorkoutCard;
+
+const styles = {
+  MOBILE: {
+    cardContainer: {
+      display: 'flex',
+      paddingVertical: '0.5rem',
+      paddingHorizontal: '0.75rem',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      alignSelf: 'stretch',
+      gap: '1rem',
+    },
+    cardDetails: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '0.5rem',
+    },
+    labelValue: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '0.25rem',
+      width: '100%',
+    },
+    image: {
+      width: '339px',
+      height: '159px',
+      flexShrink: 0,
+    },
+  },
+  DESKTOP: {
+    cardContainer: {
+      display: 'flex',
+      width: '56rem',
+      paddingLeft: '2rem',
+      paddingVertical: '1.25rem',
+      paddingRight: '6.5rem',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '4.5rem',
+    },
+    cardDetails: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '1.25rem',
+    },
+    labelValue: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '1rem',
+      width: '100%',
+    },
+  },
+  customLineClamp: {
+    overflow: 'hidden',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: 1,
+  },
+};

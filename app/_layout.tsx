@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import 'react-native-reanimated';
 import '../input.css';
+// import { enableLegacyWebImplementation } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import Navbar from '@/components/hoc/Navbar';
@@ -17,6 +18,7 @@ export {
   ErrorBoundary,
 } from 'expo-router';
 
+// enableLegacyWebImplementation(true);
 function onAppStateChange(status: AppStateStatus) {
   // React Query already supports in web browser refetch on window focus by default
   if (Platform.OS !== 'web') {
@@ -30,7 +32,6 @@ export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
