@@ -82,14 +82,16 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           style={[
             Platform.select({
               web: tailwind(`${isLargeScreen ? 'py-1' : 'py-2 pb-3'}`),
-              native: tailwind('py-1'),
+              native: tailwind('justify-between gap-3 py-1  '),
             }),
-            tailwind('flex-1 flex-row items-start justify-between gap-3 '),
+            tailwind('flex-1 flex-row items-start '),
           ]}>
           <Text
             style={[
               Platform.select({
-                web: tailwind(`${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.375rem]'} flex-1`),
+                web: tailwind(
+                  `${isLargeScreen ? 'w-[55%] text-[0.875rem]' : 'w-[56%] text-[1.375rem]'} ps-[2px]`,
+                ),
                 native: tailwind('flex-1 text-[0.875rem]'),
               }),
             ]}
@@ -101,7 +103,9 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             data={`${item?.reps ? item?.reps : '-'}`}
             style={[
               Platform.select({
-                web: tailwind(`${isLargeScreen ? 'text-[0.875rem] ' : 'text-[1.375rem]'} flex-1`),
+                web: tailwind(
+                  `${isLargeScreen ? 'w-[32%] px-4 text-[0.875rem] ' : 'w-[25%] text-[1.375rem]'}`,
+                ),
                 native: tailwind('flex-1 text-[0.875rem]'),
               }),
             ]}
@@ -110,10 +114,9 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             data={`${item?.rest ? pluralise(item?.rest, `${item?.rest} second`) : '-'}`}
             style={[
               Platform.select({
-                web: tailwind(`${isLargeScreen ? 'text-[0.875rem] ' : 'text-[1.375rem]'}`),
-                native: tailwind('text-[0.875rem]'),
+                web: tailwind(`${isLargeScreen ? 'w-[30%] text-[0.875rem]' : 'text-[1.375rem]'}`),
+                native: tailwind('flex-1 text-[0.875rem]'),
               }),
-              tailwind('flex-1 text-right'),
             ]}
           />
         </Container>
@@ -160,17 +163,19 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           <Container
             style={[
               Platform.select({
-                web: tailwind(` ${isLargeScreen ? 'rounded-lg px-3 py-2 ' : 'px-[2.5rem] py-5'}  `),
-                native: tailwind(' rounded-lg  px-3 py-2'),
+                web: tailwind(
+                  ` ${isLargeScreen ? 'justify-between1 rounded-lg px-3 py-2' : ' px-[2.5rem] py-5'}  `,
+                ),
+                native: tailwind(' justify-between  rounded-lg px-3 py-2'),
               }),
-              tailwind('flex-row justify-between'),
+              tailwind('flex-row  '),
             ]}>
             <TextContainer
               data={'Exercises'}
               style={[
                 Platform.select({
                   web: tailwind(
-                    ` ${isLargeScreen ? 'text-[0.875rem]  font-bold ' : 'text-[1.5rem]'}  flex-1 `,
+                    ` ${isLargeScreen ? 'w-[47%]  text-[0.875rem] font-bold' : 'w-[56%] text-[1.5rem]'}   `,
                   ),
                   native: tailwind('flex-1 text-[0.875rem]  font-bold'),
                 }),
@@ -182,7 +187,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               style={[
                 Platform.select({
                   web: tailwind(
-                    ` ${isLargeScreen ? 'text-[0.875rem] font-bold ' : 'text-[1.5rem]'}  flex-1 `,
+                    ` ${isLargeScreen ? 'w-[35%] text-[0.875rem] font-bold' : 'text-[1.5rem]'}  w-[32%] `,
                   ),
                   native: tailwind('flex-1 text-[0.875rem]  font-bold'),
                 }),
@@ -193,10 +198,11 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               data={'Rest'}
               style={[
                 Platform.select({
-                  web: tailwind(`${isLargeScreen ? 'text-[0.875rem] font-bold' : 'text-[1.5rem]'}`),
-                  native: tailwind('text-[0.875rem] font-bold'),
+                  web: tailwind(
+                    `${isLargeScreen ? 'text-[0.875rem] font-bold ' : ' text-[1.5rem]'} `,
+                  ),
+                  native: tailwind('flex-1 text-center  text-[0.875rem] font-bold '),
                 }),
-                tailwind('flex-1  text-center '),
               ]}
               numberOfLines={1}
             />
@@ -437,6 +443,7 @@ const styles = {
       fontStyle: 'normal',
       fontWeight: '700',
       lineHeight: '150%',
+      paddingBottom: '15px',
     },
     EXERCISES_TITLE: {
       color: '#FFF',

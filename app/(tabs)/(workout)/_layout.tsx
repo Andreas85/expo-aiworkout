@@ -21,7 +21,7 @@ export default function Layout() {
       <Container style={[tailwind('flex-1'), { marginTop: insets.bottom }]}>
         <Tab.Navigator
           sceneContainerStyle={Platform.select({
-            web: tailwind('bg-transparent'),
+            web: tailwind('bg-transparent '),
             native: tailwind('flex-1 bg-transparent'),
           })}
           // initialRouteName="workout"
@@ -32,8 +32,8 @@ export default function Layout() {
               tabBarStyle: Platform.select({
                 web: tailwind(
                   `rounded-t-4 mx-auto 
-                  ${isLargeScreen ? 'mt-4' : ''} 
-                  w-80  capitalize 
+                  ${isLargeScreen ? 'mt-4' : 'mt-32'} w-80
+                    capitalize 
                   ${!isAuthenticated && 'hidden'}
                   `,
                 ),
@@ -58,15 +58,15 @@ export default function Layout() {
               },
             };
           }}>
-          {isAuthenticated && (
-            <Tab.Screen
-              name="workouts/index"
-              component={WorkoutIndexRoute}
-              options={({ route }) => ({
-                title: 'My workouts',
-              })}
-            />
-          )}
+          {/* {isAuthenticated && ( */}
+          <Tab.Screen
+            name="workouts/index"
+            component={isAuthenticated ? WorkoutIndexRoute : PublicScreenRoute}
+            options={({ route }) => ({
+              title: 'My workouts',
+            })}
+          />
+          {/* )} */}
           <Tab.Screen
             name="workouts/public"
             component={PublicScreenRoute}

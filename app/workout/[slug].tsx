@@ -9,9 +9,12 @@ import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Loading from '@/components/atoms/Loading';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { tailwind } from '@/utils/tailwind';
+import { Platform } from 'react-native';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 const WorkoutDetailIndex = () => {
   const { slug } = useLocalSearchParams();
+  const { isLargeScreen } = useWebBreakPoints();
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const { data, isPending, refetch } = useFetchData({
     queryFn: () => getWorkoutDetailById({ id: slug }),
@@ -38,7 +41,13 @@ const WorkoutDetailIndex = () => {
     return <WorkoutDetail />;
   };
   return (
-    <SafeAreaView style={[tailwind('flex-1')]}>
+    <SafeAreaView
+      style={[
+        Platform.select({
+          web: tailwind(`${!isLargeScreen ? 'mt-24' : ''} flex-1`),
+          native: tailwind('flex-1'),
+        }),
+      ]}>
       <GradientBackground>{renderWorkingDetails()}</GradientBackground>
     </SafeAreaView>
   );

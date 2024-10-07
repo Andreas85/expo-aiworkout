@@ -11,7 +11,6 @@ import { useAuthStore } from '@/store/authStore';
 import { StatusBar } from 'expo-status-bar';
 import { tailwind } from '@/utils/tailwind';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import Header from '@/components/hoc/Header.web';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -29,12 +28,6 @@ export default function TabLayout() {
   const renderer = () => {
     return (
       <>
-        <div
-          className={` 
-            ${isLargeScreen ? 'hidden' : `${isAuthenticated ? 'mb-32' : 'mb-24'}`}
-            `}>
-          <Header />
-        </div>
         <Tabs
           screenOptions={{
             tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,

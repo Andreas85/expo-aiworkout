@@ -11,6 +11,11 @@ import '../input.css';
 import { useColorScheme } from '@/components/useColorScheme';
 import Navbar from '@/components/hoc/Navbar';
 import { AppState, AppStateStatus, Platform } from 'react-native';
+import Header from '@/components/hoc/Header.web';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import Container from '@/components/atoms/Container';
+import { tailwind } from '@/utils/tailwind';
+
 // import { ToastProvider } from 'react-native-toast-notifications';
 
 export {
@@ -61,9 +66,23 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { isLargeScreen } = useWebBreakPoints();
 
   const renderRoot = () => {
-    return <Navbar />;
+    return (
+      <>
+        {Platform.OS === 'web' && !isLargeScreen ? <Header /> : null}
+        <Container
+          style={[
+            Platform.select({
+              web: tailwind('flex-1'),
+              native: tailwind('flex-1'),
+            }),
+          ]}>
+          <Navbar />
+        </Container>
+      </>
+    );
   };
 
   useEffect(() => {
