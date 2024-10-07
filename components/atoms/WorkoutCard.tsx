@@ -42,9 +42,6 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
       <Container
         style={[
           Platform.select({
-            // web: tailwind(
-            //   ` ${isLargeScreen ? styles.MOBILE.cardDetails : styles.MOBILE.cardDetails}`,
-            // ),
             web: isLargeScreen ? styles.MOBILE.cardDetails : styles.DESKTOP.cardDetails,
             native: tailwind(''),
           }),
@@ -119,7 +116,7 @@ const styles = {
     cardDetails: {
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'flex-start',
+      // alignItems: 'flex-start',
       gap: '0.5rem',
     },
     labelValue: {

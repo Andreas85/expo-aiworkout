@@ -56,20 +56,32 @@ export default function PublicWorkout() {
     }
     return (
       <Pressable style={tailwind('flex-1')} onPress={() => handleCardClick(item)}>
-        <Container
-          style={[
-            Platform.select({ web: tailwind('cursor-pointer ') }),
-            tailwind(
-              `relative h-full w-full flex-1 grow self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
-            ),
-          ]}>
-          {!isEnabled && (
+        {!isEnabled && (
+          <Container
+            style={[
+              Platform.select({ web: tailwind('cursor-pointer ') }),
+              tailwind(
+                `relative h-full w-full flex-1 grow self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
+              ),
+            ]}>
             <ImageContainer
               source={IMAGES.logo}
               styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
               contentFit="fill"
             />
-          )}
+          </Container>
+        )}
+        <Container
+          style={[
+            Platform.select({
+              web: tailwind(
+                `flex flex-col items-center  ${isEnabled && ' h-20 flex-1 rounded-lg bg-NAVBAR_BACKGROUND'} ${isLargeScreen ? 'gap-[0.625rem] px-2 py-3' : 'gap-[1.25rem]  px-5 py-7'}`,
+              ),
+              native: tailwind(
+                `flex flex-1 flex-col items-center gap-[1.25rem] px-2 py-3 ${isEnabled && ' h-20  rounded-lg bg-NAVBAR_BACKGROUND'}`,
+              ),
+            }),
+          ]}>
           <TextContainer
             data={item?.name}
             style={[
@@ -77,9 +89,22 @@ export default function PublicWorkout() {
                 web: tailwind(`${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.125rem] '}`),
                 native: tailwind('text-[0.875rem] '),
               }),
-              tailwind(` h-full w-full flex-1 grow text-center ${isEnabled ? 'my-4' : 'mt-4'}`),
             ]}
+            numberOfLines={1}
           />
+          {isEnabled && (
+            <TextContainer
+              data={item?.totalExercises + ' Exercises'}
+              style={[
+                Platform.select({
+                  web: tailwind(
+                    `text-[#C2C2C2] ${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.125rem] '}`,
+                  ),
+                  native: tailwind('text-[0.875rem] text-[#C2C2C2]'),
+                }),
+              ]}
+            />
+          )}
         </Container>
       </Pressable>
     );
