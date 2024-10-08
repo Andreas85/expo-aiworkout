@@ -90,7 +90,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             style={[
               Platform.select({
                 web: tailwind(
-                  `${isLargeScreen ? 'w-[55%] text-[0.875rem]' : 'w-[56%] text-[1.375rem]'} ps-[2px]`,
+                  `${isLargeScreen ? 'w-[47%] text-[0.875rem]' : 'w-[56%] text-[1.375rem]'} ps-[2px]`,
                 ),
                 native: tailwind('flex-1 text-[0.875rem]'),
               }),
@@ -104,7 +104,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             style={[
               Platform.select({
                 web: tailwind(
-                  `${isLargeScreen ? 'w-[32%] px-4 text-[0.875rem] ' : 'w-[25%] text-[1.375rem]'}`,
+                  `${isLargeScreen ? 'w-[32%] px-4 text-[0.875rem] ' : 'w-[24%] text-[1.375rem]'}`,
                 ),
                 native: tailwind('flex-1 text-[0.875rem]'),
               }),
@@ -146,7 +146,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     if (isEnabled) {
       return (
         <ScrollView
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -187,7 +187,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               style={[
                 Platform.select({
                   web: tailwind(
-                    ` ${isLargeScreen ? 'w-[35%] text-[0.875rem] font-bold' : 'text-[1.5rem]'}  w-[32%] `,
+                    ` ${isLargeScreen ? 'w-[27%] text-[0.875rem] font-bold' : 'w-[24%] text-[1.5rem]'}  `,
                   ),
                   native: tailwind('flex-1 text-[0.875rem]  font-bold'),
                 }),
@@ -199,7 +199,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               style={[
                 Platform.select({
                   web: tailwind(
-                    `${isLargeScreen ? 'text-[0.875rem] font-bold ' : ' text-[1.5rem]'} `,
+                    `${isLargeScreen ? 'w-[30%] text-[0.875rem] font-bold ' : ' text-[1.5rem]'} `,
                   ),
                   native: tailwind('flex-1 text-center  text-[0.875rem] font-bold '),
                 }),
@@ -238,7 +238,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     return (
       <>
         <ScrollView
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -363,7 +363,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
         </Container>
         {!isLargeScreen && (
           <TextContainer
-            data={'Workout Name: ' + workoutDetail?.name}
+            data={workoutDetail?.name}
             style={[
               Platform.select({
                 web: styles.DESKTOP.TITLE,
@@ -392,7 +392,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           <Container
             style={[
               Platform.select({
-                web: tailwind('mb-16 '),
+                web: tailwind(isLargeScreen ? 'mb-16' : 'mb-24 '),
                 native: tailwind('mb-10 '),
               }),
               tailwind('flex-1 pb-8'),
