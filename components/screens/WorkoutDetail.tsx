@@ -13,7 +13,6 @@ import { ActionButton } from '../atoms/ActionButton';
 import { pluralise } from '@/utils/helper';
 import { Text } from '../Themed';
 import CustomSwitch from '../atoms/CustomSwitch';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import NoDataSvg from '../svgs/NoDataSvg';
@@ -21,12 +20,7 @@ import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { ICON_SIZE } from '@/utils/appConstants';
-// import {
-//   NestableDraggableFlatList,
-//   NestableScrollContainer,
-//   RenderItemParams,
-//   ScaleDecorator,
-// } from 'react-native-draggable-flatlist';
+import DraggableExercises from '../molecules/DraggableExercises';
 
 const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
@@ -145,7 +139,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   // }));
   // const [data1, setData1] = useState(data);
   const renderWorkoutExercises = () => {
-    if (true || !hasExercise) {
+    if (!hasExercise) {
       return (
         <Container style={tailwind('flex-1')}>
           <NoDataSvg
@@ -157,7 +151,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     }
     return (
       <>
-        <ScrollView
+        {/* <ScrollView
           showsVerticalScrollIndicator={false}
           nestedScrollEnabled
           contentContainerStyle={{
@@ -170,33 +164,8 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               </Container>
             );
           })}
-          {/* <GestureHandlerRootView style={{ flex: 1 }}>
-            <NestableScrollContainer>
-              <NestableDraggableFlatList
-                data={data1}
-                renderItem={({ item, drag, isActive }: RenderItemParams<any>) => (
-                  <ScaleDecorator>
-                    <TouchableOpacity
-                      activeOpacity={1}
-                      onLongPress={drag}
-                      disabled={isActive}
-                      style={[
-                        styles.rowItem,
-                        { backgroundColor: isActive ? 'red' : item.backgroundColor },
-                      ]}>
-                      <Text style={styles.text}>{item.text}</Text>
-                    </TouchableOpacity>
-                  </ScaleDecorator>
-                )}
-                keyExtractor={item => item.key}
-                onDragEnd={({ data }) => {
-                  console.log(data, 'Drap');
-                  setData1(data);
-                }}
-              />
-            </NestableScrollContainer>
-          </GestureHandlerRootView> */}
-        </ScrollView>
+        </ScrollView> */}
+        <DraggableExercises exercisesData={workoutDetail?.exercises ?? []} />
       </>
     );
   };
@@ -233,6 +202,9 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           label={workoutDetail?.name ?? ''}
           labelStyle={[
             Platform.select({
+              web: tailwind(
+                `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} text-center font-bold  not-italic leading-[150%] text-white `,
+              ),
               native: tailwind('text-xl font-bold'),
             }),
           ]}
@@ -249,13 +221,23 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
         <CustomSwitch
           isEnabled={isCurrentWorkoutPublic}
           toggleSwitch={toggleIsCurrentWorkoutPublic}
-          labelStyle={[tailwind('text-xl font-bold')]}
+          labelStyle={[
+            Platform.select({
+              web: tailwind(
+                ' text-center text-xl font-normal not-italic leading-[150%] text-white',
+              ),
+              native: tailwind('text-xl font-bold'),
+            }),
+          ]}
           label="Public"
         />
         <LabelContainer
           label={'Duplicate'}
           labelStyle={[
             Platform.select({
+              web: tailwind(
+                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center font-normal  not-italic leading-[150%] text-white`,
+              ),
               native: tailwind('text-xl font-bold'),
             }),
           ]}
@@ -271,6 +253,9 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           label={'Delete'}
           labelStyle={[
             Platform.select({
+              web: tailwind(
+                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center font-normal  not-italic leading-[150%] text-white`,
+              ),
               native: tailwind('text-xl font-bold'),
             }),
           ]}
@@ -289,7 +274,15 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const renderExcerciseLabel = () => {
     return (
       <>
-        <TextContainer data={`Exercises`} style={tailwind(' self-left  text-lg font-bold')} />
+        <TextContainer
+          data={`Exercises`}
+          style={Platform.select({
+            web: tailwind(
+              `${isLargeScreen ? 'text-base' : 'text-2xl'}  font-bold capitalize not-italic leading-[150%] text-white`,
+            ),
+            native: tailwind(' self-left  text-lg font-bold'),
+          })}
+        />
         <Container
           style={[tailwind(`mb-4 ${isPublicWorkout ? '' : 'border-[0.35px] border-white'} `)]}
         />
@@ -323,6 +316,9 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               label={workoutDetail?.name ?? ''}
               labelStyle={[
                 Platform.select({
+                  web: tailwind(
+                    `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} text-center font-bold  not-italic leading-[150%] text-white `,
+                  ),
                   native: tailwind('text-xl font-bold'),
                 }),
               ]}
@@ -383,17 +379,3 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
 };
 
 export default WorkoutDetail;
-
-// const styles = StyleSheet.create({
-//   rowItem: {
-//     height: 100,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   text: {
-//     color: 'white',
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     textAlign: 'center',
-//   },
-// });

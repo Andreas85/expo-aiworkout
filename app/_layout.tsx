@@ -15,6 +15,7 @@ import Header from '@/components/hoc/Header.web';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import Container from '@/components/atoms/Container';
 import { tailwind } from '@/utils/tailwind';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // import { ToastProvider } from 'react-native-toast-notifications';
 
@@ -103,7 +104,7 @@ function RootLayoutNav() {
           dangerColor="red"
           warningColor="orange"
           normalColor="gray"> */}
-        {renderRoot()}
+        <GestureHandlerRootView style={{ flex: 1 }}>{renderRoot()}</GestureHandlerRootView>
         {/* </ToastProvider> */}
       </ThemeProvider>
     </QueryClientProvider>
