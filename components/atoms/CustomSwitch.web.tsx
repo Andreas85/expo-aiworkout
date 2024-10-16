@@ -3,12 +3,37 @@ import { ICustomSwitch } from '@/utils/interfaces';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 const CustomSwitch = (props: ICustomSwitch) => {
-  const { isEnabled, toggleSwitch, label } = props;
+  const {
+    isEnabled,
+    toggleSwitch,
+    label,
+    hasRightLabel,
+    labelRight,
+    labelStyle,
+    containerWebStyle,
+  } = props;
   const { isLargeScreen } = useWebBreakPoints();
+  const handleRightLabel = () => {
+    if (hasRightLabel) {
+      return (
+        <span
+          className={
+            `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1rem]'}  font-medium text-gray-300 ` +
+            labelStyle
+          }>
+          {labelRight}
+        </span>
+      );
+    }
+  };
   return (
-    <label className="my-4 flex cursor-pointer items-center justify-end gap-2">
+    <label
+      className={`my-4 flex cursor-pointer items-center justify-end gap-2 ` + containerWebStyle}>
       <span
-        className={`ms-3 ${isLargeScreen ? 'text-[0.875rem]' : 'text-[1rem]'}  font-medium text-gray-300`}>
+        className={
+          ` ${isLargeScreen ? 'text-[0.875rem]' : 'ms-3 text-[1rem]'}  font-medium text-gray-300 ` +
+          labelStyle
+        }>
         {label}
       </span>
       <input type="checkbox" checked={isEnabled} onChange={toggleSwitch} className="peer sr-only" />
@@ -20,6 +45,8 @@ const CustomSwitch = (props: ICustomSwitch) => {
           ${isEnabled ? 'bg-WORKOUT_PURPLE  after:translate-x-full after:border-white' : 'bg-gray-700'}
           rtl:${isEnabled ? 'after:-translate-x-full' : ''}
         `}></div>
+
+      {handleRightLabel()}
     </label>
   );
 };

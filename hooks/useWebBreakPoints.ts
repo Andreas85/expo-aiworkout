@@ -36,7 +36,7 @@ export default function useWebBreakPoints() {
   const isMediumAndSmallScreen =
     width >= BREAK_POINTS.MEDIUM_DEVICE && width < BREAK_POINTS.LARGE_DEVICE;
   const isExtraSmallScreenOnly = width < BREAK_POINTS.MEDIUM_DEVICE;
-
+  const isMobileDeviceOnly = width < BREAK_POINTS.MOBILE_DEVICE;
   return {
     isLargeScreen,
     isMediumScreen,
@@ -45,6 +45,7 @@ export default function useWebBreakPoints() {
     isLargeAndMediumScreen,
     isMediumAndSmallScreen,
     isExtraSmallScreenOnly,
+    isMobileDeviceOnly,
     width, // Return the current width for debugging or further logic
   };
 }

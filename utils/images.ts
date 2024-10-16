@@ -4,6 +4,7 @@ import signinBanner from '@/assets/images/signin-banner.png';
 import gradientBg2 from '@/assets/images/gradient-bg-2.png';
 import gradientBg3 from '@/assets/images/gradient-bg-3.png';
 import dummyWorkout from '@/assets/images/dummy-workout.jpg';
+import dragDot from '@/assets/images/drag-dot.png';
 
 export const IMAGES = {
   logo,
@@ -12,4 +13,5 @@ export const IMAGES = {
   gradientBg2,
   gradientBg3,
   dummyWorkout,
+  dragDot,
 };

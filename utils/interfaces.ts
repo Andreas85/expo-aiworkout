@@ -16,8 +16,11 @@ export interface ICustomSwitch {
   isEnabled: boolean;
   toggleSwitch: () => void;
   label: string;
-  labelStyle?: StyleProp<TextStyle>;
+  labelStyle?: StyleProp<TextStyle> | string;
   containerStyle?: StyleProp<ViewStyle>;
+  hasRightLabel?: boolean;
+  labelRight?: string;
+  containerWebStyle?: StyleProp<TextStyle> | string;
 }
 
 export interface IAddWorkoutModalProps {

@@ -21,6 +21,7 @@ import LabelContainer from '../atoms/LabelContainer';
 import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { ICON_SIZE } from '@/utils/appConstants';
 import DraggableExercises from '../molecules/DraggableExercises';
+import AppTextSingleInput from '../atoms/AppTextSingleInput';
 
 const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
@@ -29,7 +30,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
-  const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
+  const { isLargeScreen, isMediumScreen, isMobileDeviceOnly } = useWebBreakPoints();
   const toggleSwitch = () => setIsEnabled(!isEnabled);
   const toggleIsCurrentWorkoutPublic = () => setIsCurrentWorkoutPublic(!isCurrentWorkoutPublic);
 
@@ -175,8 +176,15 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
       return (
         <Container
           style={[
-            Platform.select({ web: tailwind('shadow-[0_-4px_10px_4px_rgba(95,63,102,0.50)]') }),
-            tailwind('absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 '),
+            Platform.select({
+              web: tailwind(
+                'absolute bottom-3 left-0 right-0 mx-auto flex-1  items-center justify-center self-center',
+              ),
+
+              native: tailwind(
+                'absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 ',
+              ),
+            }),
           ]}>
           <ActionButton
             label="Start workout"
@@ -184,9 +192,11 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             disabled
             style={[
               Platform.select({
-                web: tailwind('mx-auto w-56 cursor-pointer'),
+                web: tailwind(
+                  `${isLargeScreen ? 'w-full' : 'h-[3.6875rem] w-[23.0625rem]'} flex  shrink-0 items-center justify-center gap-2.5 rounded-lg px-2.5 py-3`,
+                ),
+                native: tailwind('rounded-lg'),
               }),
-              tailwind('rounded-lg'),
             ]}
           />
         </Container>
@@ -354,21 +364,41 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           style={[
             Platform.select({
               web: tailwind(`
-                mx-auto w-4/5
-              ${isLargeScreen && 'w-full'}
+                mx-auto w-full
             `),
             }),
             tailwind('flex-1'),
           ]}>
-          {isPublicWorkout && renderExcerciseLabel()}
           <Container
             style={[
               Platform.select({
-                web: tailwind('mb-16 '),
+                web: tailwind('mb-16'),
                 native: tailwind('mb-10 '),
               }),
               tailwind('flex-1 pb-8'),
             ]}>
+            <Container
+              style={[
+                Platform.select({
+                  web: tailwind(
+                    `mx-auto flex w-[44.875rem] flex-col items-start gap-2 ${isLargeScreen && 'w-full'}`,
+                  ),
+                }),
+              ]}>
+              <AppTextSingleInput
+                initialValues={{ exercise: '' }}
+                placeholder="Search exercise name"
+                fieldName={''}
+                handleSubmit={() => {}}
+                containerStyleAppTextInput={tailwind(
+                  `w-full border border-white  ${isMobileDeviceOnly ? 'bg-[#42382E]' : 'bg-[#41474A]'} px-5`,
+                )}
+                testInputStyle={tailwind(' py-4 text-left text-base font-normal')}
+                autoCapitalize="none"
+                placeholderTextColor="#fff"
+                right={<Ionicons name="search" color="#fff" size={ICON_SIZE} />}
+              />
+            </Container>
             {renderWorkoutExercises()}
           </Container>
         </Container>
