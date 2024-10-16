@@ -13,6 +13,7 @@ import { tailwind } from '@/utils/tailwind';
 
 import { Image } from 'expo-image';
 import { IMAGES } from '@/utils/images';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
 // Sortable item component
 const SortableItem: React.FC<{ id: string; item: ExerciseElement }> = ({ id, item }) => {
@@ -48,9 +49,10 @@ const SortableItem: React.FC<{ id: string; item: ExerciseElement }> = ({ id, ite
   );
 };
 
-const DraggableExercises = (props: { exercisesData: ExerciseElement[] }) => {
-  const { exercisesData } = props;
-  const [items, setItems] = useState<ExerciseElement[]>(exercisesData);
+const DraggableExercises = (props: {}) => {
+  // const { exercisesData } = props;
+  const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
+  const [items, setItems] = useState<ExerciseElement[]>(exercisesList);
 
   // Sensors to detect dragging (e.g., mouse or touch)
   const sensors = useSensors(useSensor(PointerSensor));

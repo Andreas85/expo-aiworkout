@@ -47,6 +47,9 @@ const ExerciseCard = (props: IExerciseCard) => {
               web: tailwind(
                 `mx-auto flex flex-1 flex-row items-center justify-start gap-2 self-stretch rounded-lg  bg-[#252425] p-2`,
               ),
+              native: tailwind(
+                'mb-1 flex-row items-center justify-between gap-2 rounded-lg bg-[#252425] px-1',
+              ),
             }),
           ]}>
           <Container style={tailwind(' ')}>{children}</Container>
@@ -54,17 +57,32 @@ const ExerciseCard = (props: IExerciseCard) => {
             style={[
               Platform.select({
                 web: tailwind(`flex w-full flex-1 flex-col   gap-4 `),
+                native: tailwind('flex w-full flex-1 flex-col   gap-4'),
               }),
             ]}>
             <Container
-              style={tailwind(
-                'flex  flex-1 flex-row items-center justify-between border-b border-solid border-b-[#767676] pb-1',
-              )}>
+              style={[
+                Platform.select({
+                  web: tailwind(
+                    'flex  flex-1 flex-row items-center justify-between border-b border-solid border-b-[#767676] pb-1',
+                  ),
+                  native: tailwind(
+                    ' flex-1 flex-row items-center justify-between border-b border-solid border-b-[#767676] ',
+                  ),
+                }),
+              ]}>
               <TextContainer
                 data={`${data.exercise.name}`}
-                style={tailwind(
-                  'flex-1 text-[0.9375rem] font-bold capitalize not-italic leading-5 tracking-[-0.005rem] text-white',
-                )}
+                style={[
+                  Platform.select({
+                    web: tailwind(
+                      'flex-1 text-[0.9375rem] font-bold capitalize not-italic leading-5 tracking-[-0.005rem] text-white',
+                    ),
+                    native: tailwind(
+                      'text-[0.9375rem] font-bold capitalize not-italic leading-5 tracking-[-0.005rem] text-white',
+                    ),
+                  }),
+                ]}
                 numberOfLines={1}
               />
               <Container style={tailwind('')}>
@@ -78,6 +96,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                     'text-white text-center text-[0.8125rem] not-italic font-normal leading-[150%]'
                   }
                   containerWebStyle={'gap-2 !my-0'}
+                  containerStyle={tailwind('my-0 ')}
                 />
               </Container>
             </Container>
@@ -98,7 +117,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                     // native: tailwind('flex-1'),
                   }),
                 ]}
-                left={<Ionicons name="duplicate-sharp" color="#fff" size={ICON_SIZE} />}
+                left={<Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />}
               />
               <LabelContainer
                 label={'Delete'}
@@ -116,11 +135,23 @@ const ExerciseCard = (props: IExerciseCard) => {
                     // native: tailwind('flex-1'),
                   }),
                 ]}
-                left={<Ionicons name="trash-bin" color="#fff" size={ICON_SIZE} />}
+                left={<FontAwesome6 name="trash-can" color="#A27DE1" size={ICON_SIZE} />}
               />
             </Container>
-            <Container style={tailwind('flex-1 flex-row items-center justify-between gap-2')}>
-              <Container style={tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`)}>
+            <Container
+              style={[
+                Platform.select({
+                  web: tailwind('flex-1 flex-row items-center justify-between gap-2'),
+                  native: tailwind('flex-1 flex-row items-center justify-between gap-2'),
+                }),
+              ]}>
+              <Container
+                style={[
+                  Platform.select({
+                    web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
+                    native: tailwind(`flex-1 flex-col gap-3`),
+                  }),
+                ]}>
                 <TextContainer
                   data={`Weight (kg)`}
                   style={tailwind(' text-center text-xs')}
@@ -131,7 +162,12 @@ const ExerciseCard = (props: IExerciseCard) => {
                   placeholder=""
                   fieldName={'weight'}
                   onChangeText={handleTextChange}
-                  containerStyle={tailwind('w-full self-center border-none')}
+                  containerStyle={[
+                    Platform.select({
+                      web: tailwind('w-full self-center border-none'),
+                      native: tailwind('flex-1 self-center border-none '),
+                    }),
+                  ]}
                   containerStyleAppTextInput={tailwind(`${isMobileDeviceOnly && 'w-auto'} `)}
                   keyboardType="number-pad"
                   autoCapitalize="none"
@@ -139,14 +175,21 @@ const ExerciseCard = (props: IExerciseCard) => {
                   testInputStyle={tailwind('h-[1.875rem]  px-0 py-[0.3125rem]')}
                 />
               </Container>
-              <Container style={tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`)}>
+              <Container
+                style={Platform.select({
+                  web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
+                  native: tailwind(`flex-1 flex-col gap-3`),
+                })}>
                 <TextContainer data={`Rest (sec)`} style={tailwind('flex-1 text-center text-xs')} />
                 <AppTextSingleInput
                   initialValues={{ rest: inputValues.rest }}
                   placeholder=""
                   fieldName={'rest'}
                   onChangeText={handleTextChange}
-                  containerStyle={tailwind('self-center border-none')}
+                  containerStyle={Platform.select({
+                    web: tailwind('w-full self-center border-none'),
+                    native: tailwind('flex-1 self-center border-none'),
+                  })}
                   keyboardType="number-pad"
                   containerStyleAppTextInput={tailwind(`${isMobileDeviceOnly && 'w-auto'} `)}
                   autoCapitalize="none"
@@ -154,7 +197,11 @@ const ExerciseCard = (props: IExerciseCard) => {
                   testInputStyle={tailwind('h-[1.875rem] flex-1 px-0 py-[0.3125rem]')}
                 />
               </Container>
-              <Container style={tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`)}>
+              <Container
+                style={Platform.select({
+                  web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
+                  native: tailwind(`flex-1 flex-col gap-3`),
+                })}>
                 <TextContainer
                   data={`Number of reps`}
                   style={tailwind('flex-1 text-center text-xs')}
@@ -173,7 +220,11 @@ const ExerciseCard = (props: IExerciseCard) => {
                   testInputStyle={tailwind('h-[1.875rem] flex-1 px-0 py-[0.3125rem]')}
                 />
               </Container>
-              <Container style={tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`)}>
+              <Container
+                style={Platform.select({
+                  web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
+                  native: tailwind(`flex-1 flex-col gap-3`),
+                })}>
                 <TextContainer
                   data={`Duration (sec)`}
                   style={tailwind('flex-1 text-center text-xs')}

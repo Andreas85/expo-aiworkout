@@ -6,7 +6,7 @@ import { tailwind } from '@/utils/tailwind';
 import Container from './Container';
 
 const CustomSwitch = (props: ICustomSwitch) => {
-  const { isEnabled, toggleSwitch, label, labelStyle, containerStyle } = props;
+  const { isEnabled, toggleSwitch, label, labelStyle = '', containerStyle } = props;
   return (
     <>
       <Container

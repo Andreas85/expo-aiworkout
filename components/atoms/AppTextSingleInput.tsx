@@ -13,7 +13,7 @@ interface AppTextSingleInputProps {
   placeholder: string; // Placeholder for input field
   handleSubmit?: (values: any) => void; // Submission handler
   fieldName: string; // Name of the field
-  containerStyle?: ViewStyle; // Style for the input container
+  containerStyle?: StyleProp<ViewStyle> | any; // Style for the input container
   keyboardType?: TextInputProps['keyboardType']; // Keyboard type
   autoCapitalize?: TextInputProps['autoCapitalize']; // Autocapitalize
   placeholderTextColor?: string; // Placeholder text color
@@ -71,6 +71,7 @@ const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
             containerStyle={[
               Platform.select({
                 web: tailwind('w-[6.375rem] rounded-lg bg-[#4B3E46] '),
+                native: tailwind('rounded-lg bg-[#4B3E46] '),
               }),
               containerStyleAppTextInput,
             ]}

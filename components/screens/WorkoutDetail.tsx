@@ -4,14 +4,10 @@ import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
 import { useNavigation } from 'expo-router';
 
-import { IMAGES } from '@/utils/images';
-import ImageContainer from '../atoms/ImageContainer';
-import { Platform, ScrollView } from 'react-native';
+import { Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
-import { ExerciseElement } from '@/services/interfaces';
 import { ActionButton } from '../atoms/ActionButton';
-import { pluralise } from '@/utils/helper';
-import { Text } from '../Themed';
+
 import CustomSwitch from '../atoms/CustomSwitch';
 
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
@@ -54,91 +50,6 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     }
   }, [workoutDetail]);
 
-  const renderListItem = (item: ExerciseElement, index: number) => {
-    const renderReps = () => {
-      if (!!item?.reps) {
-        return (
-          <>
-            <Container style={tailwind('flex-1 flex-row')}>
-              <TextContainer data={`No. of reps`} style={tailwind('flex-1')} />
-              <TextContainer
-                data={`${!!item?.reps ? item?.reps : '-'}`}
-                style={tailwind('flex-1')}
-              />
-            </Container>
-            <Container style={tailwind('flex-1 flex-row')}>
-              <TextContainer data={`Reps Duration`} style={tailwind('flex-1')} />
-              <TextContainer
-                data={`${!!item?.reps ? pluralise(item?.duration, `${item?.duration} second`) : '-'}`}
-                style={tailwind('flex-1')}
-              />
-            </Container>
-          </>
-        );
-      } else {
-        return (
-          <Container style={tailwind('flex-1 flex-row')}>
-            <TextContainer data={`Duration`} style={tailwind('flex-1')} />
-            <TextContainer
-              data={`${!item?.reps ? pluralise(item?.duration, `${item?.duration} second`) : '-'}`}
-              style={tailwind('flex-1')}
-            />
-          </Container>
-        );
-      }
-    };
-
-    const renderRest = () => {
-      if (item?.rest) {
-        return (
-          <Container style={tailwind('flex-1 flex-row')}>
-            <TextContainer data={`Rest`} style={tailwind('flex-1')} />
-            <TextContainer
-              data={`${item?.rest ? pluralise(item?.rest, `${item?.rest} second`) : '-'}`}
-              style={tailwind('flex-1')}
-            />
-          </Container>
-        );
-      }
-    };
-
-    const renderExerciseContainer = () => {
-      return (
-        <>
-          <Text style={tailwind('ftont-bold text-lg font-bold')} numberOfLines={1}>
-            {item?.exercise?.name ?? item?.name}
-            {item?.weight ? `(${item?.weight} kg)` : ''}
-          </Text>
-        </>
-      );
-    };
-
-    return (
-      <Container
-        style={tailwind('flex-1 flex-row gap-4 rounded-lg bg-NAVBAR_BACKGROUND px-3 py-2')}
-        key={item._id}>
-        {!isEnabled && (
-          <ImageContainer
-            source={IMAGES.dummyWorkout}
-            styleNative={[tailwind(`aspect-video h-28 flex-1 self-center rounded-lg`)]}
-            contentFit="cover"
-            contentPosition={'right top'}
-          />
-        )}
-        <Container style={tailwind('flex-1 gap-4')}>
-          {renderExerciseContainer()}
-          {renderReps()}
-          {renderRest()}
-        </Container>
-      </Container>
-    );
-  };
-
-  // const data = [...Array(10)].map((_, index) => ({
-  //   key: `item-${index}`,
-  //   label: `Item ${index + 1}`,
-  // }));
-  // const [data1, setData1] = useState(data);
   const renderWorkoutExercises = () => {
     if (!hasExercise) {
       return (
@@ -152,21 +63,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     }
     return (
       <>
-        {/* <ScrollView
-          showsVerticalScrollIndicator={false}
-          nestedScrollEnabled
-          contentContainerStyle={{
-            rowGap: 20,
-          }}>
-          {workoutDetail?.exercises.map((item: ExerciseElement, index: number) => {
-            return (
-              <Container style={[tailwind('')]} key={item._id}>
-                {renderListItem(item, index)}
-              </Container>
-            );
-          })}
-        </ScrollView> */}
-        <DraggableExercises exercisesData={workoutDetail?.exercises ?? []} />
+        <DraggableExercises />
       </>
     );
   };
@@ -383,6 +280,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                   web: tailwind(
                     `mx-auto flex w-[44.875rem] flex-col items-start gap-2 ${isLargeScreen && 'w-full'}`,
                   ),
+                  native: tailwind(`mx-auto w-full items-start gap-2 `),
                 }),
               ]}>
               <AppTextSingleInput
@@ -390,10 +288,20 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                 placeholder="Search exercise name"
                 fieldName={''}
                 handleSubmit={() => {}}
-                containerStyleAppTextInput={tailwind(
-                  `w-full border border-white  ${isMobileDeviceOnly ? 'bg-[#42382E]' : 'bg-[#41474A]'} px-5`,
-                )}
-                testInputStyle={tailwind(' py-4 text-left text-base font-normal')}
+                containerStyleAppTextInput={[
+                  Platform.select({
+                    web: tailwind(
+                      `w-full border border-white  ${isMobileDeviceOnly ? 'bg-[#42382E]' : 'bg-[#41474A]'} px-5`,
+                    ),
+                    native: tailwind(`w-full border  border-white  bg-[#42382E]  px-5`),
+                  }),
+                ]}
+                testInputStyle={[
+                  Platform.select({
+                    web: tailwind(' py-4 text-left text-base font-normal'),
+                    // native: tailwind('h-20 flex-1 py-4 text-left text-base font-normal'),
+                  }),
+                ]}
                 autoCapitalize="none"
                 placeholderTextColor="#fff"
                 right={<Ionicons name="search" color="#fff" size={ICON_SIZE} />}
