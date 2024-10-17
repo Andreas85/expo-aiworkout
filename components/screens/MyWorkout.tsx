@@ -14,11 +14,12 @@ import { ActionButton } from '../atoms/ActionButton';
 import { AntDesign } from '@expo/vector-icons';
 import { IMAGES } from '@/utils/images';
 import CustomSwitch from '../atoms/CustomSwitch';
-import AddWorkoutModal from '../modals/AddWorkoutModal';
+import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { router } from 'expo-router';
 import { Platform, Pressable } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function MyWorkout() {
   // const { isAuthenticated } = useAuthStore();
@@ -35,7 +36,6 @@ export default function MyWorkout() {
   };
 
   const getFetchFunction = async () => {
-    // return await fetchPublicWorkoutService();
     return await fetchMyWorkoutService();
   };
 
@@ -50,6 +50,10 @@ export default function MyWorkout() {
       setProductData(data?.data);
     }
   }, [data]);
+
+  useFocusEffect(() => {
+    refetch();
+  });
 
   const handleAddWorkout = () => {
     showModal();
@@ -178,7 +182,7 @@ export default function MyWorkout() {
         {renderVersionTab()}
         {renderWorkingListing()}
       </Container>
-      {openModal && <AddWorkoutModal isModalVisible={openModal} closeModal={hideModal} />}
+      {openModal && <AddAndEditWorkoutModal isModalVisible={openModal} closeModal={hideModal} />}
     </>
   );
 }

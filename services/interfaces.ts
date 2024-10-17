@@ -1,5 +1,6 @@
 export interface ICreateWorkoutFormData {
-  name: string;
+  name?: string;
+  isPublic?: boolean;
 }
 
 export interface IAddExerciseToWorkout {

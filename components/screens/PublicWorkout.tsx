@@ -15,6 +15,7 @@ import { useAuthStore } from '@/store/authStore';
 import { Platform, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function PublicWorkout() {
   const { isAuthenticated } = useAuthStore();
@@ -45,6 +46,10 @@ export default function PublicWorkout() {
       setProductData(data?.data);
     }
   }, [data]);
+
+  useFocusEffect(() => {
+    refetch();
+  });
 
   const handleCardClick = (item: any) => {
     router.push(`/workout/public/${item?._id}`);

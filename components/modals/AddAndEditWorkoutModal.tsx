@@ -7,17 +7,25 @@ import { ActionButton } from '../atoms/ActionButton';
 import { Formik } from 'formik';
 import { AppTextInput } from '../atoms/AppTextInput';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addWorkoutService } from '@/services/workouts';
+import { addWorkoutService, updateWorkoutDataRequest } from '@/services/workouts';
 // import CustomImagePicker from '../atoms/CustomImagePicker';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import * as yup from 'yup';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { useLocalSearchParams } from 'expo-router';
 
 const validationSchema = yup.object().shape({
   workoutName: yup.string().required('Workout name is required'),
 });
 
-function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => void }) {
-  const { isModalVisible, closeModal } = props;
+function AddAndEditWorkoutModal(props: {
+  isModalVisible: boolean;
+  closeModal: () => void;
+  isEditWorkout?: boolean;
+}) {
+  const { isModalVisible, closeModal, isEditWorkout } = props;
+  const { slug } = useLocalSearchParams();
+  const workoutname = useWorkoutDetailStore(state => state.workoutDetail)?.name ?? '';
   const [responseError, setResponseError] = useState<string>();
   const queryClient = useQueryClient();
 
@@ -34,6 +42,19 @@ function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => voi
     },
   });
 
+  const { mutate: mutateUpdatedWorkout, isPending: isPendingUpdateWorkout } = useMutation({
+    mutationFn: updateWorkoutDataRequest,
+    onSuccess: async data => {
+      closeModal();
+      return await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+      });
+    },
+    onError: (error: string) => {
+      setResponseError(error);
+    },
+  });
+
   const handleAddWorkout = async (values: { workoutName: string }) => {
     const { workoutName } = values;
     const payload = {
@@ -41,14 +62,18 @@ function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => voi
         name: workoutName,
       },
     };
-    mutateAddWorkout(payload);
+    if (isEditWorkout) {
+      mutateUpdatedWorkout({ ...payload, queryParams: { id: slug } });
+    } else {
+      mutateAddWorkout(payload);
+    }
   };
 
   return (
     <>
       <ModalWrapper
         isModalVisible={isModalVisible}
-        headerTitle={'Enter workout'}
+        headerTitle={isEditWorkout ? 'Edit Workout' : 'Enter workout'}
         closeModal={closeModal}>
         {/* <ScrollView contentContainerStyle={{ flex: 1 }}> */}
         <Container>
@@ -56,7 +81,7 @@ function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => voi
             <CustomImagePicker />
           </Container> */}
           <Formik
-            initialValues={{ workoutName: '' }}
+            initialValues={{ workoutName: isEditWorkout ? workoutname : '' }}
             enableReinitialize={true}
             validationSchema={validationSchema}
             onSubmit={handleAddWorkout}>
@@ -86,8 +111,8 @@ function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => voi
                   />
                   <ActionButton
                     uppercase={true}
-                    isLoading={isPending}
-                    label={'Add'}
+                    isLoading={isPending || isPendingUpdateWorkout}
+                    label={isEditWorkout ? 'Update' : 'Add'}
                     onPress={handleSubmit}
                     style={tailwind('grow rounded-md')}
                   />
@@ -102,4 +127,4 @@ function AddWorkoutModal(props: { isModalVisible: boolean; closeModal: () => voi
   );
 }
 
-export default AddWorkoutModal;
+export default AddAndEditWorkoutModal;

@@ -91,8 +91,8 @@ export const deleteWorkoutDetail = async (payload: IPayloadWorkoutDetail) => {
       API: URL,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 
@@ -107,8 +107,8 @@ export const updateWorkoutDataRequest = async (payload: IPayloadUpdateWorkoutDat
       DATA: formData,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 
@@ -268,7 +268,7 @@ export const createWorkoutCopy = async (payload: ICreateWorkoutCopy) => {
       API: URL,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };

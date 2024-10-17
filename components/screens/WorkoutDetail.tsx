@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
-import { useNavigation } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 
 import { Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
@@ -15,17 +15,83 @@ import NoDataSvg from '../svgs/NoDataSvg';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
-import { ICON_SIZE } from '@/utils/appConstants';
+import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import DraggableExercises from '../molecules/DraggableExercises';
 import AppTextSingleInput from '../atoms/AppTextSingleInput';
+import useModal from '@/hooks/useModal';
+import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  createWorkoutCopy,
+  deleteWorkoutDetail,
+  updateWorkoutDataRequest,
+} from '@/services/workouts';
+import ConfirmationModal from '../modals/ConfirmationModal';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
+  const { slug } = useLocalSearchParams() as any;
+  const { hideModal, showModal, openModal } = useModal();
+  const {
+    hideModal: hideModalDeleteWorkout,
+    showModal: showModalDeleteModal,
+    openModal: openModalDeleteModal,
+  } = useModal();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
-  const toggleIsCurrentWorkoutPublic = () => setIsCurrentWorkoutPublic(!isCurrentWorkoutPublic);
+
+  const toggleIsCurrentWorkoutPublic = () => {
+    mutateUpdatedWorkout({
+      formData: { isPublic: !isCurrentWorkoutPublic },
+      queryParams: { id: slug },
+    });
+    setIsCurrentWorkoutPublic(!isCurrentWorkoutPublic);
+  };
+
+  const { mutate: mutateUpdatedWorkout } = useMutation({
+    mutationFn: updateWorkoutDataRequest,
+    onSuccess: async data => {
+      return await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+      });
+    },
+  });
+
+  const { mutate: mutateDeleteWorkout, isPending: isPendingDeleteWorkout } = useMutation({
+    mutationFn: deleteWorkoutDetail,
+    onSuccess: async data => {
+      // console.log(data, 'data');
+      hideModalDeleteWorkout();
+      router.push('/workouts');
+      return await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      });
+    },
+    onError: error => {
+      console.log(error, 'error');
+    },
+  });
+
+  const { mutate: mutateCreateWorkoutCopy } = useMutation({
+    mutationFn: createWorkoutCopy,
+    onSuccess: async data => {
+      router.push(`/workout/${data?.data?._id}`);
+      return await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS],
+      });
+    },
+  });
+
+  const handleDuplicateWorkout = () => {
+    mutateCreateWorkoutCopy({ id: slug });
+  };
+
+  const handleDeleteWorkout = () => {
+    mutateDeleteWorkout({ id: slug });
+  };
 
   useEffect(() => {
     if (workoutDetail) {
@@ -109,6 +175,7 @@ const WorkoutDetail = () => {
               native: tailwind('hidden'),
             }),
           ]}
+          onPress={showModal}
           left={<FontAwesome5 name="edit" color="#A27DE1" size={ICON_SIZE} />}
         />
         <CustomSwitch
@@ -134,6 +201,7 @@ const WorkoutDetail = () => {
               native: tailwind('text-sm font-bold'),
             }),
           ]}
+          onPress={handleDuplicateWorkout}
           containerStyle={[
             Platform.select({
               web: tailwind(''),
@@ -164,6 +232,7 @@ const WorkoutDetail = () => {
               // native: tailwind('flex-1'),
             }),
           ]}
+          onPress={showModalDeleteModal}
           left={
             <FontAwesome6
               name="trash-can"
@@ -220,8 +289,10 @@ const WorkoutDetail = () => {
             }),
             tailwind('flex-row items-center justify-between'),
           ]}>
-          <Container style={[tailwind('flex-1 flex-row flex-wrap items-center gap-2')]}>
-            <BackActionButton />
+          <Container style={[tailwind('flex-1 flex-row items-center justify-between gap-2')]}>
+            <Container>
+              <BackActionButton />
+            </Container>
             <LabelContainer
               label={workoutDetail?.name ?? ''}
               labelStyle={[
@@ -229,7 +300,7 @@ const WorkoutDetail = () => {
                   web: tailwind(
                     `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} text-center font-bold  not-italic leading-[150%] text-white `,
                   ),
-                  native: tailwind('text-xl font-bold'),
+                  native: tailwind('flex-1 text-xl font-bold'),
                 }),
               ]}
               containerStyle={[
@@ -240,6 +311,7 @@ const WorkoutDetail = () => {
                   native: tailwind('flex-1 justify-between'),
                 }),
               ]}
+              onPress={showModal}
               left={<Feather name="edit" color="#A27DE1" size={ICON_SIZE} />}
             />
           </Container>
@@ -303,6 +375,23 @@ const WorkoutDetail = () => {
         </Container>
       </Container>
       {renderStartWorkoutButton()}
+      {openModal && (
+        <AddAndEditWorkoutModal
+          isEditWorkout={true}
+          isModalVisible={openModal}
+          closeModal={hideModal}
+        />
+      )}
+      {openModalDeleteModal && (
+        <ConfirmationModal
+          isModalVisible={openModalDeleteModal}
+          closeModal={hideModalDeleteWorkout}
+          message="Are you sure you want to delete this workout?"
+          labelAction="Delete"
+          isLoading={isPendingDeleteWorkout}
+          handleAction={handleDeleteWorkout}
+        />
+      )}
     </Container>
   );
 };

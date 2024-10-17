@@ -23,7 +23,7 @@ export interface ICustomSwitch {
   containerWebStyle?: StyleProp<TextStyle> | string;
 }
 
-export interface IAddWorkoutModalProps {
+export interface IAddAndEditWorkoutModalProps {
   isModalVisible: boolean;
   headerTitle: string;
   closeModal: () => void;
