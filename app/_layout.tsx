@@ -17,7 +17,7 @@ import Container from '@/components/atoms/Container';
 import { tailwind } from '@/utils/tailwind';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-// import { ToastProvider } from 'react-native-toast-notifications';
+import { ToastProvider } from 'react-native-toast-notifications';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -32,7 +32,13 @@ function onAppStateChange(status: AppStateStatus) {
   }
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // default: true
+    },
+  },
+});
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -95,7 +101,7 @@ function RootLayoutNav() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        {/* <ToastProvider
+        <ToastProvider
           placement="bottom"
           duration={2000}
           animationType="slide-in"
@@ -103,9 +109,9 @@ function RootLayoutNav() {
           successColor="green"
           dangerColor="red"
           warningColor="orange"
-          normalColor="gray"> */}
-        <GestureHandlerRootView style={{ flex: 1 }}>{renderRoot()}</GestureHandlerRootView>
-        {/* </ToastProvider> */}
+          normalColor="gray">
+          <GestureHandlerRootView style={{ flex: 1 }}>{renderRoot()}</GestureHandlerRootView>
+        </ToastProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

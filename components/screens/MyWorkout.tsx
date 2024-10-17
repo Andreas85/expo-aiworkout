@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 import Container from '@/components/atoms/Container';
 import GridContainer from '@/components/atoms/GridContainer';
 import ImageContainer from '@/components/atoms/ImageContainer';
@@ -9,7 +10,7 @@ import { useFetchData } from '@/hooks/useFetchData';
 import { fetchMyWorkoutService } from '@/services/workouts';
 // import { useAuthStore } from '@/store/authStore';
 import { tailwind } from '@/utils/tailwind';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActionButton } from '../atoms/ActionButton';
 import { AntDesign } from '@expo/vector-icons';
 import { IMAGES } from '@/utils/images';
@@ -18,17 +19,24 @@ import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { router } from 'expo-router';
-import { Platform, Pressable } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { LayoutAnimation, Platform, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function MyWorkout() {
   // const { isAuthenticated } = useAuthStore();
+  const navigation = useNavigation();
   const [productData, setProductData] = useState<any[]>([]);
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
-  const toggleSwitch = () => setIsEnabled(!isEnabled);
+  // const toggleSwitch = () => setIsEnabled(!isEnabled);
+
+  // Using LayoutAnimation for smooth transitions
+  const toggleSwitch = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsEnabled(prevState => !prevState);
+  }, []);
 
   // Function to handle refresh action
   const onRefresh = async () => {
@@ -39,10 +47,9 @@ export default function MyWorkout() {
     return await fetchMyWorkoutService();
   };
 
-  const { data, error, isPending, refetch } = useFetchData({
+  const { data, error, isPending, refetch, fetchStatus } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-    staleTime: 60 * 1000,
   });
 
   useEffect(() => {
@@ -51,9 +58,15 @@ export default function MyWorkout() {
     }
   }, [data]);
 
-  useFocusEffect(() => {
-    refetch();
-  });
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // do something
+      console.log('Api is called');
+      refetch();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const handleAddWorkout = () => {
     showModal();
@@ -95,7 +108,7 @@ export default function MyWorkout() {
   };
 
   const renderWorkingListing = () => {
-    if (isPending) {
+    if (fetchStatus === 'fetching') {
       return <Loading />;
     }
     if (error) return <Text>An error has occurred: + {error.message}</Text>;
@@ -112,15 +125,17 @@ export default function MyWorkout() {
       ...Array(placeholdersNeeded).fill({ isPlaceholder: true }),
     ];
     return (
-      <GridContainer
-        data={adjustedData}
-        renderListHeaderComponent={renderTopHeader}
-        refreshingNative={isPending}
-        onRefresh={onRefresh}
-        listNumColumnsNative={isSmallScreen ? 2 : 4}
-        keyExtractorNative={item => item?._id}
-        renderListItemInNative={renderListItem}
-      />
+      <>
+        <GridContainer
+          data={adjustedData}
+          renderListHeaderComponent={renderTopHeader}
+          refreshingNative={isPending}
+          onRefresh={onRefresh}
+          listNumColumnsNative={isSmallScreen ? 2 : 4}
+          keyExtractorNative={item => item?._id}
+          renderListItemInNative={renderListItem}
+        />
+      </>
     );
   };
 

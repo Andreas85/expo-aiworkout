@@ -7,23 +7,25 @@ import { Text } from '@/components/Themed';
 import { useFetchData } from '@/hooks/useFetchData';
 import { fetchPublicWorkoutService } from '@/services/workouts';
 import { tailwind } from '@/utils/tailwind';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { IMAGES } from '@/utils/images';
 import CustomSwitch from '../atoms/CustomSwitch';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useAuthStore } from '@/store/authStore';
-import { Platform, Pressable } from 'react-native';
+import { LayoutAnimation, Platform, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { useFocusEffect } from '@react-navigation/native';
 
 export default function PublicWorkout() {
   const { isAuthenticated } = useAuthStore();
-  const [productData, setProductData] = useState<any[]>([]);
   const { isSmallScreen, isLargeScreen } = useWebBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
-  const toggleSwitch = () => setIsEnabled(!isEnabled);
+  // Using LayoutAnimation for smooth transitions
+  const toggleSwitch = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsEnabled(prevState => !prevState);
+  }, []);
 
   // Function to handle refresh action
   const onRefresh = async () => {
@@ -35,21 +37,18 @@ export default function PublicWorkout() {
     return await fetchPublicWorkoutService();
   };
 
-  const { data, error, isPending, refetch } = useFetchData({
+  // Don't refetch on window focus and hit api after 1 minutes
+  const { data, isPending, refetch, isStale, fetchStatus } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT],
-    staleTime: 60 * 1000,
+    staleTime: 60 * 1000, // 1 minute
   });
 
   useEffect(() => {
-    if (data) {
-      setProductData(data?.data);
+    if (isStale) {
+      refetch();
     }
-  }, [data]);
-
-  useFocusEffect(() => {
-    refetch();
-  });
+  }, [isStale]);
 
   const handleCardClick = (item: any) => {
     router.push(`/workout/public/${item?._id}`);
@@ -116,12 +115,14 @@ export default function PublicWorkout() {
   };
 
   const renderWorkingListing = () => {
-    if (isPending) {
+    if (fetchStatus === 'fetching') {
       return <Loading />;
     }
-    if (error) return <Text>An error has occurred: + {error.message}</Text>;
+
+    // if (error) return <Text>An error has occurred: + {error.message}</Text>;
     // Ensure bracketPrediction is iterable
-    const iterableProductData = Array.isArray(productData) ? productData : [];
+
+    const iterableProductData = Array.isArray(data?.data) ? data?.data : [];
 
     // Calculate how many placeholders are needed to make length a multiple of 4
     const placeholdersNeeded =

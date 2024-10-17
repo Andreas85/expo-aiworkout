@@ -27,10 +27,12 @@ import {
   updateWorkoutDataRequest,
 } from '@/services/workouts';
 import ConfirmationModal from '../modals/ConfirmationModal';
+import { useToast } from 'react-native-toast-notifications';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const { slug } = useLocalSearchParams() as any;
   const { hideModal, showModal, openModal } = useModal();
   const {
@@ -63,15 +65,8 @@ const WorkoutDetail = () => {
   const { mutate: mutateDeleteWorkout, isPending: isPendingDeleteWorkout } = useMutation({
     mutationFn: deleteWorkoutDetail,
     onSuccess: async data => {
-      // console.log(data, 'data');
       hideModalDeleteWorkout();
       router.push('/workouts');
-      return await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      });
-    },
-    onError: error => {
-      console.log(error, 'error');
     },
   });
 
@@ -79,9 +74,9 @@ const WorkoutDetail = () => {
     mutationFn: createWorkoutCopy,
     onSuccess: async data => {
       router.push(`/workout/${data?.data?._id}`);
-      return await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS],
-      });
+    },
+    onError: (error: any) => {
+      toast.show(error, { type: 'danger' });
     },
   });
 
@@ -104,7 +99,7 @@ const WorkoutDetail = () => {
     if (!hasExercise) {
       return (
         <Container style={tailwind('flex-1')}>
-          <NoDataSvg label="No exercises (Coming Soon)" message={'Start building your workout'} />
+          <NoDataSvg label="No exercises" message={'Start building your workout'} />
         </Container>
       );
     }
@@ -362,7 +357,7 @@ const WorkoutDetail = () => {
                 testInputStyle={[
                   Platform.select({
                     web: tailwind(' py-4 text-left text-base font-normal'),
-                    // native: tailwind('h-20 flex-1 py-4 text-left text-base font-normal'),
+                    native: tailwind('text-left text-base font-normal'),
                   }),
                 ]}
                 autoCapitalize="none"

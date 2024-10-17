@@ -1,9 +1,11 @@
 import React, { ComponentType, JSXElementConstructor, ReactElement } from 'react';
-import { View } from '../Themed';
+import { View, Text } from '../Themed';
 import { FlatList, ListRenderItem, RefreshControl, StyleProp, ViewStyle } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import NoDataSvg from '../svgs/NoDataSvg';
+import Container from './Container';
 
 export default function GridContainer(props: {
   children?: React.ReactNode;
@@ -62,6 +64,11 @@ export default function GridContainer(props: {
         columnGap: 20,
         justifyContent: 'space-around',
       }}
+      ListEmptyComponent={
+        <Container>
+          <NoDataSvg label="No data found " />
+        </Container>
+      }
       ItemSeparatorComponent={ItemSeparator}
       refreshControl={<RefreshControl refreshing={refreshingNative} onRefresh={onRefresh} />}
     />

@@ -15,11 +15,11 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 const WorkoutDetailIndex = () => {
   const { slug } = useLocalSearchParams();
   const { isLargeScreen } = useWebBreakPoints();
-  const { setWorkoutDetail } = useWorkoutDetailStore();
-  const { data, isPending, refetch } = useFetchData({
+  const isLoadingWorkout = useWorkoutDetailStore(state => state.isLoading);
+  const { setWorkoutDetail, setLoadingWorkout } = useWorkoutDetailStore();
+  const { data, refetch, fetchStatus } = useFetchData({
     queryFn: () => getWorkoutDetailById({ id: slug }),
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-    staleTime: 60 * 1000,
   });
 
   useEffect(() => {
@@ -34,8 +34,16 @@ const WorkoutDetailIndex = () => {
     }
   }, [slug]);
 
+  useEffect(() => {
+    if (fetchStatus === 'fetching') {
+      setLoadingWorkout(true);
+      return;
+    }
+    setLoadingWorkout(false);
+  }, [fetchStatus]);
+
   const renderWorkingDetails = () => {
-    if (isPending) {
+    if (isLoadingWorkout) {
       return <Loading />;
     }
     return <WorkoutDetail />;

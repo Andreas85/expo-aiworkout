@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
 import { useNavigation } from 'expo-router';
 
-import { Platform, RefreshControl, ScrollView } from 'react-native';
+import { LayoutAnimation, Platform, RefreshControl, ScrollView } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { ExerciseElement } from '@/services/interfaces';
 import { ActionButton } from '../atoms/ActionButton';
@@ -27,7 +27,10 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
-  const toggleSwitch = () => setIsEnabled(!isEnabled);
+  const toggleSwitch = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsEnabled(prev => !prev);
+  }, []);
   const [refreshing, setRefreshing] = useState(false);
   const queryClient = useQueryClient();
 

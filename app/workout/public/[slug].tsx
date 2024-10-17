@@ -17,7 +17,7 @@ const PublicWorkoutDetailIndex = () => {
   const { isLargeScreen } = useWebBreakPoints();
 
   const { setWorkoutDetail } = useWorkoutDetailStore();
-  const { data, isPending, refetch } = useFetchData({
+  const { data, fetchStatus, refetch } = useFetchData({
     queryFn: () => fetchPublicWorkoutServiceById({ id: slug }),
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, slug],
     staleTime: 60 * 1000,
@@ -36,7 +36,7 @@ const PublicWorkoutDetailIndex = () => {
   }, [slug]);
 
   const renderWorkingDetails = () => {
-    if (isPending) {
+    if (fetchStatus === 'fetching') {
       return <Loading />;
     }
     return <PublicWorkoutDetail />;
