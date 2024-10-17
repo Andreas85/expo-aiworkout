@@ -10,6 +10,7 @@ import { Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import CustomSwitch from './CustomSwitch';
 import AppTextSingleInput from './AppTextSingleInput';
+import { AppTextInput } from './AppTextInput';
 
 interface IExerciseCard {
   data: ExerciseElement;
@@ -22,10 +23,10 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [inputValues, setInputValues] = useState({
-    weight: data?.weight ?? '0',
-    rest: data?.rest ?? '0',
-    reps: data?.reps ?? '0',
-    duration: data?.duration ?? '0',
+    weight: data?.weight ? data?.weight + '' : '0',
+    rest: data?.rest ? data?.rest + '' : '0',
+    reps: data?.reps ? data?.reps + '' : '0',
+    duration: data?.duration ? data?.duration + '' : '0',
   });
   const toggleSwitch = () => setIsEnabled(!isEnabled);
 
@@ -39,6 +40,8 @@ const ExerciseCard = (props: IExerciseCard) => {
       [fieldName]: numericValue,
     }));
 
+    const send = { ...inputValues, [fieldName]: numericValue };
+    console.log(send);
     handleSubmit?.({ ...inputValues, [fieldName]: numericValue });
   };
 
