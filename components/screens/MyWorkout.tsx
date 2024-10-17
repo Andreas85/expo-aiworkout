@@ -21,6 +21,7 @@ import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { router } from 'expo-router';
 import { LayoutAnimation, Platform, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { debounce } from 'lodash';
 
 export default function MyWorkout() {
   // const { isAuthenticated } = useAuthStore();
@@ -33,10 +34,13 @@ export default function MyWorkout() {
   // const toggleSwitch = () => setIsEnabled(!isEnabled);
 
   // Using LayoutAnimation for smooth transitions
-  const toggleSwitch = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsEnabled(prevState => !prevState);
-  }, []);
+  const toggleSwitch = useCallback(
+    debounce(() => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setIsEnabled(prevState => !prevState);
+    }, 500), // 500ms delay
+    [],
+  );
 
   // Function to handle refresh action
   const onRefresh = async () => {
@@ -76,7 +80,7 @@ export default function MyWorkout() {
     router.push(`/workout/${item?._id}`);
   };
 
-  const renderListItem = (item: any, index: number) => {
+  const renderListItem = (item: any, index: number, isEnabled: boolean) => {
     if (item?.isPlaceholder) {
       return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
     }
@@ -133,7 +137,7 @@ export default function MyWorkout() {
           onRefresh={onRefresh}
           listNumColumnsNative={isSmallScreen ? 2 : 4}
           keyExtractorNative={item => item?._id}
-          renderListItemInNative={renderListItem}
+          renderListItemInNative={(item, index) => renderListItem(item, index, isEnabled)}
         />
       </>
     );

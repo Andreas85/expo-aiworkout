@@ -39,6 +39,7 @@
     "expo-updates": "~0.25.24",
     "expo-web-browser": "~13.0.3",
     "formik": "^2.4.6",
+    "lodash": "^4.17.21",
     "pauseable": "^0.3.2",
     "react": "18.2.0",
     "react-cropper": "^2.3.3",
@@ -62,6 +63,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/lodash": "^4.17.10",
     "@types/react": "~18.2.45",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",

@@ -12,9 +12,10 @@ import { IMAGES } from '@/utils/images';
 import CustomSwitch from '../atoms/CustomSwitch';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useAuthStore } from '@/store/authStore';
-import { LayoutAnimation, Platform, Pressable } from 'react-native';
+import { LayoutAnimation, Platform, Pressable, UIManager } from 'react-native';
 import { router } from 'expo-router';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { debounce } from 'lodash';
 
 export default function PublicWorkout() {
   const { isAuthenticated } = useAuthStore();
@@ -22,10 +23,27 @@ export default function PublicWorkout() {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
   // Using LayoutAnimation for smooth transitions
-  const toggleSwitch = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsEnabled(prevState => !prevState);
-  }, []);
+  // const toggleSwitch = useCallback(() => {
+  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  //   setIsEnabled(!isEnabled);
+  // }, []);
+
+  // const toggleSwitch = () => setIsEnabled(prev => !prev);
+
+  // Enable LayoutAnimation on Android
+  // useEffect(() => {
+  //   if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  //     UIManager.setLayoutAnimationEnabledExperimental(true);
+  //   }
+  // }, []);
+
+  const toggleSwitch = useCallback(
+    debounce(() => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setIsEnabled(prevState => !prevState);
+    }, 500), // 300ms delay
+    [],
+  );
 
   // Function to handle refresh action
   const onRefresh = async () => {
@@ -58,6 +76,7 @@ export default function PublicWorkout() {
     if (item?.isPlaceholder) {
       return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
     }
+
     return (
       <Pressable style={tailwind('flex-1')} onPress={() => handleCardClick(item)}>
         {!isEnabled && (
@@ -79,15 +98,15 @@ export default function PublicWorkout() {
           style={[
             Platform.select({
               web: tailwind(
-                `flex flex-col items-center  ${isEnabled && ' h-20 flex-1 rounded-lg bg-NAVBAR_BACKGROUND'} ${isLargeScreen ? 'gap-[0.625rem] px-2 py-3' : 'gap-[1.25rem]  px-5 py-7'}`,
+                `flex flex-col items-center  ${isEnabled ? ' h-20 flex-1 rounded-lg bg-NAVBAR_BACKGROUND' : ''} ${isLargeScreen ? 'gap-[0.625rem] px-2 py-3' : 'gap-[1.25rem]  px-5 py-7'}`,
               ),
               native: tailwind(
-                `flex flex-1 flex-col items-center gap-[1.25rem] px-2 py-3 ${isEnabled && ' h-20  rounded-lg bg-NAVBAR_BACKGROUND'}`,
+                `flex flex-1 flex-col items-center gap-[1.25rem] px-2 py-3 ${isEnabled ? ' h-20  rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
               ),
             }),
           ]}>
           <TextContainer
-            data={item?.name}
+            data={isEnabled + item?.name}
             style={[
               Platform.select({
                 web: tailwind(`${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.125rem] '}`),
@@ -115,9 +134,9 @@ export default function PublicWorkout() {
   };
 
   const renderWorkingListing = () => {
-    if (fetchStatus === 'fetching') {
-      return <Loading />;
-    }
+    // if (fetchStatus === 'fetching') {
+    //   return <Loading />;
+    // }
 
     // if (error) return <Text>An error has occurred: + {error.message}</Text>;
     // Ensure bracketPrediction is iterable
@@ -141,7 +160,7 @@ export default function PublicWorkout() {
         onRefresh={onRefresh}
         listNumColumnsNative={isSmallScreen ? 2 : 4}
         keyExtractorNative={item => item?._id}
-        renderListItemInNative={renderListItem}
+        renderListItemInNative={(item, index) => renderListItem(item, index, isEnabled)}
       />
     );
   };
