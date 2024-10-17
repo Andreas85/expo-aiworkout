@@ -1,5 +1,5 @@
 import React, { ComponentType, JSXElementConstructor, ReactElement } from 'react';
-import { View, Text } from '../Themed';
+import { View } from '../Themed';
 import { FlatList, ListRenderItem, RefreshControl, StyleProp, ViewStyle } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import useBreakPoints from '@/hooks/useBreakPoints';

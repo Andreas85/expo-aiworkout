@@ -15,7 +15,7 @@ const SortableItem: React.FC<{ item: ExerciseElement }> = ({ item }) => {
 
   return (
     <ExerciseCard data={item} handleSubmit={handleSubmit}>
-      <div style={{ cursor: 'grab' }}>
+      <div className="drag-handle" style={{ cursor: 'grab' }}>
         <em>
           <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
         </em>
@@ -43,13 +43,19 @@ const DraggableExercises = (props: {}) => {
     setItems(newOrder);
   };
 
-  // Function to handle auto-scroll
-  const autoScroll = (event: any) => {
+  // Function to handle auto-scroll for both mouse and touch
+  const autoScroll = (event: MouseEvent | TouchEvent) => {
     const container = scrollContainerRef.current;
 
     if (!container) return;
 
-    const { clientY } = event;
+    let clientY;
+    if (event instanceof TouchEvent) {
+      clientY = event.touches[0].clientY; // Get Y-coordinate from touch events
+    } else {
+      clientY = event.clientY; // Get Y-coordinate from mouse events
+    }
+
     const { top, bottom } = container.getBoundingClientRect();
 
     // Scroll up if near the top
@@ -67,13 +73,15 @@ const DraggableExercises = (props: {}) => {
     const container = scrollContainerRef.current;
 
     if (container) {
-      // Add event listener for the dragover event to trigger auto-scroll
-      container.addEventListener('dragover', autoScroll);
+      // Add event listeners for both mouse and touch events to trigger auto-scroll
+      container.addEventListener('dragover', autoScroll); // Desktop
+      container.addEventListener('touchmove', autoScroll); // Mobile
     }
 
     return () => {
       if (container) {
         container.removeEventListener('dragover', autoScroll);
+        container.removeEventListener('touchmove', autoScroll);
       }
     };
   }, []);
@@ -87,6 +95,7 @@ const DraggableExercises = (props: {}) => {
         list={items} // List of items to sort
         setList={handleOrderChange} // Function to update the list when items are moved
         onEnd={handleDragOnEnd} // Callback after reordering
+        handle=".drag-handle"
         className="space-y-1 overflow-x-hidden overflow-y-scroll">
         {items.map(item => (
           <div key={item?._id} data-id={item?._id}>
