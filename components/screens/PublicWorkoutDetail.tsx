@@ -92,7 +92,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                 web: tailwind(
                   `${isLargeScreen ? 'w-[47%] text-[0.875rem]' : 'w-[56%] text-[1.375rem]'} ps-[2px]`,
                 ),
-                native: tailwind('flex-1 text-[0.875rem]'),
+                native: tailwind('flex-1.5 text-[0.875rem]'),
               }),
             ]}
             numberOfLines={1}>
@@ -177,7 +177,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                   web: tailwind(
                     ` ${isLargeScreen ? 'w-[47%]  text-[0.875rem] font-bold' : 'w-[56%] text-[1.5rem]'}   `,
                   ),
-                  native: tailwind('flex-1 text-[0.875rem]  font-bold'),
+                  native: tailwind('flex-1.5 text-[0.875rem]  font-bold'),
                 }),
               ]}
               numberOfLines={1}

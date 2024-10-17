@@ -22,20 +22,24 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [inputValues, setInputValues] = useState({
-    weight: '',
-    rest: data?.rest || '',
-    reps: data?.reps || '',
-    duration: data?.duration || '',
+    weight: data?.weight ?? '0',
+    rest: data?.rest ?? '0',
+    reps: data?.reps ?? '0',
+    duration: data?.duration ?? '0',
   });
   const toggleSwitch = () => setIsEnabled(!isEnabled);
 
   // Handle change in any text field and update the corresponding value in the state
   const handleTextChange = (fieldName: string, text: string) => {
+    // Convert the string to a number if it's numeric, otherwise fallback to original text or set default as 0
+    const numericValue = isNaN(Number(text)) ? text : Number(text);
+
     setInputValues(prevValues => ({
       ...prevValues,
-      [fieldName]: text,
+      [fieldName]: numericValue,
     }));
-    handleSubmit?.({ ...inputValues, [fieldName]: text });
+
+    handleSubmit?.({ ...inputValues, [fieldName]: numericValue });
   };
 
   const renderCard = () => {
@@ -108,7 +112,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                     web: tailwind(
                       ` flex-1 justify-between text-xs  font-normal  not-italic leading-[150%] text-white`,
                     ),
-                    native: tailwind('text-xl font-bold'),
+                    native: tailwind('text-sm font-bold'),
                   }),
                 ]}
                 containerStyle={[
@@ -117,7 +121,13 @@ const ExerciseCard = (props: IExerciseCard) => {
                     // native: tailwind('flex-1'),
                   }),
                 ]}
-                left={<Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />}
+                left={
+                  <Ionicons
+                    name="duplicate-sharp"
+                    color="#A27DE1"
+                    size={Platform.OS === 'web' ? ICON_SIZE : 16}
+                  />
+                }
               />
               <LabelContainer
                 label={'Delete'}
@@ -126,7 +136,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                     web: tailwind(
                       ` flex-1 justify-between text-xs  font-normal  not-italic leading-[150%] text-white`,
                     ),
-                    native: tailwind('text-xl font-bold'),
+                    native: tailwind('ttext-sm font-bold'),
                   }),
                 ]}
                 containerStyle={[
@@ -135,7 +145,13 @@ const ExerciseCard = (props: IExerciseCard) => {
                     // native: tailwind('flex-1'),
                   }),
                 ]}
-                left={<FontAwesome6 name="trash-can" color="#A27DE1" size={ICON_SIZE} />}
+                left={
+                  <FontAwesome6
+                    name="trash-can"
+                    color="#A27DE1"
+                    size={Platform.OS === 'web' ? ICON_SIZE : 16}
+                  />
+                }
               />
             </Container>
             <Container
@@ -154,7 +170,12 @@ const ExerciseCard = (props: IExerciseCard) => {
                 ]}>
                 <TextContainer
                   data={`Weight (kg)`}
-                  style={tailwind(' text-center text-xs')}
+                  style={[
+                    Platform.select({
+                      web: tailwind(' text-center text-xs'),
+                      native: tailwind('text-2.5 text-center'),
+                    }),
+                  ]}
                   numberOfLines={1}
                 />
                 <AppTextSingleInput
@@ -168,11 +189,19 @@ const ExerciseCard = (props: IExerciseCard) => {
                       native: tailwind('flex-1 self-center border-none '),
                     }),
                   ]}
-                  containerStyleAppTextInput={tailwind(`${isMobileDeviceOnly && 'w-auto'} `)}
+                  containerStyleAppTextInput={Platform.select({
+                    web: tailwind(`${isMobileDeviceOnly && 'w-auto'} `),
+                    native: tailwind(`w-auto flex-1 `),
+                  })}
                   keyboardType="number-pad"
                   autoCapitalize="none"
                   placeholderTextColor="#999"
-                  testInputStyle={tailwind('h-[1.875rem]  px-0 py-[0.3125rem]')}
+                  testInputStyle={[
+                    Platform.select({
+                      web: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                      native: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                    }),
+                  ]}
                 />
               </Container>
               <Container
@@ -180,7 +209,15 @@ const ExerciseCard = (props: IExerciseCard) => {
                   web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
                   native: tailwind(`flex-1 flex-col gap-3`),
                 })}>
-                <TextContainer data={`Rest (sec)`} style={tailwind('flex-1 text-center text-xs')} />
+                <TextContainer
+                  data={`Rest (sec)`}
+                  style={[
+                    Platform.select({
+                      web: tailwind('text-center text-xs'),
+                      native: tailwind('text-2.5 text-center'),
+                    }),
+                  ]}
+                />
                 <AppTextSingleInput
                   initialValues={{ rest: inputValues.rest }}
                   placeholder=""
@@ -190,11 +227,19 @@ const ExerciseCard = (props: IExerciseCard) => {
                     web: tailwind('w-full self-center border-none'),
                     native: tailwind('flex-1 self-center border-none'),
                   })}
+                  containerStyleAppTextInput={Platform.select({
+                    web: tailwind(`${isMobileDeviceOnly && 'w-auto'} `),
+                    native: tailwind(`w-auto flex-1 `),
+                  })}
                   keyboardType="number-pad"
-                  containerStyleAppTextInput={tailwind(`${isMobileDeviceOnly && 'w-auto'} `)}
                   autoCapitalize="none"
                   placeholderTextColor="#999"
-                  testInputStyle={tailwind('h-[1.875rem] flex-1 px-0 py-[0.3125rem]')}
+                  testInputStyle={[
+                    Platform.select({
+                      web: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                      native: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                    }),
+                  ]}
                 />
               </Container>
               <Container
@@ -204,7 +249,12 @@ const ExerciseCard = (props: IExerciseCard) => {
                 })}>
                 <TextContainer
                   data={`Number of reps`}
-                  style={tailwind('flex-1 text-center text-xs')}
+                  style={[
+                    Platform.select({
+                      web: tailwind('text-center text-xs'),
+                      native: tailwind('text-2.5 text-center'),
+                    }),
+                  ]}
                   numberOfLines={1}
                 />
                 <AppTextSingleInput
@@ -212,12 +262,20 @@ const ExerciseCard = (props: IExerciseCard) => {
                   placeholder=""
                   fieldName={'reps'}
                   onChangeText={handleTextChange}
-                  containerStyleAppTextInput={tailwind(`${isMobileDeviceOnly && 'w-auto'} `)}
+                  containerStyleAppTextInput={Platform.select({
+                    web: tailwind(`${isMobileDeviceOnly && 'w-auto'} `),
+                    native: tailwind(`w-auto flex-1 `),
+                  })}
                   containerStyle={tailwind('self-center border-none')}
                   keyboardType="number-pad"
                   autoCapitalize="none"
                   placeholderTextColor="#999"
-                  testInputStyle={tailwind('h-[1.875rem] flex-1 px-0 py-[0.3125rem]')}
+                  testInputStyle={[
+                    Platform.select({
+                      web: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                      native: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                    }),
+                  ]}
                 />
               </Container>
               <Container
@@ -227,7 +285,12 @@ const ExerciseCard = (props: IExerciseCard) => {
                 })}>
                 <TextContainer
                   data={`Duration (sec)`}
-                  style={tailwind('flex-1 text-center text-xs')}
+                  style={[
+                    Platform.select({
+                      web: tailwind('text-center text-xs'),
+                      native: tailwind('text-2.5 text-center'),
+                    }),
+                  ]}
                   numberOfLines={1}
                 />
                 <AppTextSingleInput
@@ -237,10 +300,18 @@ const ExerciseCard = (props: IExerciseCard) => {
                   onChangeText={handleTextChange}
                   containerStyle={tailwind('self-center border-none')}
                   keyboardType="number-pad"
-                  containerStyleAppTextInput={tailwind(`${isMobileDeviceOnly && 'w-auto'} `)}
+                  containerStyleAppTextInput={Platform.select({
+                    web: tailwind(`${isMobileDeviceOnly && 'w-auto'} `),
+                    native: tailwind(`w-auto flex-1 `),
+                  })}
                   autoCapitalize="none"
                   placeholderTextColor="#999"
-                  testInputStyle={tailwind('h-[1.875rem] flex-1 px-0 py-[0.3125rem]')}
+                  testInputStyle={[
+                    Platform.select({
+                      web: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                      native: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                    }),
+                  ]}
                 />
               </Container>
             </Container>

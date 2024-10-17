@@ -78,6 +78,10 @@ export default function TabLayout() {
           options={{
             title: 'My exercise',
             headerShown: false,
+            tabBarItemStyle: {
+              display: isAuthenticated ? 'flex' : 'none',
+              marginBottom: 5,
+            },
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 18 23" fill={color}>
                 <G clipPath="url(#clip0_775_5045)">

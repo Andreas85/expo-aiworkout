@@ -36,25 +36,42 @@ const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
   testInputStyle,
   containerStyleAppTextInput,
   onChangeText,
+  right,
   ...rest
 }) => {
   const formikRef = useRef<any>(null);
-
+  // console.log('initialValues', initialValues, 'Field name', fieldName);
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       innerRef={formikRef}
       enableReinitialize={true}
+      // validateOnChange={true}
       onSubmit={handleSubmit}>
-      {({ handleChange, handleSubmit, values, errors, touched }: any) => (
+      {({
+        handleChange,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+        setFieldValue,
+        setFieldTouched,
+      }: any) => (
         <Container style={[tailwind('w-full gap-y-4'), containerStyle]}>
           <AppTextInput
             value={values[fieldName]}
             placeholder={placeholder}
-            onChangeText={
-              text => (onChangeText ? onChangeText(fieldName, text) : handleChange(fieldName)(text)) // Pass fieldName with onChangeText
-            }
+            // onChangeText={
+            //   text => (onChangeText ? onChangeText(fieldName, text) : handleChange(fieldName)(text)) // Pass fieldName with onChangeText
+            // }
+            onChangeText={text => {
+              setFieldValue(fieldName, text); // Ensure value is updated immediately in Formik
+              setFieldTouched(fieldName, true); // Mark the field as touched for validation
+              if (onChangeText) {
+                onChangeText(fieldName, text); // Call custom handler if provided
+              }
+            }}
             errorMessage={
               errors?.[fieldName] && touched?.[fieldName] ? errors[fieldName] : undefined
             }
@@ -64,6 +81,7 @@ const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
               { borderWidth: 0 },
               Platform.select({
                 web: tailwind('text-center text-lg font-bold not-italic'),
+                native: tailwind('text-center text-lg font-bold not-italic'),
               }),
               testInputStyle,
             ]}
@@ -75,8 +93,10 @@ const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
               }),
               containerStyleAppTextInput,
             ]}
+            right={right}
             {...rest}
           />
+          {/* <TextContainer style={{ color: 'red' }} data={values[fieldName]} /> */}
           {errors?.[fieldName] && touched?.[fieldName] && (
             <TextContainer style={{ color: 'red' }} data={errors[fieldName]} />
           )}

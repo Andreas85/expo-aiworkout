@@ -19,29 +19,13 @@ import { ICON_SIZE } from '@/utils/appConstants';
 import DraggableExercises from '../molecules/DraggableExercises';
 import AppTextSingleInput from '../atoms/AppTextSingleInput';
 
-const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
-  const { isPublicWorkout = false } = props;
+const WorkoutDetail = () => {
   const navigation = useNavigation();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
-  const { isLargeScreen, isMediumScreen, isMobileDeviceOnly } = useWebBreakPoints();
-  const toggleSwitch = () => setIsEnabled(!isEnabled);
+  const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
   const toggleIsCurrentWorkoutPublic = () => setIsCurrentWorkoutPublic(!isCurrentWorkoutPublic);
-
-  const renderVersionTab = () => {
-    if (hasExercise && isPublicWorkout) {
-      return (
-        <CustomSwitch
-          isEnabled={isEnabled}
-          toggleSwitch={toggleSwitch}
-          label="Short Version"
-          containerStyle={[tailwind('my-0 ')]}
-        />
-      );
-    }
-  };
 
   useEffect(() => {
     if (workoutDetail) {
@@ -54,10 +38,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     if (!hasExercise) {
       return (
         <Container style={tailwind('flex-1')}>
-          <NoDataSvg
-            label="No exercises (Coming Soon)"
-            message={!isPublicWorkout ? 'Start building your workout' : ''}
-          />
+          <NoDataSvg label="No exercises (Coming Soon)" message={'Start building your workout'} />
         </Container>
       );
     }
@@ -75,7 +56,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           style={[
             Platform.select({
               web: tailwind(
-                'absolute bottom-3 left-0 right-0 mx-auto flex-1  items-center justify-center self-center',
+                'absolute bottom-3 left-0 right-0 mx-auto flex-1  items-center justify-center self-center px-4',
               ),
 
               native: tailwind(
@@ -92,7 +73,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                 web: tailwind(
                   `${isLargeScreen ? 'w-full' : 'h-[3.6875rem] w-[23.0625rem]'} flex  shrink-0 items-center justify-center gap-2.5 rounded-lg px-2.5 py-3`,
                 ),
-                native: tailwind('rounded-lg'),
+                native: tailwind('rounded-lg '),
               }),
             ]}
           />
@@ -104,7 +85,12 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const renderWorkoutController = () => {
     return (
       <Container
-        style={[tailwind('w-full flex-row flex-wrap items-center justify-between gap-4 ')]}>
+        style={[
+          Platform.select({
+            web: tailwind('w-full flex-row flex-wrap items-center justify-between gap-4 '),
+            native: tailwind('w-full flex-row flex-wrap  items-center justify-between gap-1 '),
+          }),
+        ]}>
         <LabelContainer
           label={workoutDetail?.name ?? ''}
           labelStyle={[
@@ -133,7 +119,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               web: tailwind(
                 ' text-center text-xl font-normal not-italic leading-[150%] text-white',
               ),
-              native: tailwind('text-xl font-bold'),
+              native: tailwind('text-sm font-bold'),
             }),
           ]}
           label="Public"
@@ -145,7 +131,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               web: tailwind(
                 ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center font-normal  not-italic leading-[150%] text-white`,
               ),
-              native: tailwind('text-xl font-bold'),
+              native: tailwind('text-sm font-bold'),
             }),
           ]}
           containerStyle={[
@@ -154,7 +140,13 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               // native: tailwind('flex-1'),
             }),
           ]}
-          left={<Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />}
+          left={
+            <Ionicons
+              name="duplicate-sharp"
+              color="#A27DE1"
+              size={Platform.OS === 'web' ? ICON_SIZE : 16}
+            />
+          }
         />
         <LabelContainer
           label={'Delete'}
@@ -163,7 +155,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               web: tailwind(
                 ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center font-normal  not-italic leading-[150%] text-white`,
               ),
-              native: tailwind('text-xl font-bold'),
+              native: tailwind('text-sm font-bold'),
             }),
           ]}
           containerStyle={[
@@ -172,7 +164,13 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               // native: tailwind('flex-1'),
             }),
           ]}
-          left={<FontAwesome6 name="trash-can" color="#A27DE1" size={ICON_SIZE} />}
+          left={
+            <FontAwesome6
+              name="trash-can"
+              color="#A27DE1"
+              size={Platform.OS === 'web' ? ICON_SIZE : 16}
+            />
+          }
         />
       </Container>
     );
@@ -191,7 +189,12 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           })}
         />
         <Container
-          style={[tailwind(`mb-4 ${isPublicWorkout ? '' : 'border-[0.35px] border-white'} `)]}
+          style={[
+            Platform.select({
+              web: tailwind(`mb-4 border-[0.35px] border-white`),
+              native: tailwind(`my-4 border-[0.35px] border-white`),
+            }),
+          ]}
         />
       </>
     );
@@ -205,7 +208,7 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             web: tailwind(`mx-auto flex w-full flex-col gap-2 px-32
                 ${isLargeScreen && 'px-4'}
               `),
-            native: tailwind('flex flex-col gap-4 p-4'),
+            native: tailwind('flex flex-col  p-4'),
           }),
           tailwind('flex-1'),
         ]}>
@@ -237,26 +240,14 @@ const WorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                   native: tailwind('flex-1 justify-between'),
                 }),
               ]}
-              left={isPublicWorkout ? '' : <Feather name="edit" color="#A27DE1" size={ICON_SIZE} />}
+              left={<Feather name="edit" color="#A27DE1" size={ICON_SIZE} />}
             />
           </Container>
-          {!isMediumScreen && renderVersionTab()}
         </Container>
 
         {renderWorkoutController()}
-        {isPublicWorkout && isMediumScreen && renderVersionTab()}
-        {isPublicWorkout && (
-          <TextContainer
-            data={`Workout Name: ${workoutDetail?.name}`}
-            style={[
-              Platform.select({
-                web: tailwind('self-center py-4 text-2xl font-bold'),
-                native: tailwind('hidden'),
-              }),
-            ]}
-          />
-        )}
-        {!isPublicWorkout && renderExcerciseLabel()}
+
+        {renderExcerciseLabel()}
         <Container
           style={[
             Platform.select({

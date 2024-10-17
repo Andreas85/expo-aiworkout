@@ -131,16 +131,26 @@ export default function MyWorkout() {
             className="flex items-center justify-between">
             <Text
               style={[
-                tailwind(
-                  `text-5 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
-                ),
+                Platform.select({
+                  web: tailwind(
+                    `text-5 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
+                  ),
+                  native: tailwind(
+                    `text-4 text-center capitalize not-italic leading-10 text-white `,
+                  ),
+                }),
               ]}>
               List of workouts
             </Text>
             <ActionButton
               label={'Add Workout'}
               onPress={handleAddWorkout}
-              style={tailwind('rounded-xl')}
+              style={[
+                Platform.select({
+                  web: tailwind('rounded-xl'),
+                  native: tailwind('rounded-xl px-3.5'),
+                }),
+              ]}
               left={<AntDesign name="pluscircleo" size={20} color="white" />}
             />
           </Container>

@@ -1,82 +1,99 @@
-import React, { useState } from 'react';
-import { DndContext, useSensor, useSensors, PointerSensor, closestCenter } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import React, { useEffect, useRef, useState } from 'react';
+import { ReactSortable } from 'react-sortablejs'; // Import react-sortablejs
 import { ExerciseElement } from '@/services/interfaces';
 import ExerciseCard from '../atoms/ExerciseCard';
-import { tailwind } from '@/utils/tailwind';
-
 import { Image } from 'expo-image';
 import { IMAGES } from '@/utils/images';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { tailwind } from '@/utils/tailwind';
 
 // Sortable item component
-const SortableItem: React.FC<{ id: string; item: ExerciseElement }> = ({ id, item }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    // backgroundColor: '#f0f0f0',
-    // border: '1px solid #ccc',
-    // marginBottom: '0.5rem',
-    borderRadius: '5px',
-    // cursor: 'grab',
-  };
-
+const SortableItem: React.FC<{ item: ExerciseElement }> = ({ item }) => {
   const handleSubmit = (data: any) => {
     console.log(data);
   };
 
   return (
-    <div ref={setNodeRef} style={style} id={id}>
-      <ExerciseCard data={item} handleSubmit={handleSubmit}>
-        <div
-          style={{ cursor: 'grab' }}
-          {...attributes} // Attaching drag attributes to the name div
-          {...listeners} // Attaching drag listeners to the name div
-        >
-          <em>
-            <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
-          </em>
-        </div>
-      </ExerciseCard>
-    </div>
+    <ExerciseCard data={item} handleSubmit={handleSubmit}>
+      <div style={{ cursor: 'grab' }}>
+        <em>
+          <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
+        </em>
+      </div>
+    </ExerciseCard>
   );
 };
 
 const DraggableExercises = (props: {}) => {
-  // const { exercisesData } = props;
   const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
-  const [items, setItems] = useState<ExerciseElement[]>(exercisesList);
+  const [items, setItems] = useState<any[]>(exercisesList);
 
-  // Sensors to detect dragging (e.g., mouse or touch)
-  const sensors = useSensors(useSensor(PointerSensor));
+  const handleDragOnEnd = (event: any) => {
+    const { oldIndex, newIndex } = event;
+    console.log(oldIndex, newIndex, 'ORDER CHANGE');
+  };
 
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-    if (active?.id !== over?.id) {
-      setItems(items => {
-        const oldIndex = items.findIndex(item => item?._id === active?.id);
-        const newIndex = items.findIndex(item => item?._id === over?.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+  // Reference to the scrollable container
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollThreshold = 50; // Distance from the edge where auto-scroll should start
+  const scrollSpeed = 5; // Pixels to scroll per frame
+
+  // Function to handle reordering of items
+  const handleOrderChange = (newOrder: ExerciseElement[]) => {
+    setItems(newOrder);
+  };
+
+  // Function to handle auto-scroll
+  const autoScroll = (event: any) => {
+    const container = scrollContainerRef.current;
+
+    if (!container) return;
+
+    const { clientY } = event;
+    const { top, bottom } = container.getBoundingClientRect();
+
+    // Scroll up if near the top
+    if (clientY < top + scrollThreshold) {
+      container.scrollTop -= scrollSpeed;
+    }
+
+    // Scroll down if near the bottom
+    if (clientY > bottom - scrollThreshold) {
+      container.scrollTop += scrollSpeed;
     }
   };
 
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+
+    if (container) {
+      // Add event listener for the dragover event to trigger auto-scroll
+      container.addEventListener('dragover', autoScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('dragover', autoScroll);
+      }
+    };
+  }, []);
+
   return (
-    <div className="space-y-1 overflow-x-hidden overflow-y-scroll">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={items.map(item => item._id)} strategy={verticalListSortingStrategy}>
-          {items.map((item: ExerciseElement) => (
-            <SortableItem key={item?._id} id={item?._id} item={item} />
-          ))}
-        </SortableContext>
-      </DndContext>
+    <div
+      className="space-y-1 overflow-x-hidden overflow-y-scroll"
+      ref={scrollContainerRef}
+      style={{ maxHeight: '80vh' }}>
+      <ReactSortable
+        list={items} // List of items to sort
+        setList={handleOrderChange} // Function to update the list when items are moved
+        onEnd={handleDragOnEnd} // Callback after reordering
+        className="space-y-1 overflow-x-hidden overflow-y-scroll">
+        {items.map(item => (
+          <div key={item?._id} data-id={item?._id}>
+            <SortableItem item={item} />
+          </div>
+        ))}
+      </ReactSortable>
     </div>
   );
 };
