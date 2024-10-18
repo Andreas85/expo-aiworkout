@@ -1,54 +1,34 @@
 import Container from '@/components/atoms/Container';
-import GridContainer from '@/components/atoms/GridContainer';
-import ImageContainer from '@/components/atoms/ImageContainer';
 import Loading from '@/components/atoms/Loading';
-import TextContainer from '@/components/atoms/TextContainer';
 import { Text } from '@/components/Themed';
 import { useFetchData } from '@/hooks/useFetchData';
 import { fetchPublicWorkoutService } from '@/services/workouts';
 import { tailwind } from '@/utils/tailwind';
 import { useCallback, useEffect, useState } from 'react';
-import { IMAGES } from '@/utils/images';
 import CustomSwitch from '../atoms/CustomSwitch';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useAuthStore } from '@/store/authStore';
-import { LayoutAnimation, Platform, Pressable, UIManager } from 'react-native';
+import { LayoutAnimation, Platform } from 'react-native';
 import { router } from 'expo-router';
-import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { debounce } from 'lodash';
+import WorkoutList from '../molecules/WorkoutList';
+import useBreakPoints from '@/hooks/useBreakPoints';
 
 export default function PublicWorkout() {
   const { isAuthenticated } = useAuthStore();
-  const { isSmallScreen, isLargeScreen } = useWebBreakPoints();
+  const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-
-  // Using LayoutAnimation for smooth transitions
-  // const toggleSwitch = useCallback(() => {
-  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  //   setIsEnabled(!isEnabled);
-  // }, []);
+  const [productData, setProductData] = useState<any[]>([]);
 
   // const toggleSwitch = () => setIsEnabled(prev => !prev);
-
-  // Enable LayoutAnimation on Android
-  // useEffect(() => {
-  //   if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  //     UIManager.setLayoutAnimationEnabledExperimental(true);
-  //   }
-  // }, []);
 
   const toggleSwitch = useCallback(
     debounce(() => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setIsEnabled(prevState => !prevState);
-    }, 500), // 300ms delay
+    }, 500), // 500ms delay
     [],
   );
-
-  // Function to handle refresh action
-  const onRefresh = async () => {
-    await refetch();
-  };
 
   const getFetchFunction = async () => {
     // return await fetchPublicWorkoutService();
@@ -56,92 +36,37 @@ export default function PublicWorkout() {
   };
 
   // Don't refetch on window focus and hit api after 1 minutes
-  const { data, isPending, refetch, isStale, fetchStatus } = useFetchData({
+  const { data, isPending, refetch, fetchStatus, isStale } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT],
-    staleTime: 60 * 1000, // 1 minute
+    // staleTime: 10 * 1000, // 1 minute
   });
 
   useEffect(() => {
-    if (isStale) {
-      refetch();
+    if (data) {
+      setProductData(data?.data);
     }
-  }, [isStale]);
+  }, [data]);
+
+  // useEffect(() => {
+  //   if (isStale && Platform.OS === 'web') {
+  //     refetch();
+  //   }
+  // }, [isStale]);
 
   const handleCardClick = (item: any) => {
     router.push(`/workout/public/${item?._id}`);
   };
 
-  const renderListItem = (item: any, index: number) => {
-    if (item?.isPlaceholder) {
-      return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
-    }
-
-    return (
-      <Pressable style={tailwind('flex-1')} onPress={() => handleCardClick(item)}>
-        {!isEnabled && (
-          <Container
-            style={[
-              Platform.select({ web: tailwind('cursor-pointer ') }),
-              tailwind(
-                `relative h-full w-full flex-1 grow self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
-              ),
-            ]}>
-            <ImageContainer
-              source={IMAGES.logo}
-              styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
-              contentFit="fill"
-            />
-          </Container>
-        )}
-        <Container
-          style={[
-            Platform.select({
-              web: tailwind(
-                `flex flex-col items-center  ${isEnabled ? ' h-20 flex-1 rounded-lg bg-NAVBAR_BACKGROUND' : ''} ${isLargeScreen ? 'gap-[0.625rem] px-2 py-3' : 'gap-[1.25rem]  px-5 py-7'}`,
-              ),
-              native: tailwind(
-                `flex flex-1 flex-col items-center gap-[1.25rem] px-2 py-3 ${isEnabled ? ' h-20  rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
-              ),
-            }),
-          ]}>
-          <TextContainer
-            data={isEnabled + item?.name}
-            style={[
-              Platform.select({
-                web: tailwind(`${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.125rem] '}`),
-                native: tailwind('text-[0.875rem] '),
-              }),
-            ]}
-            numberOfLines={1}
-          />
-          {isEnabled && (
-            <TextContainer
-              data={item?.totalExercises + ' Exercises'}
-              style={[
-                Platform.select({
-                  web: tailwind(
-                    `text-[#C2C2C2] ${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.125rem] '}`,
-                  ),
-                  native: tailwind('text-[0.875rem] text-[#C2C2C2]'),
-                }),
-              ]}
-            />
-          )}
-        </Container>
-      </Pressable>
-    );
-  };
-
   const renderWorkingListing = () => {
-    // if (fetchStatus === 'fetching') {
-    //   return <Loading />;
-    // }
+    if (fetchStatus === 'fetching' && Platform.OS !== 'web') {
+      return <Loading />;
+    }
 
     // if (error) return <Text>An error has occurred: + {error.message}</Text>;
     // Ensure bracketPrediction is iterable
 
-    const iterableProductData = Array.isArray(data?.data) ? data?.data : [];
+    const iterableProductData = Array.isArray(productData) ? productData : [];
 
     // Calculate how many placeholders are needed to make length a multiple of 4
     const placeholdersNeeded =
@@ -152,15 +77,16 @@ export default function PublicWorkout() {
       ...iterableProductData,
       ...Array(placeholdersNeeded).fill({ isPlaceholder: true }),
     ];
+
     return (
-      <GridContainer
+      <WorkoutList
         data={adjustedData}
-        renderListHeaderComponent={renderTopHeader}
-        refreshingNative={isPending}
-        onRefresh={onRefresh}
-        listNumColumnsNative={isSmallScreen ? 2 : 4}
-        keyExtractorNative={item => item?._id}
-        renderListItemInNative={(item, index) => renderListItem(item, index, isEnabled)}
+        onRefresh={refetch}
+        isPending={isPending}
+        numColumns={isSmallScreen ? 2 : 4}
+        isEnabled={isEnabled}
+        onItemPress={handleCardClick}
+        keyName="public-workout"
       />
     );
   };
@@ -201,10 +127,9 @@ export default function PublicWorkout() {
   return (
     <>
       <Container
-        style={tailwind(
-          `h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} bg-transparent`,
-        )}>
+        style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
         {renderVersionTab()}
+        {renderTopHeader()}
         {renderWorkingListing()}
       </Container>
     </>

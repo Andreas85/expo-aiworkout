@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-no-undef */
 import Container from '@/components/atoms/Container';
-import GridContainer from '@/components/atoms/GridContainer';
 import ImageContainer from '@/components/atoms/ImageContainer';
 import Loading from '@/components/atoms/Loading';
 import TextContainer from '@/components/atoms/TextContainer';
@@ -22,6 +21,7 @@ import { router } from 'expo-router';
 import { LayoutAnimation, Platform, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { debounce } from 'lodash';
+import WorkoutList from '../molecules/WorkoutList';
 
 export default function MyWorkout() {
   // const { isAuthenticated } = useAuthStore();
@@ -41,11 +41,6 @@ export default function MyWorkout() {
     }, 500), // 500ms delay
     [],
   );
-
-  // Function to handle refresh action
-  const onRefresh = async () => {
-    await refetch();
-  };
 
   const getFetchFunction = async () => {
     return await fetchMyWorkoutService();
@@ -130,14 +125,15 @@ export default function MyWorkout() {
     ];
     return (
       <>
-        <GridContainer
+        <WorkoutList
           data={adjustedData}
-          renderListHeaderComponent={renderTopHeader}
-          refreshingNative={isPending}
-          onRefresh={onRefresh}
-          listNumColumnsNative={isSmallScreen ? 2 : 4}
-          keyExtractorNative={item => item?._id}
-          renderListItemInNative={(item, index) => renderListItem(item, index, isEnabled)}
+          onRefresh={refetch}
+          isMyWorkout={true}
+          isPending={isPending}
+          keyName="my-workout"
+          numColumns={isSmallScreen ? 2 : 4}
+          isEnabled={isEnabled}
+          onItemPress={handleCardClick}
         />
       </>
     );
@@ -199,6 +195,7 @@ export default function MyWorkout() {
       <Container
         style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
         {renderVersionTab()}
+        {renderTopHeader()}
         {renderWorkingListing()}
       </Container>
       {openModal && <AddAndEditWorkoutModal isModalVisible={openModal} closeModal={hideModal} />}

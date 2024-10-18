@@ -75,14 +75,15 @@ export default function Layout() {
                 title: 'My workouts',
               })}
             />
-            {/* )} */}
-            <Tab.Screen
-              name="workouts/public"
-              component={PublicScreenRoute}
-              options={({ route }) => ({
-                title: 'Public workouts',
-              })}
-            />
+            {isAuthenticated && (
+              <Tab.Screen
+                name="workouts/public"
+                component={PublicScreenRoute}
+                options={({ route }) => ({
+                  title: 'Public workouts',
+                })}
+              />
+            )}
           </Tab.Navigator>
         </Container>
       </GradientBackground>
