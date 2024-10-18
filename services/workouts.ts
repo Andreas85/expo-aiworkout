@@ -123,8 +123,8 @@ export const addExerciseToWorkoutRequest = async (payload: IPayloadAddExerciseTo
       DATA: formData,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 
@@ -139,8 +139,8 @@ export const removeExerciseToWorkoutRequest = async (payload: IPayloadRemoveExer
       DATA: formData,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 
@@ -155,8 +155,8 @@ export const updateExerciseToWorkoutRequest = async (payload: IPayloadUpdateExer
       DATA: formData,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 
@@ -171,8 +171,8 @@ export const sortExercisesRequest = async (payload: IPayloadSortExercises) => {
       DATA: formData,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 

@@ -4,9 +4,12 @@ export interface ICreateWorkoutFormData {
 }
 
 export interface IAddExerciseToWorkout {
-  exerciseId: string | number;
-  duration: number;
+  exerciseId: string;
+  name?: string;
+  duration: any;
   reps?: any;
+  rest?: any;
+  weight?: any;
 }
 
 export interface IUpdateExerciseToWorkout {

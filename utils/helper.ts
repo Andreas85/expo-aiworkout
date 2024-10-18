@@ -21,3 +21,22 @@ export function removeParenthesisString(input: any) {
 export const pluralise = (count: any, value: any) => {
   return count != 1 ? `${value}s` : `${value}`;
 };
+
+export const getReorderItemsForSortingWorkoutExercises = (items: any[]) => {
+  const itemOrder = items?.map((item: any, index: number) => ({
+    exerciseId: item?._id,
+    order: index,
+    name: item?.exercise?.name,
+  }));
+
+  const modifiedData = Object.fromEntries(
+    itemOrder?.map(
+      ({ exerciseId, order, name }: { exerciseId: string; order: number; name: string }) => [
+        exerciseId,
+        order,
+        name,
+      ],
+    ),
+  );
+  return modifiedData;
+};

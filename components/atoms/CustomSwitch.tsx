@@ -6,7 +6,15 @@ import { tailwind } from '@/utils/tailwind';
 import Container from './Container';
 
 const CustomSwitch = (props: ICustomSwitch) => {
-  const { isEnabled, toggleSwitch, label, labelStyle = '', containerStyle } = props;
+  const {
+    isEnabled,
+    toggleSwitch,
+    label,
+    labelStyle = '',
+    containerStyle,
+    hasRightLabel = false,
+    labelRight,
+  } = props;
   return (
     <>
       <Container
@@ -19,6 +27,7 @@ const CustomSwitch = (props: ICustomSwitch) => {
           onValueChange={toggleSwitch}
           value={isEnabled}
         />
+        {hasRightLabel && <Text style={[labelStyle, tailwind('mr-2')]}>{labelRight}</Text>}
       </Container>
     </>
   );

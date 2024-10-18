@@ -40,6 +40,11 @@ const WorkoutDetail = () => {
     showModal: showModalDeleteModal,
     openModal: openModalDeleteModal,
   } = useModal();
+  const {
+    hideModal: hideModalCreateWorkoutCopy,
+    showModal: showModalCreateWorkoutCopy,
+    openModal: openModalCreateWorkoutCopy,
+  } = useModal();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
@@ -70,13 +75,17 @@ const WorkoutDetail = () => {
     },
   });
 
-  const { mutate: mutateCreateWorkoutCopy } = useMutation({
+  const { mutate: mutateCreateWorkoutCopy, isPending: isPendingCreateWorkoutCopy } = useMutation({
     mutationFn: createWorkoutCopy,
     onSuccess: async data => {
+      toast.show('Duplicate success', { type: 'success' });
       router.push(`/workout/${data?.data?._id}`);
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
+    },
+    onSettled: () => {
+      hideModalCreateWorkoutCopy();
     },
   });
 
@@ -196,7 +205,7 @@ const WorkoutDetail = () => {
               native: tailwind('text-sm font-bold'),
             }),
           ]}
-          onPress={handleDuplicateWorkout}
+          onPress={showModalCreateWorkoutCopy}
           containerStyle={[
             Platform.select({
               web: tailwind(''),
@@ -385,6 +394,16 @@ const WorkoutDetail = () => {
           labelAction="Delete"
           isLoading={isPendingDeleteWorkout}
           handleAction={handleDeleteWorkout}
+        />
+      )}
+      {openModalCreateWorkoutCopy && (
+        <ConfirmationModal
+          isModalVisible={openModalCreateWorkoutCopy}
+          closeModal={hideModalCreateWorkoutCopy}
+          message="Are you sure you want to duplicate this workout?"
+          labelAction="Duplicate"
+          isLoading={isPendingCreateWorkoutCopy}
+          handleAction={handleDuplicateWorkout}
         />
       )}
     </Container>

@@ -6,11 +6,16 @@ import { Image } from 'expo-image';
 import { IMAGES } from '@/utils/images';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { tailwind } from '@/utils/tailwind';
+import { useLocalSearchParams } from 'expo-router';
+import { sortExercisesRequest } from '@/services/workouts';
+import { useMutation } from '@tanstack/react-query';
+import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
+import { useToast } from 'react-native-toast-notifications';
 
 // Sortable item component
-const SortableItem: React.FC<{ item: ExerciseElement }> = ({ item }) => {
+const SortableItem: React.FC<{ item: ExerciseElement; index: number }> = ({ item, index }) => {
   const handleSubmit = (data: any) => {
-    console.log(data);
+    // console.log(data);
   };
 
   return (
@@ -25,12 +30,43 @@ const SortableItem: React.FC<{ item: ExerciseElement }> = ({ item }) => {
 };
 
 const DraggableExercises = (props: {}) => {
+  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const toast = useToast();
+  const { slug } = useLocalSearchParams() as any;
   const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
-  const [items, setItems] = useState<any[]>(exercisesList);
+
+  // Sort exercises by the 'order' key
+
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    const sortedExercisesList = [...exercisesList].sort((a, b) => a.order - b.order);
+    setItems(sortedExercisesList);
+  }, [exercisesList]);
+
+  const { mutate: mutateSortExercise } = useMutation({
+    mutationFn: sortExercisesRequest,
+    onSuccess: async data => {
+      toast.show('Updated order of exercises', { type: 'success' });
+      setWorkoutDetail(data?.data);
+    },
+  });
 
   const handleDragOnEnd = (event: any) => {
     const { oldIndex, newIndex } = event;
-    console.log(oldIndex, newIndex, 'ORDER CHANGE');
+    // Manually reorder the items array
+    const reorderedItems = [...items];
+    const [movedItem] = reorderedItems.splice(oldIndex, 1); // Remove the dragged item from old index
+    reorderedItems.splice(newIndex, 0, movedItem); // Insert it at the new index
+
+    const modifiedData = getReorderItemsForSortingWorkoutExercises(reorderedItems);
+    const payload = {
+      queryParams: { id: slug },
+      formData: { ...modifiedData },
+    };
+    // console.log(itemOrder);
+    mutateSortExercise(payload);
+    console.log(oldIndex, newIndex, 'ORDER CHANGE', reorderedItems);
   };
 
   // Reference to the scrollable container
@@ -97,9 +133,9 @@ const DraggableExercises = (props: {}) => {
         onEnd={handleDragOnEnd} // Callback after reordering
         handle=".drag-handle"
         className="space-y-1 overflow-x-hidden overflow-y-scroll">
-        {items.map(item => (
+        {items.map((item, index) => (
           <div key={item?._id} data-id={item?._id}>
-            <SortableItem item={item} />
+            <SortableItem item={item} index={index} />
           </div>
         ))}
       </ReactSortable>
