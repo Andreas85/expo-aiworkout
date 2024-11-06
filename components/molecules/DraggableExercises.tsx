@@ -1,7 +1,7 @@
 import { ExerciseElement } from '@/services/interfaces';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, Platform } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import DraggableFlatList, {
   RenderItemParams,
   ScaleDecorator,
@@ -15,13 +15,13 @@ import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 import { useMutation } from '@tanstack/react-query';
 import { sortExercisesRequest } from '@/services/workouts';
 import { useLocalSearchParams } from 'expo-router';
-import { useToast } from 'react-native-toast-notifications';
 
-const DraggableExercises = (props: {}) => {
-  // const { exercisesData } = props;
+const DraggableExercises = (props: {
+  setIsPendingExerciseCardAction: (loading: boolean) => void;
+}) => {
+  const { setIsPendingExerciseCardAction } = props;
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
-  const toast = useToast();
   const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
   const [data, setData] = useState<ExerciseElement[]>([]);
 
@@ -30,23 +30,29 @@ const DraggableExercises = (props: {}) => {
     setData(sortedExercisesList);
   }, [exercisesList]);
 
-  const { mutate: mutateSortExercise } = useMutation({
+  const { mutate: mutateSortExercise, isPending } = useMutation({
     mutationFn: sortExercisesRequest,
     onSuccess: async data => {
-      toast.show('Updated order of exercises', { type: 'success' });
       setWorkoutDetail(data?.data);
     },
   });
+
+  useEffect(() => {
+    setIsPendingExerciseCardAction(isPending);
+  }, [isPending]);
 
   const renderItem = ({ item, drag, isActive }: RenderItemParams<ExerciseElement>) => {
     return (
       <>
         <ScaleDecorator>
-          <ExerciseCard data={item} handleSubmit={() => {}}>
+          <ExerciseCard
+            data={item}
+            handleSubmit={() => {}}
+            setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}>
             <TouchableOpacity
-              onPressIn={Platform.OS === 'web' ? drag : undefined}
-              onLongPress={Platform.OS !== 'web' ? drag : undefined}
-              onPress={() => console.log('onPress', item.exercise.name)}
+              onPressIn={drag}
+              onLongPress={drag}
+              onPress={drag}
               disabled={isActive}>
               <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
             </TouchableOpacity>
@@ -63,7 +69,6 @@ const DraggableExercises = (props: {}) => {
       queryParams: { id: slug },
       formData: { ...modifiedData },
     };
-    // console.log(itemOrder);
     mutateSortExercise(payload);
     setData(data);
   };

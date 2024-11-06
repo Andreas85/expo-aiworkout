@@ -10,16 +10,23 @@ import { useLocalSearchParams } from 'expo-router';
 import { sortExercisesRequest } from '@/services/workouts';
 import { useMutation } from '@tanstack/react-query';
 import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
-import { useToast } from 'react-native-toast-notifications';
 
 // Sortable item component
-const SortableItem: React.FC<{ item: ExerciseElement; index: number }> = ({ item, index }) => {
+const SortableItem: React.FC<{
+  item: ExerciseElement;
+  index: number;
+  setIsPendingExerciseCardAction: (loading: boolean) => void;
+}> = ({ item, index, setIsPendingExerciseCardAction }) => {
   const handleSubmit = (data: any) => {
     // console.log(data);
   };
 
   return (
-    <ExerciseCard data={item} handleSubmit={handleSubmit}>
+    <ExerciseCard
+      key={item?._id}
+      data={item}
+      handleSubmit={handleSubmit}
+      setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}>
       <div className="drag-handle" style={{ cursor: 'grab' }}>
         <em>
           <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
@@ -29,9 +36,11 @@ const SortableItem: React.FC<{ item: ExerciseElement; index: number }> = ({ item
   );
 };
 
-const DraggableExercises = (props: {}) => {
+const DraggableExercises = (props: {
+  setIsPendingExerciseCardAction: (loading: boolean) => void;
+}) => {
+  const { setIsPendingExerciseCardAction } = props;
   const { setWorkoutDetail } = useWorkoutDetailStore();
-  const toast = useToast();
   const { slug } = useLocalSearchParams() as any;
   const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
 
@@ -44,13 +53,16 @@ const DraggableExercises = (props: {}) => {
     setItems(sortedExercisesList);
   }, [exercisesList]);
 
-  const { mutate: mutateSortExercise } = useMutation({
+  const { mutate: mutateSortExercise, isPending } = useMutation({
     mutationFn: sortExercisesRequest,
     onSuccess: async data => {
-      toast.show('Updated order of exercises', { type: 'success' });
       setWorkoutDetail(data?.data);
     },
   });
+
+  useEffect(() => {
+    setIsPendingExerciseCardAction(isPending);
+  }, [isPending]);
 
   const handleDragOnEnd = (event: any) => {
     const { oldIndex, newIndex } = event;
@@ -64,7 +76,6 @@ const DraggableExercises = (props: {}) => {
       queryParams: { id: slug },
       formData: { ...modifiedData },
     };
-    // console.log(itemOrder);
     mutateSortExercise(payload);
     console.log(oldIndex, newIndex, 'ORDER CHANGE', reorderedItems);
   };
@@ -135,7 +146,11 @@ const DraggableExercises = (props: {}) => {
         className="space-y-1 overflow-x-hidden overflow-y-scroll">
         {items.map((item, index) => (
           <div key={item?._id} data-id={item?._id}>
-            <SortableItem item={item} index={index} />
+            <SortableItem
+              item={item}
+              index={index}
+              setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}
+            />
           </div>
         ))}
       </ReactSortable>

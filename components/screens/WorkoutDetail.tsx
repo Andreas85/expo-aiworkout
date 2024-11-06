@@ -7,7 +7,7 @@ import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { ActionButton } from '../atoms/ActionButton';
-
+import { SkypeIndicator } from 'react-native-indicators';
 import CustomSwitch from '../atoms/CustomSwitch';
 
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
@@ -15,12 +15,12 @@ import NoDataSvg from '../svgs/NoDataSvg';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
-import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { ICON_SIZE } from '@/utils/appConstants';
 import DraggableExercises from '../molecules/DraggableExercises';
 import AppTextSingleInput from '../atoms/AppTextSingleInput';
 import useModal from '@/hooks/useModal';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import {
   createWorkoutCopy,
   deleteWorkoutDetail,
@@ -31,7 +31,6 @@ import { useToast } from 'react-native-toast-notifications';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
-  const queryClient = useQueryClient();
   const toast = useToast();
   const { slug } = useLocalSearchParams() as any;
   const { hideModal, showModal, openModal } = useModal();
@@ -47,8 +46,10 @@ const WorkoutDetail = () => {
   } = useModal();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
+  const { setWorkoutDetail } = useWorkoutDetailStore();
   const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
+  const [isPendingExerciseCardAction, setIsPendingExerciseCardAction] = useState<boolean>(false);
 
   const toggleIsCurrentWorkoutPublic = () => {
     mutateUpdatedWorkout({
@@ -58,12 +59,13 @@ const WorkoutDetail = () => {
     setIsCurrentWorkoutPublic(!isCurrentWorkoutPublic);
   };
 
-  const { mutate: mutateUpdatedWorkout } = useMutation({
+  const { mutate: mutateUpdatedWorkout, isPending } = useMutation({
     mutationFn: updateWorkoutDataRequest,
     onSuccess: async data => {
-      return await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-      });
+      setWorkoutDetail(data?.data);
+    },
+    onError: (error: any) => {
+      toast.show(error, { type: 'danger' });
     },
   });
 
@@ -114,7 +116,7 @@ const WorkoutDetail = () => {
     }
     return (
       <>
-        <DraggableExercises />
+        <DraggableExercises setIsPendingExerciseCardAction={setIsPendingExerciseCardAction} />
       </>
     );
   };
@@ -252,15 +254,44 @@ const WorkoutDetail = () => {
   const renderExcerciseLabel = () => {
     return (
       <>
-        <TextContainer
-          data={`Exercises`}
-          style={Platform.select({
-            web: tailwind(
-              `${isLargeScreen ? 'text-base' : 'text-2xl'}  font-bold capitalize not-italic leading-[150%] text-white`,
-            ),
-            native: tailwind(' self-left  text-lg font-bold'),
-          })}
-        />
+        <Container style={[tailwind('flex-row  justify-between gap-2 ')]}>
+          <Container style={[tailwind(``)]}>
+            <TextContainer
+              data={`Exercises `}
+              style={Platform.select({
+                web: tailwind(
+                  `${isLargeScreen ? 'text-base' : 'text-2xl'}  font-bold capitalize not-italic leading-[150%] text-white`,
+                ),
+                native: tailwind(' self-left  text-lg font-bold'),
+              })}
+            />
+          </Container>
+          {(isPending || isPendingExerciseCardAction) && (
+            <Container style={[tailwind(``)]}>
+              <LabelContainer
+                label={'Saving Changes'}
+                containerStyle={[
+                  Platform.select({
+                    web: tailwind(`
+                    ${isLargeScreen ? 'flex-1 justify-end gap-2' : 'hidden'}
+                  `),
+                    native: tailwind('flex-1 justify-end gap-2'),
+                  }),
+                ]}
+                right={
+                  <SkypeIndicator
+                    color="#A27DE1"
+                    animating
+                    size={Platform.OS === 'web' ? 20 : 16}
+                    style={{
+                      marginRight: 10,
+                    }}
+                  />
+                }
+              />
+            </Container>
+          )}
+        </Container>
         <Container
           style={[
             Platform.select({
@@ -293,10 +324,36 @@ const WorkoutDetail = () => {
             }),
             tailwind('flex-row items-center justify-between'),
           ]}>
-          <Container style={[tailwind('flex-1 flex-row items-center justify-between gap-2')]}>
+          <Container style={[tailwind('flex-1 flex-row items-center gap-2')]}>
             <Container>
               <BackActionButton />
             </Container>
+            {(isPending || isPendingExerciseCardAction) &&
+              Platform.OS === 'web' &&
+              !isLargeScreen && (
+                <Container style={[tailwind(`flex-1 items-start justify-center self-center`)]}>
+                  <LabelContainer
+                    label={'Saving Changes'}
+                    containerStyle={[
+                      Platform.select({
+                        web: tailwind(`
+                    ${isLargeScreen ? 'hidden' : 'self-center'}
+                  `),
+                      }),
+                    ]}
+                    right={
+                      <SkypeIndicator
+                        color="#A27DE1"
+                        animating
+                        size={Platform.OS === 'web' ? 20 : 16}
+                        style={{
+                          marginRight: 10,
+                        }}
+                      />
+                    }
+                  />
+                </Container>
+              )}
             <LabelContainer
               label={workoutDetail?.name ?? ''}
               labelStyle={[

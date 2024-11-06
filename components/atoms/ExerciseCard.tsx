@@ -27,17 +27,21 @@ import { debounce } from 'lodash';
 interface IExerciseCard {
   data: ExerciseElement;
   children: React.ReactNode;
+  setIsPendingExerciseCardAction: (loading: boolean) => void;
   handleSubmit?: (data: any) => void;
 }
 
 const ExerciseCard = (props: IExerciseCard) => {
-  const { data, children, handleSubmit } = props;
+  const { data, children, handleSubmit, setIsPendingExerciseCardAction } = props;
 
-  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const { setWorkoutDetail } = useWorkoutDetailStore() as any;
+  const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail) ?? [];
+  const workoutDetailExercises =
+    useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
   const { slug } = useLocalSearchParams() as any;
   const toast = useToast();
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
-  const { hideModal, showModal, openModal } = useModal();
+  const { hideModal, openModal } = useModal();
   const {
     hideModal: hideModalDeleteWorkoutExercise,
     showModal: showModalDeleteWorkoutExercise,
@@ -45,25 +49,39 @@ const ExerciseCard = (props: IExerciseCard) => {
   } = useModal();
   const [isEnabled, setIsEnabled] = useState<boolean>(!data?.reps);
   const [inputValues, setInputValues] = useState<any>({
-    weight: data?.weight ? data?.weight + '' : '',
-    rest: data?.rest ? data?.rest + '' : '',
-    reps: data?.reps ? data?.reps + '' : '',
-    duration: data?.duration ? data?.duration + '' : '',
+    weight: data?.weight ? data?.weight + '' : '0',
+    rest: data?.rest ? data?.rest + '' : '0',
+    reps: data?.reps ? data?.reps + '' : '0',
+    duration: data?.duration ? data?.duration + '' : '0',
   });
   const toggleSwitch = () => {
+    let updatedInValue = { ...inputValues };
+    if (!isEnabled) {
+      updatedInValue = {
+        ...inputValues,
+        reps: '0',
+        duration: inputValues?.duration,
+      };
+    } else {
+      updatedInValue = {
+        ...inputValues,
+        reps: inputValues?.reps,
+        duration: '0',
+      };
+    }
+
     setIsEnabled(prev => {
       return !prev;
     });
-    // console.log('inputValues', inputValues);
-    updateExerciseRequest(inputValues);
+    updateExerciseRequest(updatedInValue);
   };
 
   useEffect(() => {
     setInputValues({
-      weight: data?.weight ? data?.weight + '' : '',
-      rest: data?.rest ? data?.rest + '' : '',
-      reps: data?.reps ? data?.reps + '' : '',
-      duration: data?.duration ? data?.duration + '' : '',
+      weight: data?.weight ? data?.weight + '' : '0',
+      rest: data?.rest ? data?.rest + '' : '0',
+      reps: data?.reps ? data?.reps + '' : '0',
+      duration: data?.duration ? data?.duration + '' : '0',
     });
   }, [data]);
 
@@ -81,13 +99,15 @@ const ExerciseCard = (props: IExerciseCard) => {
         index: data?.order,
         exercise: {
           ...send,
-          reps: isEnabled ? 0 : send.reps, // Ensure 'reps' is set to 0 when 'isEnabled' is true
+          reps: isEnabled ? 0 : (send.reps ?? 0), // Ensure 'reps' is set to 0 when 'isEnabled' is true
+          duration: isEnabled ? (send.duration ?? 0) : 0, // Ensure 'duration' is set to 0 when 'isEnabled' is false
         },
       },
       queryParams: { id: slug },
     };
 
-    // console.log(payload);
+    workoutDetailExercises[data?.order] = updatedValues;
+    setWorkoutDetail({ ...workoutDetails, exercises: workoutDetailExercises });
 
     // Call mutation function
     mutateUpdateExerciseToWorkoutRequest(payload);
@@ -107,12 +127,11 @@ const ExerciseCard = (props: IExerciseCard) => {
 
       // Reuse the updateExerciseRequest function
       const send = updateExerciseRequest(updatedValues);
-
       handleSubmit?.(send);
 
       return updatedValues;
     });
-  }, 300); // Adjust debounce time as needed
+  }, 1000); // Adjust debounce time as needed
 
   const { mutate: mutateAddExercise } = useMutation({
     mutationFn: addExerciseToWorkoutRequest,
@@ -153,11 +172,10 @@ const ExerciseCard = (props: IExerciseCard) => {
     },
   });
 
-  const { mutate: mutateUpdateExerciseToWorkoutRequest } = useMutation({
+  const { mutate: mutateUpdateExerciseToWorkoutRequest, isPending } = useMutation({
     mutationFn: updateExerciseToWorkoutRequest,
     onSuccess: async data => {
       setWorkoutDetail(data?.data);
-      toast.show('Exercise Updated', { type: 'success' });
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
@@ -166,6 +184,10 @@ const ExerciseCard = (props: IExerciseCard) => {
       hideModalDeleteWorkoutExercise();
     },
   });
+
+  useEffect(() => {
+    setIsPendingExerciseCardAction(isPending);
+  }, [isPending]);
 
   const handleDeleteExerciseCard = () => {
     showModalDeleteWorkoutExercise();
@@ -205,10 +227,10 @@ const ExerciseCard = (props: IExerciseCard) => {
               style={[
                 Platform.select({
                   web: tailwind(
-                    'flex  flex-1 flex-row items-center justify-between border-b border-solid border-b-[#767676] pb-1',
+                    'flex  flex-1 flex-row items-center justify-between gap-4 border-b border-solid border-b-[#767676] pb-1',
                   ),
                   native: tailwind(
-                    ' flex-1 flex-row items-center justify-between border-b border-solid border-b-[#767676] ',
+                    ' flex-row items-center justify-between gap-4 border-b border-solid border-b-[#767676]',
                   ),
                 }),
               ]}>
@@ -220,13 +242,16 @@ const ExerciseCard = (props: IExerciseCard) => {
                       'flex-1 text-[0.9375rem] font-bold capitalize not-italic leading-5 tracking-[-0.005rem] text-white',
                     ),
                     native: tailwind(
-                      'text-[0.9375rem] font-bold capitalize not-italic leading-5 tracking-[-0.005rem] text-white',
+                      'flex-1 text-[0.9375rem] font-bold capitalize not-italic leading-5 tracking-[-0.005rem] text-white',
                     ),
                   }),
                 ]}
                 numberOfLines={1}
               />
-              <Container style={tailwind('')}>
+              <Container
+                style={Platform.select({
+                  native: tailwind('flex-1'),
+                })}>
                 <CustomSwitch
                   isEnabled={isEnabled}
                   toggleSwitch={toggleSwitch}
@@ -406,7 +431,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                   ]}
                 />
               </Container>
-              {!isEnabled && (
+              {!isEnabled ? (
                 <Container
                   style={Platform.select({
                     web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
@@ -443,43 +468,44 @@ const ExerciseCard = (props: IExerciseCard) => {
                     ]}
                   />
                 </Container>
+              ) : (
+                <Container
+                  style={Platform.select({
+                    web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
+                    native: tailwind(`flex-1 flex-col gap-3`),
+                  })}>
+                  <TextContainer
+                    data={`Duration (sec)`}
+                    style={[
+                      Platform.select({
+                        web: tailwind('text-center text-xs'),
+                        native: tailwind('text-2.5 text-center'),
+                      }),
+                    ]}
+                    numberOfLines={1}
+                  />
+                  <AppTextSingleInput
+                    initialValues={{ duration: inputValues.duration }}
+                    placeholder=""
+                    fieldName={'duration'}
+                    onChangeText={handleTextChange}
+                    containerStyle={tailwind('self-center border-none')}
+                    keyboardType="number-pad"
+                    containerStyleAppTextInput={Platform.select({
+                      web: tailwind(`${isMobileDeviceOnly && 'w-auto'} `),
+                      native: tailwind(`w-auto flex-1 `),
+                    })}
+                    autoCapitalize="none"
+                    placeholderTextColor="#999"
+                    testInputStyle={[
+                      Platform.select({
+                        web: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                        native: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
+                      }),
+                    ]}
+                  />
+                </Container>
               )}
-              <Container
-                style={Platform.select({
-                  web: tailwind(`flex-col gap-3 ${isMobileDeviceOnly && 'flex-1'}`),
-                  native: tailwind(`flex-1 flex-col gap-3`),
-                })}>
-                <TextContainer
-                  data={`Duration (sec)`}
-                  style={[
-                    Platform.select({
-                      web: tailwind('text-center text-xs'),
-                      native: tailwind('text-2.5 text-center'),
-                    }),
-                  ]}
-                  numberOfLines={1}
-                />
-                <AppTextSingleInput
-                  initialValues={{ duration: inputValues.duration }}
-                  placeholder=""
-                  fieldName={'duration'}
-                  onChangeText={handleTextChange}
-                  containerStyle={tailwind('self-center border-none')}
-                  keyboardType="number-pad"
-                  containerStyleAppTextInput={Platform.select({
-                    web: tailwind(`${isMobileDeviceOnly && 'w-auto'} `),
-                    native: tailwind(`w-auto flex-1 `),
-                  })}
-                  autoCapitalize="none"
-                  placeholderTextColor="#999"
-                  testInputStyle={[
-                    Platform.select({
-                      web: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
-                      native: tailwind('h-[1.875rem]  px-0 py-[0.3125rem]'),
-                    }),
-                  ]}
-                />
-              </Container>
             </Container>
           </Container>
         </Container>
@@ -500,7 +526,7 @@ const ExerciseCard = (props: IExerciseCard) => {
           )}>
           <Container style={tailwind(' ')}>{children}</Container>
           <TextContainer
-            data={`${data.exercise.name}`}
+            data={`${data?.exercise?.name}`}
             style={tailwind('flex-1')}
             numberOfLines={1}
           />
@@ -520,7 +546,7 @@ const ExerciseCard = (props: IExerciseCard) => {
           <Container style={tailwind('flex-1 flex-col gap-3')}>
             <TextContainer data={`Weight (kg)`} style={tailwind('flex-1 text-center')} />
             <AppTextSingleInput
-              initialValues={{ weight: inputValues.weight }}
+              initialValues={{ weight: inputValues?.weight ?? '0' }}
               placeholder=""
               fieldName={'weight'}
               onChangeText={handleTextChange}
@@ -536,7 +562,7 @@ const ExerciseCard = (props: IExerciseCard) => {
           <Container style={tailwind('flex-1 flex-col items-center justify-center gap-3')}>
             <TextContainer data={`Rest (sec)`} style={tailwind('flex-1 text-center ')} />
             <AppTextSingleInput
-              initialValues={{ rest: inputValues.rest }}
+              initialValues={{ rest: inputValues?.rest ?? '0' }}
               placeholder=""
               fieldName={'rest'}
               onChangeText={handleTextChange}
@@ -549,11 +575,11 @@ const ExerciseCard = (props: IExerciseCard) => {
               placeholderTextColor="#999"
             />
           </Container>
-          {isEnabled && (
+          {!isEnabled ? (
             <Container style={tailwind('flex-1 flex-col gap-3')}>
               <TextContainer data={`Number of reps`} style={tailwind('flex-1 text-center')} />
               <AppTextSingleInput
-                initialValues={{ reps: inputValues.reps }}
+                initialValues={{ reps: inputValues?.reps ?? '0' }}
                 placeholder=""
                 fieldName={'reps'}
                 onChangeText={handleTextChange}
@@ -566,23 +592,24 @@ const ExerciseCard = (props: IExerciseCard) => {
                 placeholderTextColor="#999"
               />
             </Container>
+          ) : (
+            <Container style={tailwind('flex-1 flex-col gap-3')}>
+              <TextContainer data={`Duration (sec)`} style={tailwind('flex-1 text-center')} />
+              <AppTextSingleInput
+                initialValues={{ duration: inputValues?.duration ?? '0' }}
+                placeholder=""
+                fieldName={'duration'}
+                onChangeText={handleTextChange}
+                containerStyle={tailwind('border-none')}
+                containerStyleAppTextInput={Platform.select({
+                  web: tailwind(`w-full`),
+                })}
+                keyboardType="number-pad"
+                autoCapitalize="none"
+                placeholderTextColor="#999"
+              />
+            </Container>
           )}
-          <Container style={tailwind('flex-1 flex-col gap-3')}>
-            <TextContainer data={`Duration (sec)`} style={tailwind('flex-1 text-center')} />
-            <AppTextSingleInput
-              initialValues={{ duration: inputValues.duration }}
-              placeholder=""
-              fieldName={'duration'}
-              onChangeText={handleTextChange}
-              containerStyle={tailwind('border-none')}
-              containerStyleAppTextInput={Platform.select({
-                web: tailwind(`w-full`),
-              })}
-              keyboardType="number-pad"
-              autoCapitalize="none"
-              placeholderTextColor="#999"
-            />
-          </Container>
         </Container>
         <Container style={tailwind(' flex-col items-start justify-start gap-5')}>
           <LabelContainer

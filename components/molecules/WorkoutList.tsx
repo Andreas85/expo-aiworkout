@@ -68,7 +68,7 @@ export default function WorkoutList({
           ]}>
           {!isEnabled && (
             <ImageContainer
-              source={IMAGES.logo}
+              source={IMAGES.fitness}
               styleNative={[tailwind(`aspect-square w-full self-center rounded-2xl`)]}
               contentFit="fill"
             />

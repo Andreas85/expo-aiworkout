@@ -5,6 +5,7 @@ import gradientBg2 from '@/assets/images/gradient-bg-2.png';
 import gradientBg3 from '@/assets/images/gradient-bg-3.png';
 import dummyWorkout from '@/assets/images/dummy-workout.jpg';
 import dragDot from '@/assets/images/drag-dot.png';
+import fitness from '@/assets/images/fitness.webp';
 
 export const IMAGES = {
   logo,
@@ -14,4 +15,5 @@ export const IMAGES = {
   gradientBg3,
   dummyWorkout,
   dragDot,
+  fitness,
 };

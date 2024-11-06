@@ -60,7 +60,7 @@ const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
       }: any) => (
         <Container style={[tailwind('w-full gap-y-4'), containerStyle]}>
           <AppTextInput
-            value={values[fieldName]}
+            value={values[fieldName] || ''}
             placeholder={placeholder}
             // onChangeText={
             //   text => (onChangeText ? onChangeText(fieldName, text) : handleChange(fieldName)(text)) // Pass fieldName with onChangeText

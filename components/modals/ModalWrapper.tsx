@@ -14,7 +14,13 @@ function ModalWrapper(props: IAddAndEditWorkoutModalProps) {
 
   return (
     <Container style={tailwind('bg-black')}>
-      <Modal isVisible={isModalVisible} backdropColor="white" onBackdropPress={closeModal}>
+      <Modal
+        isVisible={isModalVisible}
+        backdropColor="white"
+        onBackdropPress={closeModal}
+        useNativeDriver={true}
+        animationIn="fadeIn"
+        animationOut="fadeOut">
         <Container
           style={Platform.select({
             web: tailwind(

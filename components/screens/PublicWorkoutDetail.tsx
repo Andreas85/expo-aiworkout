@@ -95,7 +95,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                 web: tailwind(
                   `${isLargeScreen ? 'w-[47%] text-[0.875rem]' : 'w-[56%] text-[1.375rem]'} ps-[2px]`,
                 ),
-                native: tailwind('flex-1.5 text-[0.875rem]'),
+                native: tailwind('w-[47%] text-[0.875rem]'),
               }),
             ]}
             numberOfLines={1}>
@@ -109,7 +109,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                 web: tailwind(
                   `${isLargeScreen ? 'w-[32%] px-4 text-[0.875rem] ' : 'w-[24%] text-[1.375rem]'}`,
                 ),
-                native: tailwind('flex-1 text-[0.875rem]'),
+                native: tailwind('w-[27%] text-[0.875rem]'),
               }),
             ]}
           />
@@ -118,7 +118,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             style={[
               Platform.select({
                 web: tailwind(`${isLargeScreen ? 'w-[30%] text-[0.875rem]' : 'text-[1.375rem]'}`),
-                native: tailwind('flex-1 text-[0.875rem]'),
+                native: tailwind('w-[30%] text-[0.875rem]'),
               }),
             ]}
           />
@@ -180,7 +180,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                   web: tailwind(
                     ` ${isLargeScreen ? 'w-[47%]  text-[0.875rem] font-bold' : 'w-[56%] text-[1.5rem]'}   `,
                   ),
-                  native: tailwind('flex-1.5 text-[0.875rem]  font-bold'),
+                  native: tailwind(' w-[47%] text-[0.875rem]  font-bold'),
                 }),
               ]}
               numberOfLines={1}
@@ -192,7 +192,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                   web: tailwind(
                     ` ${isLargeScreen ? 'w-[27%] text-[0.875rem] font-bold' : 'w-[24%] text-[1.5rem]'}  `,
                   ),
-                  native: tailwind('flex-1 text-[0.875rem]  font-bold'),
+                  native: tailwind('w-[27%]  text-[0.875rem]  font-bold'),
                 }),
               ]}
               numberOfLines={1}
@@ -204,7 +204,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
                   web: tailwind(
                     `${isLargeScreen ? 'w-[30%] text-[0.875rem] font-bold ' : ' text-[1.5rem]'} `,
                   ),
-                  native: tailwind('flex-1 text-center  text-[0.875rem] font-bold '),
+                  native: tailwind('w-[30%]  text-center  text-[0.875rem] font-bold '),
                 }),
               ]}
               numberOfLines={1}
