@@ -511,94 +511,46 @@ const ExerciseCard = (props: IExerciseCard) => {
         </Container>
       );
     }
-    return (
-      <Container
-        style={[
-          Platform.select({
-            web: tailwind(
-              `'w-[73.125rem] mx-auto flex-1 flex-row items-center justify-between gap-[2.3125rem] rounded-lg bg-[#252425] p-[1.25rem]`,
-            ),
-          }),
-        ]}>
+    if (Platform.OS === 'web') {
+      return (
         <Container
-          style={tailwind(
-            'flex h-28 w-[10.1875rem] shrink-0 flex-row items-start items-center justify-center gap-5',
-          )}>
-          <Container style={tailwind(' ')}>{children}</Container>
-          <TextContainer
-            data={`${data?.exercise?.name}`}
-            style={tailwind('flex-1')}
-            numberOfLines={1}
-          />
-        </Container>
-        <Container style={tailwind('')}>
-          <CustomSwitch
-            isEnabled={isEnabled}
-            toggleSwitch={toggleSwitch}
-            label="Reps"
-            hasRightLabel={true}
-            labelRight={'Duration'}
-            labelStyle={'text-base'}
-            containerWebStyle={'gap-3 h-28 !my-0'}
-          />
-        </Container>
-        <Container style={tailwind('flex h-28 w-[33.75rem] shrink-0 flex-row items-center gap-9')}>
-          <Container style={tailwind('flex-1 flex-col gap-3')}>
-            <TextContainer data={`Weight (kg)`} style={tailwind('flex-1 text-center')} />
-            <AppTextSingleInput
-              initialValues={{ weight: inputValues?.weight ?? '0' }}
-              placeholder=""
-              fieldName={'weight'}
-              onChangeText={handleTextChange}
-              containerStyle={tailwind('border-none')}
-              containerStyleAppTextInput={Platform.select({
-                web: tailwind(`w-full`),
-              })}
-              keyboardType="number-pad"
-              autoCapitalize="none"
-              placeholderTextColor="#999"
+          style={[
+            Platform.select({
+              web: tailwind(
+                `'w-[73.125rem] mx-auto flex-1 flex-row items-center justify-between gap-[2.3125rem] rounded-lg bg-[#252425] p-[1.25rem]`,
+              ),
+            }),
+          ]}>
+          <Container
+            style={tailwind(
+              'flex h-28 w-[10.1875rem] shrink-0 flex-row items-start items-center justify-center gap-5',
+            )}>
+            <Container style={tailwind(' ')}>{children}</Container>
+            <TextContainer
+              data={`${data?.exercise?.name}`}
+              style={tailwind('flex-1')}
+              numberOfLines={1}
             />
           </Container>
-          <Container style={tailwind('flex-1 flex-col items-center justify-center gap-3')}>
-            <TextContainer data={`Rest (sec)`} style={tailwind('flex-1 text-center ')} />
-            <AppTextSingleInput
-              initialValues={{ rest: inputValues?.rest ?? '0' }}
-              placeholder=""
-              fieldName={'rest'}
-              onChangeText={handleTextChange}
-              containerStyle={tailwind('border-none')}
-              keyboardType="number-pad"
-              containerStyleAppTextInput={Platform.select({
-                web: tailwind(`w-full`),
-              })}
-              autoCapitalize="none"
-              placeholderTextColor="#999"
+          <Container style={tailwind('')}>
+            <CustomSwitch
+              isEnabled={isEnabled}
+              toggleSwitch={toggleSwitch}
+              label="Reps"
+              hasRightLabel={true}
+              labelRight={'Duration'}
+              labelStyle={'text-base'}
+              containerWebStyle={'gap-3 h-28 !my-0'}
             />
           </Container>
-          {!isEnabled ? (
+          <Container
+            style={tailwind('flex h-28 w-[33.75rem] shrink-0 flex-row items-center gap-9')}>
             <Container style={tailwind('flex-1 flex-col gap-3')}>
-              <TextContainer data={`Number of reps`} style={tailwind('flex-1 text-center')} />
+              <TextContainer data={`Weight (kg)`} style={tailwind('flex-1 text-center')} />
               <AppTextSingleInput
-                initialValues={{ reps: inputValues?.reps ?? '0' }}
+                initialValues={{ weight: inputValues?.weight ?? '0' }}
                 placeholder=""
-                fieldName={'reps'}
-                onChangeText={handleTextChange}
-                containerStyleAppTextInput={Platform.select({
-                  web: tailwind(`w-full`),
-                })}
-                containerStyle={tailwind('border-none')}
-                keyboardType="number-pad"
-                autoCapitalize="none"
-                placeholderTextColor="#999"
-              />
-            </Container>
-          ) : (
-            <Container style={tailwind('flex-1 flex-col gap-3')}>
-              <TextContainer data={`Duration (sec)`} style={tailwind('flex-1 text-center')} />
-              <AppTextSingleInput
-                initialValues={{ duration: inputValues?.duration ?? '0' }}
-                placeholder=""
-                fieldName={'duration'}
+                fieldName={'weight'}
                 onChangeText={handleTextChange}
                 containerStyle={tailwind('border-none')}
                 containerStyleAppTextInput={Platform.select({
@@ -609,69 +561,120 @@ const ExerciseCard = (props: IExerciseCard) => {
                 placeholderTextColor="#999"
               />
             </Container>
-          )}
+            <Container style={tailwind('flex-1 flex-col items-center justify-center gap-3')}>
+              <TextContainer data={`Rest (sec)`} style={tailwind('flex-1 text-center ')} />
+              <AppTextSingleInput
+                initialValues={{ rest: inputValues?.rest ?? '0' }}
+                placeholder=""
+                fieldName={'rest'}
+                onChangeText={handleTextChange}
+                containerStyle={tailwind('border-none')}
+                keyboardType="number-pad"
+                containerStyleAppTextInput={Platform.select({
+                  web: tailwind(`w-full`),
+                })}
+                autoCapitalize="none"
+                placeholderTextColor="#999"
+              />
+            </Container>
+            {!isEnabled ? (
+              <Container style={tailwind('flex-1 flex-col gap-3')}>
+                <TextContainer data={`Number of reps`} style={tailwind('flex-1 text-center')} />
+                <AppTextSingleInput
+                  initialValues={{ reps: inputValues?.reps ?? '0' }}
+                  placeholder=""
+                  fieldName={'reps'}
+                  onChangeText={handleTextChange}
+                  containerStyleAppTextInput={Platform.select({
+                    web: tailwind(`w-full`),
+                  })}
+                  containerStyle={tailwind('border-none')}
+                  keyboardType="number-pad"
+                  autoCapitalize="none"
+                  placeholderTextColor="#999"
+                />
+              </Container>
+            ) : (
+              <Container style={tailwind('flex-1 flex-col gap-3')}>
+                <TextContainer data={`Duration (sec)`} style={tailwind('flex-1 text-center')} />
+                <AppTextSingleInput
+                  initialValues={{ duration: inputValues?.duration ?? '0' }}
+                  placeholder=""
+                  fieldName={'duration'}
+                  onChangeText={handleTextChange}
+                  containerStyle={tailwind('border-none')}
+                  containerStyleAppTextInput={Platform.select({
+                    web: tailwind(`w-full`),
+                  })}
+                  keyboardType="number-pad"
+                  autoCapitalize="none"
+                  placeholderTextColor="#999"
+                />
+              </Container>
+            )}
+          </Container>
+          <Container style={tailwind(' flex-col items-start justify-start gap-5')}>
+            <LabelContainer
+              label={'Add New'}
+              labelStyle={[
+                Platform.select({
+                  web: tailwind(
+                    `flex-1  justify-between text-base  font-normal  not-italic leading-[150%] text-white`,
+                  ),
+                  native: tailwind('text-xl font-bold'),
+                }),
+              ]}
+              // onPress={showModal}
+              containerStyle={[
+                Platform.select({
+                  web: tailwind('w-[7.25rem] flex-1 gap-x-2 self-stretch'),
+                  // native: tailwind('flex-1'),
+                }),
+              ]}
+              left={<Ionicons name="add-circle-outline" color="#A27DE1" size={ICON_SIZE} />}
+            />
+            <LabelContainer
+              label={'Duplicate'}
+              labelStyle={[
+                Platform.select({
+                  web: tailwind(
+                    `flex-1  justify-between text-base  font-normal  not-italic leading-[150%] text-white`,
+                  ),
+                  native: tailwind('text-xl font-bold'),
+                }),
+              ]}
+              onPress={handleDuplicateExerciseCard}
+              containerStyle={[
+                Platform.select({
+                  web: tailwind('w-[7.25rem] flex-1 gap-x-2 self-stretch'),
+                  // native: tailwind('flex-1'),
+                }),
+              ]}
+              left={<Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />}
+            />
+            <LabelContainer
+              label={'Delete'}
+              labelStyle={[
+                Platform.select({
+                  web: tailwind(
+                    `flex-1 justify-between text-base font-normal  not-italic leading-[150%] text-white`,
+                  ),
+                  native: tailwind('text-xl font-bold'),
+                }),
+              ]}
+              onPress={handleDeleteExerciseCard}
+              containerStyle={[
+                Platform.select({
+                  web: tailwind('w-[7.25rem] flex-1 gap-x-2 self-stretch'),
+                  // native: tailwind('flex-1'),
+                }),
+              ]}
+              left={<FontAwesome6 name="trash-can" color="#A27DE1" size={ICON_SIZE} />}
+            />
+          </Container>
         </Container>
-        <Container style={tailwind(' flex-col items-start justify-start gap-5')}>
-          <LabelContainer
-            label={'Add New'}
-            labelStyle={[
-              Platform.select({
-                web: tailwind(
-                  `flex-1  justify-between text-base  font-normal  not-italic leading-[150%] text-white`,
-                ),
-                native: tailwind('text-xl font-bold'),
-              }),
-            ]}
-            // onPress={showModal}
-            containerStyle={[
-              Platform.select({
-                web: tailwind('w-[7.25rem] flex-1 gap-x-2 self-stretch'),
-                // native: tailwind('flex-1'),
-              }),
-            ]}
-            left={<Ionicons name="add-circle-outline" color="#A27DE1" size={ICON_SIZE} />}
-          />
-          <LabelContainer
-            label={'Duplicate'}
-            labelStyle={[
-              Platform.select({
-                web: tailwind(
-                  `flex-1  justify-between text-base  font-normal  not-italic leading-[150%] text-white`,
-                ),
-                native: tailwind('text-xl font-bold'),
-              }),
-            ]}
-            onPress={handleDuplicateExerciseCard}
-            containerStyle={[
-              Platform.select({
-                web: tailwind('w-[7.25rem] flex-1 gap-x-2 self-stretch'),
-                // native: tailwind('flex-1'),
-              }),
-            ]}
-            left={<Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />}
-          />
-          <LabelContainer
-            label={'Delete'}
-            labelStyle={[
-              Platform.select({
-                web: tailwind(
-                  `flex-1 justify-between text-base font-normal  not-italic leading-[150%] text-white`,
-                ),
-                native: tailwind('text-xl font-bold'),
-              }),
-            ]}
-            onPress={handleDeleteExerciseCard}
-            containerStyle={[
-              Platform.select({
-                web: tailwind('w-[7.25rem] flex-1 gap-x-2 self-stretch'),
-                // native: tailwind('flex-1'),
-              }),
-            ]}
-            left={<FontAwesome6 name="trash-can" color="#A27DE1" size={ICON_SIZE} />}
-          />
-        </Container>
-      </Container>
-    );
+      );
+    }
   };
 
   return (

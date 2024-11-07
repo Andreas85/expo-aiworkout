@@ -46,7 +46,7 @@ const DraggableExercises = (props: {
 
   // Sort exercises by the 'order' key
 
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([...exercisesList].sort((a, b) => a.order - b.order));
 
   useEffect(() => {
     const sortedExercisesList = [...exercisesList].sort((a, b) => a.order - b.order);
@@ -145,7 +145,7 @@ const DraggableExercises = (props: {
         handle=".drag-handle"
         className="space-y-1 overflow-x-hidden overflow-y-scroll">
         {items.map((item, index) => (
-          <div key={item?._id} data-id={item?._id}>
+          <div key={item?._id} data-id={item?._id + index?.toString()}>
             <SortableItem
               item={item}
               index={index}

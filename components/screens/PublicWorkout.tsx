@@ -2,7 +2,7 @@ import Container from '@/components/atoms/Container';
 import Loading from '@/components/atoms/Loading';
 import { Text } from '@/components/Themed';
 import { useFetchData } from '@/hooks/useFetchData';
-import { fetchPublicWorkoutService } from '@/services/workouts';
+import { fetchPublicWorkoutService, fetchPublicWorkoutServiceById } from '@/services/workouts';
 import { tailwind } from '@/utils/tailwind';
 import { useCallback, useEffect, useState } from 'react';
 import CustomSwitch from '../atoms/CustomSwitch';
@@ -13,13 +13,13 @@ import { router } from 'expo-router';
 import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
 import useBreakPoints from '@/hooks/useBreakPoints';
+import { queryClient } from '@/utils/helper';
 
 export default function PublicWorkout() {
   const { isAuthenticated } = useAuthStore();
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [productData, setProductData] = useState<any[]>([]);
-
   // const toggleSwitch = () => setIsEnabled(prev => !prev);
 
   const toggleSwitch = useCallback(
@@ -36,11 +36,20 @@ export default function PublicWorkout() {
   };
 
   // Don't refetch on window focus and hit api after 1 minutes
-  const { data, isPending, refetch, fetchStatus, isStale } = useFetchData({
+  const { data, isPending, refetch, isLoading } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT],
     // staleTime: 10 * 1000, // 1 minute
   });
+
+  // const prefetchWorkouts = (id: string) => {
+  //   // The results of this query will be cached like a normal query
+  //   queryClient.prefetchQuery({
+  //     queryFn: () => fetchPublicWorkoutServiceById({ id: id }),
+  //     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, id],
+  //     staleTime: 10 * 1000, // 1 minute
+  //   });
+  // };
 
   useEffect(() => {
     if (data) {
@@ -48,18 +57,13 @@ export default function PublicWorkout() {
     }
   }, [data]);
 
-  // useEffect(() => {
-  //   if (isStale && Platform.OS === 'web') {
-  //     refetch();
-  //   }
-  // }, [isStale]);
-
   const handleCardClick = (item: any) => {
+    // prefetchWorkouts(item?._id);
     router.push(`/workout/public/${item?._id}`);
   };
 
   const renderWorkingListing = () => {
-    if (fetchStatus === 'fetching' && Platform.OS !== 'web') {
+    if (isLoading && Platform.OS !== 'web') {
       return <Loading />;
     }
 

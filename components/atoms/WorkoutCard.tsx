@@ -17,10 +17,12 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
     <Container
       style={[
         Platform.select({
-          web: [isLargeScreen ? styles.MOBILE.cardContainer : styles.DESKTOP.cardContainer],
-          native: tailwind(' flex-1  gap-4 p-2 px-4'),
+          web: [
+            isLargeScreen ? styles.MOBILE.cardContainer : styles.DESKTOP.cardContainer,
+            tailwind('flex-row rounded-lg bg-NAVBAR_BACKGROUND'),
+          ],
+          native: tailwind('flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-4 py-2'),
         }),
-        tailwind(' flex-row rounded-lg bg-NAVBAR_BACKGROUND '),
       ]}
       key={item._id}>
       {!isEnabled && (
@@ -31,9 +33,8 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
               web: tailwind(
                 `${isLargeScreen ? 'h-[4.875rem] w-[8.1875rem]' : 'h-[9.9375rem] w-[21.1875rem] shrink-0'} flex-1.5 aspect-video rounded-lg`,
               ),
-              native: tailwind('flex-1.5 aspect-video self-center rounded-lg'),
+              native: tailwind('aspect-video h-20 self-center rounded-lg'),
             }),
-            // tailwind(`flex-1.5 aspect-video self-center rounded-lg`),
           ]}
           contentFit="cover"
           contentPosition={'right top'}

@@ -18,6 +18,7 @@ import { tailwind } from '@/utils/tailwind';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastProvider } from 'react-native-toast-notifications';
+import { useReactQueryDevTools } from '@dev-plugins/react-query';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -72,6 +73,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  useReactQueryDevTools(queryClient);
   const colorScheme = useColorScheme();
   const { isLargeScreen } = useWebBreakPoints();
 

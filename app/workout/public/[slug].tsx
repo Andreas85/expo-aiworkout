@@ -11,16 +11,18 @@ import { tailwind } from '@/utils/tailwind';
 import PublicWorkoutDetail from '@/components/screens/PublicWorkoutDetail';
 import { Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { keepPreviousData } from '@tanstack/react-query';
 
 const PublicWorkoutDetailIndex = () => {
   const { slug } = useLocalSearchParams();
   const { isLargeScreen } = useWebBreakPoints();
 
   const { setWorkoutDetail } = useWorkoutDetailStore();
-  const { data, fetchStatus, refetch } = useFetchData({
+  const { data, isLoading, refetch } = useFetchData({
     queryFn: () => fetchPublicWorkoutServiceById({ id: slug }),
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, slug],
-    staleTime: 60 * 1000,
+    keepPreviousData: keepPreviousData,
+    enabled: false,
   });
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const PublicWorkoutDetailIndex = () => {
   }, [slug]);
 
   const renderWorkingDetails = () => {
-    if (fetchStatus === 'fetching') {
+    if (isLoading) {
       return <Loading />;
     }
     return <PublicWorkoutDetail />;

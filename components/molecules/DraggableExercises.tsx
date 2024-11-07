@@ -23,12 +23,10 @@ const DraggableExercises = (props: {
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
   const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
-  const [data, setData] = useState<ExerciseElement[]>([]);
 
-  useEffect(() => {
-    const sortedExercisesList = [...exercisesList].sort((a, b) => a.order - b.order);
-    setData(sortedExercisesList);
-  }, [exercisesList]);
+  const [data, setData] = useState<ExerciseElement[]>(
+    [...exercisesList].sort((a, b) => a.order - b.order),
+  );
 
   const { mutate: mutateSortExercise, isPending } = useMutation({
     mutationFn: sortExercisesRequest,
@@ -37,28 +35,25 @@ const DraggableExercises = (props: {
     },
   });
 
+  // Use a ref to avoid triggering continuous re-renders
   useEffect(() => {
-    setIsPendingExerciseCardAction(isPending);
-  }, [isPending]);
+    if (setIsPendingExerciseCardAction) {
+      setIsPendingExerciseCardAction(isPending);
+    }
+  }, [isPending, setIsPendingExerciseCardAction]);
 
   const renderItem = ({ item, drag, isActive }: RenderItemParams<ExerciseElement>) => {
     return (
-      <>
-        <ScaleDecorator>
-          <ExerciseCard
-            data={item}
-            handleSubmit={() => {}}
-            setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}>
-            <TouchableOpacity
-              onPressIn={drag}
-              onLongPress={drag}
-              onPress={drag}
-              disabled={isActive}>
-              <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
-            </TouchableOpacity>
-          </ExerciseCard>
-        </ScaleDecorator>
-      </>
+      <ScaleDecorator>
+        <ExerciseCard
+          data={item}
+          handleSubmit={() => {}}
+          setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}>
+          <TouchableOpacity onPressIn={drag} onLongPress={drag} onPress={drag} disabled={isActive}>
+            <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
+          </TouchableOpacity>
+        </ExerciseCard>
+      </ScaleDecorator>
     );
   };
 
@@ -78,12 +73,19 @@ const DraggableExercises = (props: {
       <DraggableFlatList
         data={data}
         onDragEnd={handleDragEnd}
-        keyExtractor={item => item?._id}
+        keyExtractor={(item, index) => item?._id + index}
+        getItemLayout={(data, index) => {
+          return { index, length: 100, offset: 100 * index };
+        }}
         style={{
           marginBottom: 55,
         }}
+        initialNumToRender={1}
+        maxToRenderPerBatch={5}
+        updateCellsBatchingPeriod={10}
+        windowSize={5}
         renderItem={renderItem}
-        scrollEnabled={true}
+        scrollEnabled
       />
     </>
   );

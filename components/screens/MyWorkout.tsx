@@ -1,27 +1,25 @@
 /* eslint-disable react/jsx-no-undef */
 import Container from '@/components/atoms/Container';
-import ImageContainer from '@/components/atoms/ImageContainer';
 import Loading from '@/components/atoms/Loading';
-import TextContainer from '@/components/atoms/TextContainer';
 import { Text } from '@/components/Themed';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useFetchData } from '@/hooks/useFetchData';
 import { fetchMyWorkoutService } from '@/services/workouts';
-// import { useAuthStore } from '@/store/authStore';
 import { tailwind } from '@/utils/tailwind';
 import { useCallback, useEffect, useState } from 'react';
 import { ActionButton } from '../atoms/ActionButton';
 import { AntDesign } from '@expo/vector-icons';
-import { IMAGES } from '@/utils/images';
+
 import CustomSwitch from '../atoms/CustomSwitch';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { router } from 'expo-router';
-import { LayoutAnimation, Platform, Pressable } from 'react-native';
+import { LayoutAnimation, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
+import { keepPreviousData } from '@tanstack/react-query';
 
 export default function MyWorkout() {
   // const { isAuthenticated } = useAuthStore();
@@ -46,26 +44,12 @@ export default function MyWorkout() {
     return await fetchMyWorkoutService();
   };
 
-  const { data, error, isPending, refetch, fetchStatus } = useFetchData({
+  const { data, error, isPending, refetch, isLoading } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+
+    keepPreviousData: keepPreviousData,
   });
-
-  useEffect(() => {
-    if (data) {
-      setProductData(data?.data);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      // do something
-      console.log('Api is called');
-      refetch();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
 
   const handleAddWorkout = () => {
     showModal();
@@ -75,44 +59,13 @@ export default function MyWorkout() {
     router.push(`/workout/${item?._id}`);
   };
 
-  const renderListItem = (item: any, index: number, isEnabled: boolean) => {
-    if (item?.isPlaceholder) {
-      return <Container style={tailwind(`relative h-full w-full flex-1`)}></Container>;
-    }
-    return (
-      <Pressable style={tailwind('flex-1')} onPress={() => handleCardClick(item)}>
-        <Container
-          style={[
-            Platform.select({ web: tailwind('cursor-pointer') }),
-            tailwind(
-              `relative h-full w-full flex-1 grow self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
-            ),
-          ]}>
-          {!isEnabled && (
-            <ImageContainer
-              source={IMAGES.fitness}
-              styleNative={[tailwind(`aspect-square  w-full  self-center rounded-2xl `)]}
-              contentFit="fill"
-            />
-          )}
-          <TextContainer
-            data={item?.name}
-            style={tailwind(
-              ` h-full w-full flex-1 grow text-center ${isEnabled ? 'my-4' : 'mt-4'}`,
-            )}
-          />
-        </Container>
-      </Pressable>
-    );
-  };
-
   const renderWorkingListing = () => {
-    if (fetchStatus === 'fetching') {
+    if (isLoading) {
       return <Loading />;
     }
     if (error) return <Text>An error has occurred: + {error.message}</Text>;
     // Ensure bracketPrediction is iterable
-    const iterableProductData = Array.isArray(productData) ? productData : [];
+    const iterableProductData = Array.isArray(data?.data) ? data?.data : [];
 
     // Calculate how many placeholders are needed to make length a multiple of 4
     const placeholdersNeeded =

@@ -47,7 +47,9 @@ const WorkoutDetail = () => {
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const { setWorkoutDetail } = useWorkoutDetailStore();
-  const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
+  const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(
+    workoutDetail?.isPublic ?? false,
+  );
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
   const [isPendingExerciseCardAction, setIsPendingExerciseCardAction] = useState<boolean>(false);
 
@@ -309,12 +311,11 @@ const WorkoutDetail = () => {
       <Container
         style={[
           Platform.select({
-            web: tailwind(`mx-auto flex w-full flex-col gap-2 px-32
+            web: tailwind(`mx-auto flex w-full flex-1 flex-col gap-2 px-32
                 ${isLargeScreen && 'px-4'}
               `),
-            native: tailwind('flex flex-col  p-4'),
+            native: tailwind('flex-1 flex-col  p-4'),
           }),
-          tailwind('flex-1'),
         ]}>
         <Container
           style={[

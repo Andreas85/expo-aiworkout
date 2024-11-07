@@ -4,9 +4,8 @@ import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
 import { useNavigation } from 'expo-router';
 
-import { LayoutAnimation, Platform, RefreshControl, ScrollView } from 'react-native';
+import { LayoutAnimation, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
-import { ExerciseElement } from '@/services/interfaces';
 import { ActionButton } from '../atoms/ActionButton';
 import CustomSwitch from '../atoms/CustomSwitch';
 
@@ -14,11 +13,12 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import NoDataSvg from '../svgs/NoDataSvg';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
-import WorkoutCard from '../atoms/WorkoutCard';
+
 import { useQueryClient } from '@tanstack/react-query';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
-import { pluralise } from '@/utils/helper';
-import { Text } from '../Themed';
+
+import PublicWorkoutExercisesRender from '../molecules/PublicWorkoutExercisesRender';
+import { debounce } from 'lodash';
 
 const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
@@ -27,10 +27,18 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
-  const toggleSwitch = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsEnabled(prev => !prev);
-  }, []);
+  // const toggleSwitch = useCallback(() => {
+  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  //   setIsEnabled(prev => !prev);
+  // }, []);
+
+  const toggleSwitch = useCallback(
+    debounce(() => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setIsEnabled(prevState => !prevState);
+    }, 500), // 500ms delay
+    [],
+  );
   const [refreshing, setRefreshing] = useState(false);
   const queryClient = useQueryClient();
 
@@ -67,74 +75,6 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     }
   }, [workoutDetail]);
 
-  const renderListItem = (item: ExerciseElement, index: number) => {
-    return <WorkoutCard key={item?._id} item={item} isEnabled={isEnabled} />;
-  };
-
-  const renderExerciseItem = (item: ExerciseElement) => {
-    return (
-      <Container
-        style={[
-          Platform.select({
-            web: tailwind(`flex-1 ${isLargeScreen ? 'py-[0.25rem]' : 'py-3'}  `),
-            native: tailwind('flex-1 py-[0.25rem]'),
-          }),
-        ]}
-        key={item._id}>
-        <Container
-          style={[
-            Platform.select({
-              web: tailwind(`${isLargeScreen ? 'py-1' : 'py-2 pb-3'}`),
-              native: tailwind('justify-between gap-3 py-1  '),
-            }),
-            tailwind('flex-1 flex-row items-start '),
-          ]}>
-          <Text
-            style={[
-              Platform.select({
-                web: tailwind(
-                  `${isLargeScreen ? 'w-[47%] text-[0.875rem]' : 'w-[56%] text-[1.375rem]'} ps-[2px]`,
-                ),
-                native: tailwind('w-[47%] text-[0.875rem]'),
-              }),
-            ]}
-            numberOfLines={1}>
-            {item?.exercise?.name ?? item?.name}
-            {item?.weight ? ` (${item?.weight} kg)` : ''}
-          </Text>
-          <TextContainer
-            data={`${item?.reps ? item?.reps : '-'}`}
-            style={[
-              Platform.select({
-                web: tailwind(
-                  `${isLargeScreen ? 'w-[32%] px-4 text-[0.875rem] ' : 'w-[24%] text-[1.375rem]'}`,
-                ),
-                native: tailwind('w-[27%] text-[0.875rem]'),
-              }),
-            ]}
-          />
-          <TextContainer
-            data={`${item?.rest ? pluralise(item?.rest, `${item?.rest} second`) : '-'}`}
-            style={[
-              Platform.select({
-                web: tailwind(`${isLargeScreen ? 'w-[30%] text-[0.875rem]' : 'text-[1.375rem]'}`),
-                native: tailwind('w-[30%] text-[0.875rem]'),
-              }),
-            ]}
-          />
-        </Container>
-        <Container
-          style={[
-            Platform.select({
-              web: tailwind('border-b-[0.1px] opacity-10'),
-              native: tailwind('border-[0.25px] opacity-25'),
-            }),
-            tailwind('border-none border-white '),
-          ]}
-        />
-      </Container>
-    );
-  };
   const renderWorkoutExercises = () => {
     if (!hasExercise) {
       return (
@@ -146,126 +86,15 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
         </Container>
       );
     }
-    if (isEnabled) {
-      return (
-        <ScrollView
-          showsVerticalScrollIndicator={true}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#ff0000" // iOS specific
-              colors={['#ff0000', '#00ff00', '#0000ff']} // Android specific
-            />
-          }
-          contentContainerStyle={{
-            rowGap: 0,
-            borderRadius: isLargeScreen ? 10 : 5,
-            backgroundColor: '#252425',
-          }}>
-          <Container
-            style={[
-              Platform.select({
-                web: tailwind(
-                  ` ${isLargeScreen ? 'justify-between1 rounded-lg px-3 py-2' : ' px-[2.5rem] py-5'}  `,
-                ),
-                native: tailwind(' justify-between  rounded-lg px-3 py-2'),
-              }),
-              tailwind('flex-row  '),
-            ]}>
-            <TextContainer
-              data={'Exercises'}
-              style={[
-                Platform.select({
-                  web: tailwind(
-                    ` ${isLargeScreen ? 'w-[47%]  text-[0.875rem] font-bold' : 'w-[56%] text-[1.5rem]'}   `,
-                  ),
-                  native: tailwind(' w-[47%] text-[0.875rem]  font-bold'),
-                }),
-              ]}
-              numberOfLines={1}
-            />
-            <TextContainer
-              data={'No. of Reps'}
-              style={[
-                Platform.select({
-                  web: tailwind(
-                    ` ${isLargeScreen ? 'w-[27%] text-[0.875rem] font-bold' : 'w-[24%] text-[1.5rem]'}  `,
-                  ),
-                  native: tailwind('w-[27%]  text-[0.875rem]  font-bold'),
-                }),
-              ]}
-              numberOfLines={1}
-            />
-            <TextContainer
-              data={'Rest'}
-              style={[
-                Platform.select({
-                  web: tailwind(
-                    `${isLargeScreen ? 'w-[30%] text-[0.875rem] font-bold ' : ' text-[1.5rem]'} `,
-                  ),
-                  native: tailwind('w-[30%]  text-center  text-[0.875rem] font-bold '),
-                }),
-              ]}
-              numberOfLines={1}
-            />
-          </Container>
-          {!isLargeScreen && (
-            <Container
-              style={[
-                Platform.select({
-                  web: tailwind('border-b-[0.1px] opacity-10'),
-                  native: tailwind('border-[0.25px] opacity-25'),
-                }),
-                tailwind('border-none border-white '),
-              ]}
-            />
-          )}
-          <Container
-            style={[
-              Platform.select({
-                web: tailwind(
-                  `flex-1 flex-col gap-4 ${isLargeScreen ? 'rounded-lg px-3 py-2 ' : 'px-[2.5rem] py-[1.25rem]'}  `,
-                ),
-                native: tailwind('flex-1 flex-col gap-4 rounded-lg  px-3 py-2'),
-              }),
-            ]}>
-            <Container style={tailwind('flex-1 ')}>
-              {workoutDetail?.exercises.map(renderExerciseItem)}
-            </Container>
-          </Container>
-        </ScrollView>
-      );
-    }
 
     return (
       <>
-        <ScrollView
-          showsVerticalScrollIndicator={true}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#ff0000" // iOS specific
-              colors={['#ff0000', '#00ff00', '#0000ff']} // Android specific
-            />
-          }
-          contentContainerStyle={[
-            Platform.select({
-              web: tailwind(`${isLargeScreen ? 'gap-[0.5rem]' : 'gap-[1.25rem]'} `),
-              native: {
-                rowGap: 10,
-              },
-            }),
-          ]}>
-          {workoutDetail?.exercises.map((item: ExerciseElement, index: number) => {
-            return (
-              <Container style={[tailwind('flex-1')]} key={item._id}>
-                {renderListItem(item, index)}
-              </Container>
-            );
-          })}
-        </ScrollView>
+        <PublicWorkoutExercisesRender
+          data={workoutDetail?.exercises}
+          isEnabled={isEnabled}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+        />
       </>
     );
   };
