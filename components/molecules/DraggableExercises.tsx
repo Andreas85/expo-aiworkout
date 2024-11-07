@@ -11,10 +11,11 @@ import { tailwind } from '@/utils/tailwind';
 import { Image } from 'expo-image';
 import { IMAGES } from '@/utils/images';
 import ExerciseCard from '../atoms/ExerciseCard';
-import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
+import { getReorderItemsForSortingWorkoutExercises, queryClient } from '@/utils/helper';
 import { useMutation } from '@tanstack/react-query';
 import { sortExercisesRequest } from '@/services/workouts';
 import { useLocalSearchParams } from 'expo-router';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
 const DraggableExercises = (props: {
   setIsPendingExerciseCardAction: (loading: boolean) => void;
@@ -31,6 +32,7 @@ const DraggableExercises = (props: {
   const { mutate: mutateSortExercise, isPending } = useMutation({
     mutationFn: sortExercisesRequest,
     onSuccess: async data => {
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
   });

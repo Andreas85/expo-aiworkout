@@ -4,7 +4,7 @@ import Loading from '@/components/atoms/Loading';
 import { Text } from '@/components/Themed';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useFetchData } from '@/hooks/useFetchData';
-import { fetchMyWorkoutService } from '@/services/workouts';
+import { fetchMyWorkoutService, getWorkoutDetailById } from '@/services/workouts';
 import { tailwind } from '@/utils/tailwind';
 import { useCallback, useEffect, useState } from 'react';
 import { ActionButton } from '../atoms/ActionButton';
@@ -16,15 +16,11 @@ import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { router } from 'expo-router';
 import { LayoutAnimation, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
-import { keepPreviousData } from '@tanstack/react-query';
+import { queryClient } from '@/utils/helper';
 
 export default function MyWorkout() {
-  // const { isAuthenticated } = useAuthStore();
-  const navigation = useNavigation();
-  const [productData, setProductData] = useState<any[]>([]);
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
@@ -44,16 +40,32 @@ export default function MyWorkout() {
     return await fetchMyWorkoutService();
   };
 
-  const { data, error, isPending, refetch, isLoading } = useFetchData({
+  const { data, error, isPending, refetch, fetchStatus, isLoading } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-
-    keepPreviousData: keepPreviousData,
+    staleTime: 60 * 1000, // 1 minute
   });
+
+  const prefetchWorkouts = (id: string) => {
+    // The results of this query will be cached like a normal query
+    queryClient.prefetchQuery({
+      queryFn: () => getWorkoutDetailById({ id: id }),
+      queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, id],
+      staleTime: 60 * 1000, // 1 minute
+    });
+  };
 
   const handleAddWorkout = () => {
     showModal();
   };
+
+  useEffect(() => {
+    if (data && fetchStatus === 'idle') {
+      data?.data.map((item: any) => {
+        prefetchWorkouts(item?._id);
+      });
+    }
+  }, [data, fetchStatus]);
 
   const handleCardClick = (item: any) => {
     router.push(`/workout/${item?._id}`);

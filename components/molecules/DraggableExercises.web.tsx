@@ -9,7 +9,8 @@ import { tailwind } from '@/utils/tailwind';
 import { useLocalSearchParams } from 'expo-router';
 import { sortExercisesRequest } from '@/services/workouts';
 import { useMutation } from '@tanstack/react-query';
-import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
+import { getReorderItemsForSortingWorkoutExercises, queryClient } from '@/utils/helper';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
 // Sortable item component
 const SortableItem: React.FC<{
@@ -56,6 +57,7 @@ const DraggableExercises = (props: {
   const { mutate: mutateSortExercise, isPending } = useMutation({
     mutationFn: sortExercisesRequest,
     onSuccess: async data => {
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
   });

@@ -15,7 +15,7 @@ import NoDataSvg from '../svgs/NoDataSvg';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
-import { ICON_SIZE } from '@/utils/appConstants';
+import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import DraggableExercises from '../molecules/DraggableExercises';
 import AppTextSingleInput from '../atoms/AppTextSingleInput';
 import useModal from '@/hooks/useModal';
@@ -28,6 +28,7 @@ import {
 } from '@/services/workouts';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { useToast } from 'react-native-toast-notifications';
+import { queryClient } from '@/utils/helper';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
@@ -64,6 +65,7 @@ const WorkoutDetail = () => {
   const { mutate: mutateUpdatedWorkout, isPending } = useMutation({
     mutationFn: updateWorkoutDataRequest,
     onSuccess: async data => {
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
     onError: (error: any) => {

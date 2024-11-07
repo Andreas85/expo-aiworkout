@@ -5,7 +5,7 @@ import TextContainer from './TextContainer';
 import { tailwind } from '@/utils/tailwind';
 import LabelContainer from './LabelContainer';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
-import { ICON_SIZE } from '@/utils/appConstants';
+import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import CustomSwitch from './CustomSwitch';
@@ -23,6 +23,7 @@ import { useToast } from 'react-native-toast-notifications';
 import AddExercise from '../modals/AddExercise';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { debounce } from 'lodash';
+import { queryClient } from '@/utils/helper';
 
 interface IExerciseCard {
   data: ExerciseElement;
@@ -136,6 +137,7 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { mutate: mutateAddExercise } = useMutation({
     mutationFn: addExerciseToWorkoutRequest,
     onSuccess: async data => {
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
   });
@@ -143,7 +145,7 @@ const ExerciseCard = (props: IExerciseCard) => {
   const handleDuplicateExerciseCard = () => {
     const payload = {
       formData: {
-        name: data?.exercise.name,
+        name: data?.exercise?.name,
         exerciseId: data?.exercise?._id,
         duration: data?.duration,
         reps: data?.reps,
@@ -162,6 +164,7 @@ const ExerciseCard = (props: IExerciseCard) => {
   } = useMutation({
     mutationFn: removeExerciseToWorkoutRequest,
     onSuccess: async data => {
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
     onError: (error: any) => {
@@ -175,6 +178,7 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { mutate: mutateUpdateExerciseToWorkoutRequest, isPending } = useMutation({
     mutationFn: updateExerciseToWorkoutRequest,
     onSuccess: async data => {
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
     onError: (error: any) => {
@@ -235,7 +239,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                 }),
               ]}>
               <TextContainer
-                data={`${data.exercise.name}`}
+                data={`${data.exercise?.name}`}
                 style={[
                   Platform.select({
                     web: tailwind(
