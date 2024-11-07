@@ -14,10 +14,9 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import NoDataSvg from '../svgs/NoDataSvg';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
-import { Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { AntDesign, Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import DraggableExercises from '../molecules/DraggableExercises';
-import AppTextSingleInput from '../atoms/AppTextSingleInput';
 import useModal from '@/hooks/useModal';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import { useMutation } from '@tanstack/react-query';
@@ -29,12 +28,18 @@ import {
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { useToast } from 'react-native-toast-notifications';
 import { queryClient } from '@/utils/helper';
+import AddExercise from '../modals/AddExercise';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
   const toast = useToast();
   const { slug } = useLocalSearchParams() as any;
   const { hideModal, showModal, openModal } = useModal();
+  const {
+    hideModal: hideModalAddExercise,
+    openModal: openModalAddExercise,
+    showModal: showModalAddExercise,
+  } = useModal();
   const {
     hideModal: hideModalDeleteWorkout,
     showModal: showModalDeleteModal,
@@ -167,27 +172,36 @@ const WorkoutDetail = () => {
             native: tailwind('w-full flex-row flex-wrap  items-center justify-between gap-1 '),
           }),
         ]}>
-        <LabelContainer
-          label={workoutDetail?.name ?? ''}
-          labelStyle={[
+        <Container
+          style={[
             Platform.select({
-              web: tailwind(
-                `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} text-center font-bold  not-italic leading-[150%] text-white `,
-              ),
-              native: tailwind('text-xl font-bold'),
-            }),
-          ]}
-          containerStyle={[
-            Platform.select({
-              web: tailwind(`
-                ${isLargeScreen ? 'hidden' : 'text-xl font-bold'}  
-              `),
+              web: tailwind(` gap-4 ${isLargeScreen ? 'hidden ' : 'flex-row'}`),
               native: tailwind('hidden'),
             }),
-          ]}
-          onPress={showModal}
-          left={<FontAwesome5 name="edit" color="#A27DE1" size={ICON_SIZE} />}
-        />
+          ]}>
+          <BackActionButton />
+          <LabelContainer
+            label={workoutDetail?.name ?? ''}
+            labelStyle={[
+              Platform.select({
+                web: tailwind(
+                  `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} flex-1 text-center  font-bold not-italic leading-[150%] text-white `,
+                ),
+                native: tailwind('text-xl font-bold'),
+              }),
+            ]}
+            containerStyle={[
+              Platform.select({
+                web: tailwind(`
+                ${isLargeScreen ? 'hidden' : 'flex-1 text-xl font-bold'}  
+              `),
+                native: tailwind('hidden'),
+              }),
+            ]}
+            onPress={showModal}
+            left={<FontAwesome5 name="edit" color="#A27DE1" size={ICON_SIZE} />}
+          />
+        </Container>
         <CustomSwitch
           isEnabled={isCurrentWorkoutPublic}
           toggleSwitch={toggleIsCurrentWorkoutPublic}
@@ -258,7 +272,7 @@ const WorkoutDetail = () => {
   const renderExcerciseLabel = () => {
     return (
       <>
-        <Container style={[tailwind('flex-row  justify-between gap-2 ')]}>
+        <Container style={[tailwind('mb-2  flex-row items-center justify-between gap-2 ')]}>
           <Container style={[tailwind(``)]}>
             <TextContainer
               data={`Exercises `}
@@ -295,6 +309,17 @@ const WorkoutDetail = () => {
               />
             </Container>
           )}
+          <ActionButton
+            label={'Add Exercise'}
+            onPress={showModalAddExercise}
+            style={[
+              Platform.select({
+                web: tailwind('rounded-xl'),
+                native: tailwind('rounded-xl px-3.5'),
+              }),
+            ]}
+            left={<AntDesign name="pluscircleo" size={20} color="white" />}
+          />
         </Container>
         <Container
           style={[
@@ -328,9 +353,11 @@ const WorkoutDetail = () => {
             tailwind('flex-row items-center justify-between'),
           ]}>
           <Container style={[tailwind('flex-1 flex-row items-center gap-2')]}>
-            <Container>
-              <BackActionButton />
-            </Container>
+            {isLargeScreen && (
+              <Container style={[]}>
+                <BackActionButton />
+              </Container>
+            )}
             {(isPending || isPendingExerciseCardAction) &&
               Platform.OS === 'web' &&
               !isLargeScreen && (
@@ -362,7 +389,7 @@ const WorkoutDetail = () => {
               labelStyle={[
                 Platform.select({
                   web: tailwind(
-                    `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} text-center font-bold  not-italic leading-[150%] text-white `,
+                    `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} text-center  font-bold not-italic leading-[150%] text-white`,
                   ),
                   native: tailwind('flex-1 text-xl font-bold'),
                 }),
@@ -401,39 +428,6 @@ const WorkoutDetail = () => {
               }),
               tailwind('flex-1 pb-8'),
             ]}>
-            <Container
-              style={[
-                Platform.select({
-                  web: tailwind(
-                    `mx-auto flex w-[44.875rem] flex-col items-start gap-2 ${isLargeScreen && 'w-full'}`,
-                  ),
-                  native: tailwind(`mx-auto w-full items-start gap-2 `),
-                }),
-              ]}>
-              <AppTextSingleInput
-                initialValues={{ exercise: '' }}
-                placeholder="Search exercise name"
-                fieldName={''}
-                handleSubmit={() => {}}
-                containerStyleAppTextInput={[
-                  Platform.select({
-                    web: tailwind(
-                      `w-full border border-white  ${isMobileDeviceOnly ? 'bg-[#42382E]' : 'bg-[#41474A]'} px-5`,
-                    ),
-                    native: tailwind(`w-full border  border-white  bg-[#42382E]  px-5`),
-                  }),
-                ]}
-                testInputStyle={[
-                  Platform.select({
-                    web: tailwind(' py-4 text-left text-base font-normal'),
-                    native: tailwind('text-left text-base font-normal'),
-                  }),
-                ]}
-                autoCapitalize="none"
-                placeholderTextColor="#fff"
-                right={<Ionicons name="search" color="#fff" size={ICON_SIZE} />}
-              />
-            </Container>
             {renderWorkoutExercises()}
           </Container>
         </Container>
@@ -465,6 +459,9 @@ const WorkoutDetail = () => {
           isLoading={isPendingCreateWorkoutCopy}
           handleAction={handleDuplicateWorkout}
         />
+      )}
+      {openModalAddExercise && (
+        <AddExercise isModalVisible={openModalAddExercise} closeModal={hideModalAddExercise} />
       )}
     </Container>
   );

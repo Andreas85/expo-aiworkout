@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { tailwind } from '@/utils/tailwind';
 import { Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData } from '@tanstack/react-query';
 import { useFetchData } from '@/hooks/useFetchData';
 import { queryClient } from '@/utils/helper';
 
@@ -18,6 +18,9 @@ const WorkoutDetailIndex = () => {
   const { slug } = useLocalSearchParams();
   const { isLargeScreen } = useWebBreakPoints();
   const { setWorkoutDetail } = useWorkoutDetailStore();
+  const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+
+  const cachedData: any = queryClient.getQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug]);
 
   const { data, refetch, isLoading } = useFetchData({
     queryFn: () => getWorkoutDetailById({ id: slug }),
@@ -26,22 +29,25 @@ const WorkoutDetailIndex = () => {
     enabled: false,
   });
 
-  const data1: any =
-    queryClient.getQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug]) ?? {};
-  // console.log({ data1 });
-
-  // const { data, refetch, isLoading } = useQuery({
-  //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-  //   queryFn: () => getWorkoutDetailById({ id: slug }),
-  //   placeholderData: keepPreviousData,
-  //   // staleTime: 30000,
-  // });
+  // console.log({ cachedData });
 
   useEffect(() => {
-    if (data1) {
-      setWorkoutDetail(data1);
+    if (!cachedData) {
+      refetch();
     }
-  }, [data1]);
+  }, []);
+
+  useEffect(() => {
+    if (cachedData) {
+      setWorkoutDetail(cachedData);
+    }
+  }, [cachedData]);
+
+  useEffect(() => {
+    if (data) {
+      setWorkoutDetail(data);
+    }
+  }, [data]);
 
   // useEffect(() => {
   //   if (slug) {
@@ -53,7 +59,9 @@ const WorkoutDetailIndex = () => {
     if (isLoading) {
       return <Loading />;
     }
-    return <WorkoutDetail />;
+    if (workoutDetail) {
+      return <WorkoutDetail />;
+    }
   };
   return (
     <SafeAreaView

@@ -22,7 +22,7 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
     isLoading: false,
     setWorkoutDetail: async payload => {
       if (payload) {
-        set({ workoutDetail: payload, hasExercise: payload.exercises.length > 0 }); // set the workout detail
+        set({ workoutDetail: payload, hasExercise: payload.exercises?.length > 0 }); // set the workout detail
       }
     },
     setLoadingWorkout: async (payload: any) => {
