@@ -78,7 +78,7 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
                 fontWeight: '700',
               },
             ]}
-            numberOfLines={1}>
+            numberOfLines={2}>
             {`${item?.exercise?.name || item?.name}${item?.weight ? ` (${item?.weight} kg)` : ''}`}
           </Text>
         </Container>
@@ -90,6 +90,7 @@ const WorkoutCard = (props: { item: ExerciseElement; isEnabled?: boolean }) => {
             }),
           ]}>
           <ShowLabelValue label="No. of Reps" value={`${item?.reps ? item?.reps : '-'}`} />
+          {item?.reps ? <ShowLabelValue label="Duration" value={`${item?.duration}`} /> : null}
           <ShowLabelValue
             label="Rest"
             value={`${item?.rest ? pluralise(item?.rest, `${item?.rest} second`) : '-'}`}

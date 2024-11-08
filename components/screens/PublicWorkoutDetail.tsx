@@ -105,14 +105,8 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
         <Container
           style={[
             Platform.select({
-              web: [
-                tailwind(
-                  'absolute bottom-0 left-0 right-0 mx-auto flex-1   bg-NAVBAR_BACKGROUND p-4 shadow-[0_-4px_10px_4px_rgba(95,63,102,0.50)]',
-                ),
-                isLargeScreen
-                  ? styles.MOBILE.START_BUTTON_CONTAINER
-                  : styles.DESKTOP.START_BUTTON_CONTAINER,
-              ],
+              web: tailwind('absolute bottom-0 left-0 right-0  items-center p-4'),
+
               native: tailwind(
                 'absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 ',
               ),
@@ -224,10 +218,9 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           <Container
             style={[
               Platform.select({
-                web: tailwind(isLargeScreen ? 'mb-16' : 'mb-24 '),
-                native: tailwind('mb-10 '),
+                web: tailwind(`${isLargeScreen ? 'mb-16' : ' '} flex-1 `),
+                native: tailwind('mb-10 flex-1 pb-8'),
               }),
-              tailwind('flex-1 pb-8'),
             ]}>
             {renderWorkoutExercises()}
           </Container>

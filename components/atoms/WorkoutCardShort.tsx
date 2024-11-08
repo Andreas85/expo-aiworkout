@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import React from 'react';
+import React, { memo } from 'react';
 import Container from './Container';
 import { tailwind } from '@/utils/tailwind';
 import { ExerciseElement } from '@/services/interfaces';
@@ -75,4 +75,4 @@ const WorkoutCardShort = (props: { item: ExerciseElement; isEnabled?: boolean })
   );
 };
 
-export default WorkoutCardShort;
+export default memo(WorkoutCardShort);

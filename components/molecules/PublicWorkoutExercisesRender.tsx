@@ -103,7 +103,7 @@ const PublicWorkoutExercisesRender = (props: any) => {
         contentContainerStyle={[
           Platform.select({
             web: tailwind(
-              ` gap-y-4 rounded bg-NAVBAR_BACKGROUND  ${isLargeScreen ? 'rounded-lg px-3 py-2 ' : 'px-[2.5rem] py-[1.25rem]'}`,
+              ` gap-y-4 overflow-y-scroll rounded bg-NAVBAR_BACKGROUND pb-24  ${isLargeScreen ? 'rounded-lg px-3 pt-2 ' : 'px-[2.5rem] pt-[1.25rem]'}`,
             ),
             native: tailwind(` gap-y-4 rounded-lg bg-NAVBAR_BACKGROUND  px-3 py-2`),
           }),
@@ -126,7 +126,9 @@ const PublicWorkoutExercisesRender = (props: any) => {
       renderItem={renderListItem}
       contentContainerStyle={[
         Platform.select({
-          web: tailwind(`${isLargeScreen ? 'gap-[0.5rem]' : 'gap-[1.25rem]'} `),
+          web: tailwind(
+            ` ${isLargeScreen ? 'gap-[0.5rem]' : 'gap-[1.25rem] '} overflow-y-scroll pb-24 `,
+          ),
           native: tailwind(` gap-y-4 py-4 pt-0 `),
         }),
       ]}
