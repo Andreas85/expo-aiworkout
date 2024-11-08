@@ -56,7 +56,7 @@ const WorkoutDetail = () => {
   const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(
     workoutDetail?.isPublic ?? false,
   );
-  const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
+  const { isLargeScreen, isExtraSmallScreenOnly } = useWebBreakPoints();
   const [isPendingExerciseCardAction, setIsPendingExerciseCardAction] = useState<boolean>(false);
 
   const toggleIsCurrentWorkoutPublic = () => {
@@ -137,7 +137,7 @@ const WorkoutDetail = () => {
           style={[
             Platform.select({
               web: tailwind(
-                'absolute bottom-3 left-0 right-0 mx-auto flex-1  items-center justify-center self-center px-4',
+                'absolute bottom-3 left-0 right-0 mx-auto items-center justify-center self-center px-4',
               ),
 
               native: tailwind(
@@ -175,7 +175,7 @@ const WorkoutDetail = () => {
         <Container
           style={[
             Platform.select({
-              web: tailwind(` gap-4 ${isLargeScreen ? 'hidden ' : 'flex-row'}`),
+              web: tailwind(` gap-4 ${isLargeScreen ? 'hidden ' : 'flex-row'} flex-1.5`),
               native: tailwind('hidden'),
             }),
           ]}>
@@ -185,7 +185,7 @@ const WorkoutDetail = () => {
             labelStyle={[
               Platform.select({
                 web: tailwind(
-                  `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'} flex-1 text-center  font-bold not-italic leading-[150%] text-white `,
+                  `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'}   font-bold not-italic leading-[150%] text-white `,
                 ),
                 native: tailwind('text-xl font-bold'),
               }),
@@ -193,7 +193,7 @@ const WorkoutDetail = () => {
             containerStyle={[
               Platform.select({
                 web: tailwind(`
-                ${isLargeScreen ? 'hidden' : 'flex-1 text-xl font-bold'}  
+                ${isLargeScreen ? 'hidden' : 'flex-1 justify-start text-xl font-bold'}  
               `),
                 native: tailwind('hidden'),
               }),
@@ -220,7 +220,7 @@ const WorkoutDetail = () => {
           labelStyle={[
             Platform.select({
               web: tailwind(
-                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center font-normal  not-italic leading-[150%] text-white`,
+                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center  font-normal not-italic leading-[150%] text-white`,
               ),
               native: tailwind('text-sm font-bold'),
             }),
@@ -228,7 +228,7 @@ const WorkoutDetail = () => {
           onPress={showModalCreateWorkoutCopy}
           containerStyle={[
             Platform.select({
-              web: tailwind(''),
+              web: tailwind('flex-1 justify-end'),
               // native: tailwind('flex-1'),
             }),
           ]}
@@ -245,14 +245,14 @@ const WorkoutDetail = () => {
           labelStyle={[
             Platform.select({
               web: tailwind(
-                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center font-normal  not-italic leading-[150%] text-white`,
+                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'}  text-center font-normal  not-italic leading-[150%] text-white`,
               ),
               native: tailwind('text-sm font-bold'),
             }),
           ]}
           containerStyle={[
             Platform.select({
-              web: tailwind(''),
+              web: tailwind('flex-1 justify-end'),
               // native: tailwind('flex-1'),
             }),
           ]}
@@ -288,10 +288,13 @@ const WorkoutDetail = () => {
             <Container style={[tailwind(``)]}>
               <LabelContainer
                 label={'Saving Changes'}
+                labelStyle={Platform.select({
+                  web: tailwind(isExtraSmallScreenOnly ? 'text-[10px]' : ''),
+                })}
                 containerStyle={[
                   Platform.select({
                     web: tailwind(`
-                    ${isLargeScreen ? 'flex-1 justify-end gap-2' : 'hidden'}
+                    ${'flex-1 justify-end gap-2 text-[6px]'} 
                   `),
                     native: tailwind('flex-1 justify-end gap-2'),
                   }),
@@ -300,9 +303,9 @@ const WorkoutDetail = () => {
                   <SkypeIndicator
                     color="#A27DE1"
                     animating
-                    size={Platform.OS === 'web' ? 20 : 16}
+                    size={Platform.OS === 'web' ? 10 : 16}
                     style={{
-                      marginRight: 10,
+                      marginRight: 4,
                     }}
                   />
                 }
@@ -314,8 +317,8 @@ const WorkoutDetail = () => {
             onPress={showModalAddExercise}
             style={[
               Platform.select({
-                web: tailwind('rounded-xl'),
-                native: tailwind('rounded-xl px-3.5'),
+                web: tailwind('rounded-xl px-3'),
+                native: tailwind('rounded-xl px-3'),
               }),
             ]}
             left={<AntDesign name="pluscircleo" size={20} color="white" />}
@@ -352,22 +355,23 @@ const WorkoutDetail = () => {
             }),
             tailwind('flex-row items-center justify-between'),
           ]}>
-          <Container style={[tailwind('flex-1 flex-row items-center gap-2')]}>
+          <Container style={[tailwind('relative flex-1 flex-row items-center gap-2 ')]}>
             {isLargeScreen && (
               <Container style={[]}>
                 <BackActionButton />
               </Container>
             )}
-            {(isPending || isPendingExerciseCardAction) &&
+            {/* {(isPending || isPendingExerciseCardAction) &&
               Platform.OS === 'web' &&
               !isLargeScreen && (
-                <Container style={[tailwind(`flex-1 items-start justify-center self-center`)]}>
+                <Container
+                  style={[tailwind(` relative flex-1 items-start justify-center self-center`)]}>
                   <LabelContainer
                     label={'Saving Changes'}
                     containerStyle={[
                       Platform.select({
                         web: tailwind(`
-                    ${isLargeScreen ? 'hidden' : 'self-center'}
+                    ${isLargeScreen ? 'hidden' : 'absolute top-[5px] self-center'}
                   `),
                       }),
                     ]}
@@ -383,7 +387,7 @@ const WorkoutDetail = () => {
                     }
                   />
                 </Container>
-              )}
+              )} */}
             <LabelContainer
               label={workoutDetail?.name ?? ''}
               labelStyle={[
@@ -417,16 +421,15 @@ const WorkoutDetail = () => {
               web: tailwind(`
                 mx-auto w-full
             `),
+              native: tailwind('flex-1'),
             }),
-            tailwind('flex-1'),
           ]}>
           <Container
             style={[
               Platform.select({
-                web: tailwind('mb-16'),
-                native: tailwind('mb-10 '),
+                web: tailwind(`flex-1 ${isLargeScreen ? '' : 'pb-8'}`),
+                native: tailwind('mb-1 flex-1 '),
               }),
-              tailwind('flex-1 pb-8'),
             ]}>
             {renderWorkoutExercises()}
           </Container>

@@ -83,10 +83,11 @@ const DraggableExercises = (props: {
           marginBottom: 55,
         }}
         initialNumToRender={1}
-        maxToRenderPerBatch={5}
-        updateCellsBatchingPeriod={10}
-        windowSize={5}
+        // maxToRenderPerBatch={10}
+        // updateCellsBatchingPeriod={10}
+        // windowSize={5}
         renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
         scrollEnabled
       />
     </>
