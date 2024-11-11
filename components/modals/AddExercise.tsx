@@ -77,7 +77,6 @@ function AddExercise(props: {
     onSuccess: async data => {
       if (isExerciseCard) {
         const oldIndex = data?.data?.exercises?.at(-1)?.order;
-        alert(JSON.stringify({ oldIndex, newCardOrder }));
         const reorderedItems = data?.data?.exercises?.sort(
           (a: ExerciseElement, b: ExerciseElement) => a.order - b.order,
         );

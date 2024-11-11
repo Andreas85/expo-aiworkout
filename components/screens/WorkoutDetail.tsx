@@ -53,9 +53,7 @@ const WorkoutDetail = () => {
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const { setWorkoutDetail } = useWorkoutDetailStore();
-  const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(
-    workoutDetail?.isPublic ?? false,
-  );
+  const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
   const { isLargeScreen, isExtraSmallScreenOnly } = useWebBreakPoints();
   const [isPendingExerciseCardAction, setIsPendingExerciseCardAction] = useState<boolean>(false);
 
@@ -64,7 +62,6 @@ const WorkoutDetail = () => {
       formData: { isPublic: !isCurrentWorkoutPublic },
       queryParams: { id: slug },
     });
-    setIsCurrentWorkoutPublic(!isCurrentWorkoutPublic);
   };
 
   const { mutate: mutateUpdatedWorkout, isPending } = useMutation({
@@ -78,6 +75,7 @@ const WorkoutDetail = () => {
       });
       queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
       setWorkoutDetail(data?.data);
+      setIsCurrentWorkoutPublic(data?.data?.isPublic);
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
@@ -234,7 +232,7 @@ const WorkoutDetail = () => {
               native: tailwind('text-sm font-bold'),
             }),
           ]}
-          label="Public"
+          label={'Public'}
         />
         <LabelContainer
           label={'Duplicate'}
