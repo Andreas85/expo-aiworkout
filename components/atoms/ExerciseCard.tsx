@@ -22,7 +22,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useToast } from 'react-native-toast-notifications';
 import AddExercise from '../modals/AddExercise';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { debounce } from 'lodash';
+import _, { debounce } from 'lodash';
 import { queryClient } from '@/utils/helper';
 
 interface IExerciseCard {
@@ -42,7 +42,7 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { slug } = useLocalSearchParams() as any;
   const toast = useToast();
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
-  const { hideModal, openModal } = useModal();
+  const { hideModal, openModal, showModal } = useModal();
   const {
     hideModal: hideModalDeleteWorkoutExercise,
     showModal: showModalDeleteWorkoutExercise,
@@ -137,7 +137,8 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { mutate: mutateAddExercise } = useMutation({
     mutationFn: addExerciseToWorkoutRequest,
     onSuccess: async data => {
-      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
   });
@@ -164,8 +165,15 @@ const ExerciseCard = (props: IExerciseCard) => {
   } = useMutation({
     mutationFn: removeExerciseToWorkoutRequest,
     onSuccess: async data => {
-      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(data?.data);
+      // queryClient.invalidateQueries({
+      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      //   type: 'all',
+      //   refetchType: 'all',
+      //   stale: true,
+      // });
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      setWorkoutDetail(_.cloneDeep(data?.data));
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
@@ -178,8 +186,9 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { mutate: mutateUpdateExerciseToWorkoutRequest, isPending } = useMutation({
     mutationFn: updateExerciseToWorkoutRequest,
     onSuccess: async data => {
-      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(data?.data);
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      setWorkoutDetail(_.cloneDeep(data?.data));
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
@@ -318,7 +327,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                     // native: tailwind('flex-1'),
                   }),
                 ]}
-                // onPress={showModal}
+                onPress={showModal}
                 left={
                   <Ionicons
                     name="add-circle-outline"
@@ -653,7 +662,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                   native: tailwind('text-xl font-bold'),
                 }),
               ]}
-              // onPress={showModal}
+              onPress={showModal}
               containerStyle={[
                 Platform.select({
                   web: tailwind('w-[7.25rem] flex-1 gap-x-2 self-stretch'),
@@ -720,7 +729,14 @@ const ExerciseCard = (props: IExerciseCard) => {
           handleAction={handleDeleteWorkoutExercise}
         />
       )}
-      {openModal && <AddExercise isModalVisible={openModal} closeModal={hideModal} />}
+      {openModal && (
+        <AddExercise
+          isModalVisible={openModal}
+          closeModal={hideModal}
+          isExerciseCard={true}
+          newCardOrder={data?.order + 1}
+        />
+      )}
     </>
   );
 };

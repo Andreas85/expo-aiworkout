@@ -70,7 +70,13 @@ const WorkoutDetail = () => {
   const { mutate: mutateUpdatedWorkout, isPending } = useMutation({
     mutationFn: updateWorkoutDataRequest,
     onSuccess: async data => {
-      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+        type: 'all',
+        refetchType: 'all',
+        stale: true,
+      });
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
       setWorkoutDetail(data?.data);
     },
     onError: (error: any) => {
@@ -81,14 +87,29 @@ const WorkoutDetail = () => {
   const { mutate: mutateDeleteWorkout, isPending: isPendingDeleteWorkout } = useMutation({
     mutationFn: deleteWorkoutDetail,
     onSuccess: async data => {
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+        type: 'all',
+        refetchType: 'all',
+        stale: true,
+      });
+
       hideModalDeleteWorkout();
       router.push('/workouts');
+    },
+    onError: (error: any) => {
+      toast.show(error, { type: 'danger' });
     },
   });
 
   const { mutate: mutateCreateWorkoutCopy, isPending: isPendingCreateWorkoutCopy } = useMutation({
     mutationFn: createWorkoutCopy,
     onSuccess: async data => {
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+        type: 'all',
+        refetchType: 'none',
+      });
       toast.show('Duplicate success', { type: 'success' });
       router.push(`/workout/${data?.data?._id}`);
     },

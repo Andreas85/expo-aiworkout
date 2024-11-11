@@ -272,3 +272,30 @@ export const createWorkoutCopy = async (payload: ICreateWorkoutCopy) => {
     throw extractedErrorMessage(error?.response);
   }
 };
+
+export const exerciseAutoSuggest = async (query: any) => {
+  try {
+    const params = query;
+    const URL = API_ENPOINTS.EXERCISE_SEARCH + params;
+    const { data } = await getRequest({
+      API: URL,
+    });
+    return data.data.map((item: any) => {
+      return { value: item._id, label: item.name };
+    });
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const fetchExerciseService = async () => {
+  try {
+    const URL = API_ENPOINTS.EXERCISES;
+    const { data } = await getRequest({
+      API: URL,
+    });
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};

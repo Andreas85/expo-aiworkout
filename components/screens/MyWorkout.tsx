@@ -14,7 +14,7 @@ import CustomSwitch from '../atoms/CustomSwitch';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { LayoutAnimation, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
@@ -40,18 +40,26 @@ export default function MyWorkout() {
     return await fetchMyWorkoutService();
   };
 
-  const { data, error, isPending, refetch, fetchStatus, isLoading } = useFetchData({
+  const { data, error, isPending, refetch, isSuccess, isLoading } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
     staleTime: 60 * 1000, // 1 minute
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      // if (!isStale) {
+      refetch();
+      // }
+    }, []),
+  );
 
   const prefetchWorkouts = (id: string) => {
     // The results of this query will be cached like a normal query
     queryClient.prefetchQuery({
       queryFn: () => getWorkoutDetailById({ id: id }),
       queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, id],
-      staleTime: 60 * 1000, // 1 minute
+      // staleTime: 60 * 1000, // 1 minute
     });
   };
 
@@ -60,12 +68,12 @@ export default function MyWorkout() {
   };
 
   useEffect(() => {
-    if (data && fetchStatus === 'idle') {
-      data?.data.map((item: any) => {
+    if (data && isSuccess) {
+      data?.data?.map((item: any) => {
         prefetchWorkouts(item?._id);
       });
     }
-  }, [data, fetchStatus]);
+  }, [data, isSuccess]);
 
   const handleCardClick = (item: any) => {
     router.push(`/workout/${item?._id}`);
@@ -163,7 +171,13 @@ export default function MyWorkout() {
         {renderTopHeader()}
         {renderWorkingListing()}
       </Container>
-      {openModal && <AddAndEditWorkoutModal isModalVisible={openModal} closeModal={hideModal} />}
+      {openModal && (
+        <AddAndEditWorkoutModal
+          isModalVisible={openModal}
+          closeModal={hideModal}
+          refetch={refetch}
+        />
+      )}
     </>
   );
 }

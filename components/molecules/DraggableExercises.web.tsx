@@ -57,7 +57,8 @@ const DraggableExercises = (props: {
   const { mutate: mutateSortExercise, isPending } = useMutation({
     mutationFn: sortExercisesRequest,
     onSuccess: async data => {
-      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
     },
   });

@@ -54,4 +54,5 @@ export const REACT_QUERY_API_KEYS = {
   MY_WORKOUT: 'my-workouts',
   MY_WORKOUT_DETAILS: 'my-workout-details',
   PUBLIC_WORKOUT_DETAILS: 'public-workout-details',
+  MY_EXERCISES: 'my-exercises',
 };

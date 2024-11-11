@@ -23,8 +23,9 @@ function AddAndEditWorkoutModal(props: {
   isModalVisible: boolean;
   closeModal: () => void;
   isEditWorkout?: boolean;
+  refetch?: () => void;
 }) {
-  const { isModalVisible, closeModal, isEditWorkout } = props;
+  const { isModalVisible, closeModal, isEditWorkout, refetch } = props;
   const { slug } = useLocalSearchParams();
   const workoutname = useWorkoutDetailStore(state => state.workoutDetail)?.name ?? '';
   const { setWorkoutDetail } = useWorkoutDetailStore();
@@ -34,9 +35,7 @@ function AddAndEditWorkoutModal(props: {
     mutationFn: addWorkoutService,
     onSuccess: async data => {
       closeModal();
-      return await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      });
+      refetch?.();
     },
     onError: (error: string) => {
       setResponseError(error);
@@ -45,13 +44,15 @@ function AddAndEditWorkoutModal(props: {
 
   const { mutate: mutateUpdatedWorkout, isPending: isPendingUpdateWorkout } = useMutation({
     mutationFn: updateWorkoutDataRequest,
-    onSuccess: async data => {
-      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(data?.data);
-      closeModal();
-      await queryClient.invalidateQueries({
+    onSuccess: data => {
+      // alert('HERE---');
+      queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
       });
+      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      // queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      setWorkoutDetail(data?.data);
+      closeModal();
     },
     onError: (error: string) => {
       setResponseError(error);

@@ -28,7 +28,9 @@ const CustomSwitch = (props: ICustomSwitch) => {
   };
   return (
     <label
-      className={`my-4 flex cursor-pointer items-center justify-end gap-2 ` + containerWebStyle}>
+      className={
+        `-z-10 my-4 flex cursor-pointer items-center justify-end gap-2 ` + containerWebStyle
+      }>
       <span
         className={
           ` ${isLargeScreen ? 'text-[0.875rem]' : 'ms-3 text-xl'}  font-medium text-gray-300 ` +
