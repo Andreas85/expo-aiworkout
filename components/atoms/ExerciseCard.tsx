@@ -6,7 +6,7 @@ import { tailwind } from '@/utils/tailwind';
 import LabelContainer from './LabelContainer';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
-import { Platform } from 'react-native';
+import { ActivityIndicator, Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import CustomSwitch from './CustomSwitch';
 import AppTextSingleInput from './AppTextSingleInput';
@@ -16,26 +16,28 @@ import { useMutation } from '@tanstack/react-query';
 import {
   addExerciseToWorkoutRequest,
   removeExerciseToWorkoutRequest,
+  sortExercisesRequest,
   updateExerciseToWorkoutRequest,
 } from '@/services/workouts';
 import { useLocalSearchParams } from 'expo-router';
 import { useToast } from 'react-native-toast-notifications';
 import AddExercise from '../modals/AddExercise';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import _, { debounce } from 'lodash';
-import { queryClient } from '@/utils/helper';
+import { debounce } from 'lodash';
+import { getReorderItemsForSortingWorkoutExercises, queryClient } from '@/utils/helper';
 
 interface IExerciseCard {
   data: ExerciseElement;
   children: React.ReactNode;
+  index: number;
   setIsPendingExerciseCardAction: (loading: boolean) => void;
   handleSubmit?: (data: any) => void;
 }
 
 const ExerciseCard = (props: IExerciseCard) => {
-  const { data, children, handleSubmit, setIsPendingExerciseCardAction } = props;
+  const { data, children, handleSubmit, setIsPendingExerciseCardAction, index } = props;
 
-  const { setWorkoutDetail } = useWorkoutDetailStore() as any;
+  const { setWorkoutDetail, updateWorkoutExercises } = useWorkoutDetailStore() as any;
   const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail) ?? [];
   const workoutDetailExercises =
     useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
@@ -134,12 +136,48 @@ const ExerciseCard = (props: IExerciseCard) => {
     });
   }, 1000); // Adjust debounce time as needed
 
-  const { mutate: mutateAddExercise } = useMutation({
-    mutationFn: addExerciseToWorkoutRequest,
+  const { mutate: mutateSortExercise, isPending: isPendingSortExercise } = useMutation({
+    mutationFn: sortExercisesRequest,
     onSuccess: async data => {
-      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(data?.data);
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+        refetchType: 'all',
+      });
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      updateWorkoutExercises(data?.data?.exercises);
+      // setWorkoutDetail(data?.data);
+    },
+    onError: (error: any) => {
+      toast.show(error, { type: 'danger' });
+    },
+  });
+
+  const { mutate: mutateAddExercise, isPending: isPendingDuplicate } = useMutation({
+    mutationFn: addExerciseToWorkoutRequest,
+
+    onSuccess: async (data, variables) => {
+      if (variables?.isDuplicated) {
+        toast.show('Exercise duplicated successfully', { type: 'success' });
+        const lastIndex = data?.data?.exercises?.length - 1;
+        const reorderedItems = data?.data?.exercises?.sort(
+          (a: ExerciseElement, b: ExerciseElement) => a?.order - b?.order,
+        );
+        const [movedItem] = reorderedItems.splice(lastIndex, 1);
+        reorderedItems.splice(index + 1, 0, movedItem); // Insert it at the new index
+        const modifiedData = getReorderItemsForSortingWorkoutExercises(reorderedItems);
+        const payload = {
+          queryParams: { id: slug },
+          formData: { ...modifiedData },
+        };
+        mutateSortExercise(payload);
+        return;
+      }
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+      });
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      toast.show('Exercise added successfully', { type: 'success' });
+      updateWorkoutExercises(data?.data?.exercises);
     },
   });
 
@@ -154,6 +192,7 @@ const ExerciseCard = (props: IExerciseCard) => {
         weight: data?.weight,
       },
       queryParams: { id: slug },
+      isDuplicated: true,
     };
 
     mutateAddExercise(payload);
@@ -165,15 +204,12 @@ const ExerciseCard = (props: IExerciseCard) => {
   } = useMutation({
     mutationFn: removeExerciseToWorkoutRequest,
     onSuccess: async data => {
-      // queryClient.invalidateQueries({
-      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      //   type: 'all',
-      //   refetchType: 'all',
-      //   stale: true,
-      // });
-      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(_.cloneDeep(data?.data));
+      toast.show('Exercise deleted successfully', { type: 'success' });
+      updateWorkoutExercises(data?.data?.exercises);
+      return await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+        refetchType: 'none',
+      });
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
@@ -188,7 +224,9 @@ const ExerciseCard = (props: IExerciseCard) => {
     onSuccess: async data => {
       queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
       // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(_.cloneDeep(data?.data));
+      // setWorkoutDetail(_.cloneDeep(data?.data));
+      // setWorkoutDetail(_.cloneDeep(data?.data));
+      updateWorkoutExercises(data?.data?.exercises);
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
@@ -209,7 +247,7 @@ const ExerciseCard = (props: IExerciseCard) => {
   const handleDeleteWorkoutExercise = () => {
     // console.log('Api called to delete workout exercise', data?.order);
     mutateRemoveExerciseToWorkoutRequest({
-      formData: { index: data?.order },
+      formData: { index: index },
       queryParams: { id: slug },
     });
   };
@@ -352,13 +390,18 @@ const ExerciseCard = (props: IExerciseCard) => {
                     // native: tailwind('flex-1'),
                   }),
                 ]}
+                isLoading={isPendingDuplicate || isPendingSortExercise}
                 onPress={handleDuplicateExerciseCard}
                 left={
-                  <Ionicons
-                    name="duplicate-sharp"
-                    color="#A27DE1"
-                    size={Platform.OS === 'web' ? ICON_SIZE : 16}
-                  />
+                  isPendingDuplicate || isPendingSortExercise ? (
+                    <ActivityIndicator size={ICON_SIZE} color="#A27DE1" />
+                  ) : (
+                    <Ionicons
+                      name="duplicate-sharp"
+                      color="#A27DE1"
+                      size={Platform.OS === 'web' ? ICON_SIZE : 16}
+                    />
+                  )
                 }
               />
               <LabelContainer
@@ -569,7 +612,8 @@ const ExerciseCard = (props: IExerciseCard) => {
               'flex h-28 w-[12.1875rem] shrink-0 flex-row items-start items-center justify-center gap-5 break-words',
             )}>
             <Container style={tailwind(' ')}>{children}</Container>
-            <TextContainer data={`${data?.exercise?.name}`} style={tailwind('flex-1')} />
+            {/* :${data.order} */}
+            <TextContainer data={`${data?.exercise?.name} `} style={tailwind('flex-1')} />
           </Container>
           <Container style={tailwind('')}>
             <CustomSwitch
@@ -681,6 +725,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                   native: tailwind('text-xl font-bold'),
                 }),
               ]}
+              isLoading={isPendingDuplicate || isPendingSortExercise}
               onPress={handleDuplicateExerciseCard}
               containerStyle={[
                 Platform.select({
@@ -688,7 +733,13 @@ const ExerciseCard = (props: IExerciseCard) => {
                   // native: tailwind('flex-1'),
                 }),
               ]}
-              left={<Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />}
+              left={
+                isPendingDuplicate || isPendingSortExercise ? (
+                  <ActivityIndicator size={ICON_SIZE} />
+                ) : (
+                  <Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />
+                )
+              }
             />
             <LabelContainer
               label={'Delete'}
@@ -700,6 +751,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                   native: tailwind('text-xl font-bold'),
                 }),
               ]}
+              isLoading={isPendingDeleteWorkoutExercise}
               onPress={handleDeleteExerciseCard}
               containerStyle={[
                 Platform.select({

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
 import { tailwind } from '@/utils/tailwind';
@@ -7,7 +7,12 @@ import { ActionButton } from '../atoms/ActionButton';
 import { FieldArray, Formik } from 'formik';
 import { AppTextInput } from '../atoms/AppTextInput';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addExerciseToWorkoutRequest, sortExercisesRequest } from '@/services/workouts';
+import {
+  addExerciseToWorkoutRequest,
+  exerciseAutoSuggest,
+  fetchExerciseService,
+  sortExercisesRequest,
+} from '@/services/workouts';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import * as yup from 'yup';
 import { useLocalSearchParams } from 'expo-router';
@@ -17,24 +22,17 @@ import CustomAutoComplete from '../atoms/CustomAutoComplete';
 
 import { ExerciseElement } from '@/services/interfaces';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { View } from '../Themed';
+import { Text, View } from '../Themed';
 import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 import { useToast } from 'react-native-toast-notifications';
-import _ from 'lodash';
+import CustomDropdown from '../atoms/CustomDropdown';
+import { useFetchData } from '@/hooks/useFetchData';
 
 const ERROR_MESSAGE = {
   EXERCISE_REQ: 'Exercise name is required if less than 3 characters.',
   REPS_REQ: 'Reps are required when duration is not specified.',
   DURATION_REQ: 'Duration is required.',
 };
-
-const validationSchema = yup.object().shape({
-  reps: yup.string().when('isDuration', {
-    is: false,
-    then: schema => schema.required(ERROR_MESSAGE.REPS_REQ),
-  }),
-  duration: yup.string().required(ERROR_MESSAGE.DURATION_REQ),
-});
 
 interface IFormValues {
   exercise: any;
@@ -47,14 +45,22 @@ interface IFormValues {
   optionsCount: string;
 }
 
+const validationSchema = yup.object().shape({
+  reps: yup.string().when('isDuration', {
+    is: false,
+    then: schema => schema.required(ERROR_MESSAGE.REPS_REQ),
+  }),
+  duration: yup.string().required(ERROR_MESSAGE.DURATION_REQ),
+});
+
 const initialValues = {
   exercise: {},
   name: '',
   reps: '',
   duration: '',
   isDuration: true,
-  weight: '0',
-  rest: '0',
+  weight: '',
+  rest: '',
   optionsCount: '0',
 };
 
@@ -67,8 +73,9 @@ function AddExercise(props: {
   const { isModalVisible, closeModal, isExerciseCard, newCardOrder } = props;
   const { slug } = useLocalSearchParams() as any;
   const toast = useToast();
-  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const { updateWorkoutExercises } = useWorkoutDetailStore();
   const [responseError, setResponseError] = useState<string>();
+  const [filteredExercises, setFilteredExercises] = useState<any>([]);
   const [isNewExercise, setIsNewExercise] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
@@ -101,9 +108,16 @@ function AddExercise(props: {
       //   refetchType: 'all',
       //   stale: true,
       // });
-      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-
-      setWorkoutDetail(_.cloneDeep(data?.data));
+      // queryClient.invalidateQueries({
+      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      // });
+      // queryClient.invalidateQueries({
+      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+      //   stale: true,
+      // });
+      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      // setWorkoutDetail(_.cloneDeep(data?.data));
+      updateWorkoutExercises(data?.data?.exercises);
       closeModal();
     },
     onError: (error: string) => {
@@ -115,8 +129,13 @@ function AddExercise(props: {
   const { mutate: mutateSortExercise, isPending: isPendingSort } = useMutation({
     mutationFn: sortExercisesRequest,
     onSuccess: async data => {
+      // queryClient.invalidateQueries({
+      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      // });
       queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-      setWorkoutDetail(data?.data);
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      updateWorkoutExercises(data?.data?.exercises);
+      // setWorkoutDetail(data?.data);
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
@@ -145,6 +164,57 @@ function AddExercise(props: {
     mutateAddExerciseToWorkout(payload);
   };
 
+  const { data, refetch, isSuccess } = useFetchData({
+    queryFn: fetchExerciseService,
+    queryKey: [REACT_QUERY_API_KEYS.MY_EXERCISES],
+    enabled: false,
+  });
+
+  useEffect(() => {
+    if (isSuccess && Array.isArray(data)) {
+      setFilteredExercises(
+        data.map((item: any) => ({ ...item, label: item.name, value: item._id })),
+      );
+    }
+  }, [data, isSuccess]);
+
+  const isLabelValueObject = (input: any): boolean =>
+    input && typeof input === 'object' && 'label' in input && 'value' in input;
+
+  // Fetch exercises based on the query input
+  const handleExercisesOptionsFetch = async (input: string) => {
+    if (!input) return [];
+    try {
+      const response = await exerciseAutoSuggest(input);
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  // const findExercise = async (input: string) => {
+  //   setQuery(input);
+  //   onchange?.(input);
+
+  //   // If input is empty, display cached `data`
+  //   if (!input && isSuccess) {
+  //     setFilteredExercises(data || []);
+  //     setHideResults(false);
+  //     return;
+  //   }
+
+  //   // Otherwise, fetch matching exercises from API
+  //   const result = (await handleExercisesOptionsFetch(input)) ?? [];
+  //   result > 0 ? setIsNewExercise(false) : setIsNewExercise(true);
+  //   setFilteredExercises(result);
+
+  // };
+
   return (
     <>
       <ModalWrapper
@@ -155,23 +225,29 @@ function AddExercise(props: {
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
+            validateOnChange={false} // Disable validation on field change
+            validateOnBlur={true} // Enable validation on blur
             onSubmit={handleAddWorkout}>
             {({ handleChange, handleSubmit, values, errors, isSubmitting, setFieldValue }: any) => (
               <Container style={tailwind('gap-y-4')}>
                 <ScrollView>
                   <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    // style={{ flex: 1 }}
-                  >
+                    style={{ flex: 1 }}>
+                    {/* <Text>{JSON.stringify(values?.exercise)}</Text> */}
                     <FieldArray name="exercise">
                       {({ field, form }: any) => (
-                        <CustomAutoComplete
-                          isNewExercise={isNewExercise}
-                          setIsNewExercise={setIsNewExercise}
+                        <CustomDropdown
+                          open={true}
+                          search={true}
+                          // searchQuery={values?.exercise}
+                          selectedItem={values?.exercise}
+                          items={filteredExercises}
                           onchange={(value: ExerciseElement) => {
-                            form.setFieldValue('exercise', value);
+                            console.log({ value }, isLabelValueObject(value));
+                            setFieldValue('exercise', value, false);
                           }}
-                          placeholder="Exercise"
+                          placeholder="Select"
                         />
                       )}
                     </FieldArray>

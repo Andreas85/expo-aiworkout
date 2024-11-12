@@ -6,10 +6,11 @@ interface IUseFetchData {
   staleTime?: number;
   enabled?: boolean;
   keepPreviousData?: any;
+  shouldFetchFresh?: boolean;
 }
 
 export const useFetchData = (props: IUseFetchData) => {
-  const { queryKey, staleTime = 0, queryFn, enabled = true } = props;
+  const { queryKey, staleTime = 0, queryFn, enabled = true, shouldFetchFresh } = props;
   const { data, isLoading, isError, error, isPending, refetch, fetchStatus, isStale, isSuccess } =
     useQuery({
       queryKey: queryKey,
@@ -17,6 +18,11 @@ export const useFetchData = (props: IUseFetchData) => {
       staleTime: staleTime, // Eg: 60 * 1000 = 1 minute,
       enabled: enabled,
     });
+
+  // Conditionally refetch if shouldFetchFresh is true and the data is stale
+  if (shouldFetchFresh && isStale && !isLoading) {
+    refetch(); // Trigger refetch for fresh data
+  }
 
   return {
     data,
@@ -29,5 +35,6 @@ export const useFetchData = (props: IUseFetchData) => {
     fetchStatus,
     isStale,
     isSuccess,
+    shouldFetchFresh,
   };
 };

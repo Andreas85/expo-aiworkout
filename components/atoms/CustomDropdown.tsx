@@ -4,6 +4,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { AntDesign } from '@expo/vector-icons';
 import { tailwind } from '@/utils/tailwind';
 import { Text, View } from '../Themed';
+import { exerciseAutoSuggest } from '@/services/workouts';
 
 interface CustomDropdownProps {
   open: boolean;
@@ -58,6 +59,7 @@ const CustomDropdown = (props: CustomDropdownProps) => {
         value={selectedItem}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
+        // onChangeText={onchange}
         onChange={onchange}
         renderRightIcon={() => {
           return <AntDesign name="caretdown" size={10} />;

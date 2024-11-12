@@ -156,7 +156,7 @@ const WorkoutDetail = () => {
           style={[
             Platform.select({
               web: tailwind(
-                'absolute bottom-3 left-0 right-0 mx-auto items-center justify-center self-center px-4',
+                `${isLargeScreen ? ' p-4' : 'absolute bottom-3  mx-auto items-center justify-center self-center px-4'}`,
               ),
 
               native: tailwind(
@@ -291,7 +291,7 @@ const WorkoutDetail = () => {
   const renderExcerciseLabel = () => {
     return (
       <>
-        <Container style={[tailwind('mb-2  flex-row items-center justify-between gap-2 ')]}>
+        <Container style={[tailwind('mb-2 flex-row items-center justify-between gap-2 ')]}>
           <Container style={[tailwind(``)]}>
             <TextContainer
               data={`Exercises `}
@@ -304,18 +304,21 @@ const WorkoutDetail = () => {
             />
           </Container>
           {(isPending || isPendingExerciseCardAction) && (
-            <Container style={[tailwind(``)]}>
+            <Container style={[tailwind(`relative self-center `)]}>
               <LabelContainer
                 label={'Saving Changes'}
                 labelStyle={Platform.select({
-                  web: tailwind(isExtraSmallScreenOnly ? 'text-[10px]' : ''),
+                  web: tailwind(`${isExtraSmallScreenOnly ? 'text-[10px]' : '' + ''}`),
+                  native: tailwind('z-20 '),
                 })}
                 containerStyle={[
                   Platform.select({
                     web: tailwind(`
                     ${'flex-1 justify-end gap-2 text-[6px]'} 
                   `),
-                    native: tailwind('flex-1 justify-end gap-2'),
+                    native: tailwind(
+                      ' bottom-0 left-0 right-0 top-0  flex-1 items-center justify-center gap-2 self-center ',
+                    ),
                   }),
                 ]}
                 right={

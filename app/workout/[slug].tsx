@@ -20,40 +20,49 @@ const WorkoutDetailIndex = () => {
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
 
-  const cachedData: any = queryClient.getQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug]);
+  // const cachedData: any = queryClient.getQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug]);
 
-  const { data, refetch, isLoading } = useFetchData({
-    queryFn: () => getWorkoutDetailById({ id: slug }),
+  const { data, refetch, isLoading, isStale } = useFetchData({
+    queryFn: async () => {
+      const response = await getWorkoutDetailById({ id: slug });
+      console.log({ response });
+      setWorkoutDetail(response);
+      return response;
+    },
+    staleTime: 0, // 1 minute
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-    keepPreviousData: keepPreviousData,
-    enabled: false,
   });
 
-  // console.log({ cachedData });
-
+  // Uncomment this block of code if you want to use the fresh data
   useEffect(() => {
-    if (!cachedData) {
+    if (slug) {
       refetch();
     }
-  }, []);
-
-  useEffect(() => {
-    if (cachedData) {
-      setWorkoutDetail(cachedData);
-    }
-  }, [cachedData]);
+  }, [slug]);
 
   useEffect(() => {
     if (data) {
-      setWorkoutDetail(data);
+      setWorkoutDetail(data); // Update store with the latest data
     }
   }, [data]);
 
+  // Uncomment this block of code if you want to use the cached data
+
   // useEffect(() => {
-  //   if (slug) {
+  //   const cachedData: any = queryClient.getQueryData([
+  //     REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS,
+  //     slug,
+  //   ]);
+  //   const requiredData = data || cachedData;
+  //   console.log('Refetch: ', { isStale }, { data });
+  //   console.log({ requiredData });
+  //   if (requiredData) {
+  //     setWorkoutDetail(requiredData);
+  //   } else {
+  //     queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
   //     refetch();
   //   }
-  // }, [slug]);
+  // }, [slug, refetch, data]);
 
   const renderWorkingDetails = () => {
     if (isLoading) {

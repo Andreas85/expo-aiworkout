@@ -38,6 +38,7 @@ export interface IPayloadUpdateWorkoutData {
 }
 
 export interface IPayloadAddExerciseToWorkout {
+  isDuplicated?: boolean;
   formData: IAddExerciseToWorkout;
   queryParams: { id: any };
 }

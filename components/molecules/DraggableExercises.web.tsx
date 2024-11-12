@@ -11,6 +11,7 @@ import { sortExercisesRequest } from '@/services/workouts';
 import { useMutation } from '@tanstack/react-query';
 import { getReorderItemsForSortingWorkoutExercises, queryClient } from '@/utils/helper';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { useToast } from 'react-native-toast-notifications';
 
 // Sortable item component
 const SortableItem: React.FC<{
@@ -26,9 +27,10 @@ const SortableItem: React.FC<{
     <ExerciseCard
       key={item?._id}
       data={item}
+      index={index}
       handleSubmit={handleSubmit}
       setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}>
-      <div className="drag-handle" style={{ cursor: 'grab' }}>
+      <div className="drag-handle z-50" style={{ cursor: 'grab' }}>
         <em>
           <Image source={IMAGES.dragDot} contentFit="contain" style={tailwind(' h-5 w-5 ')} />
         </em>
@@ -41,9 +43,10 @@ const DraggableExercises = (props: {
   setIsPendingExerciseCardAction: (loading: boolean) => void;
 }) => {
   const { setIsPendingExerciseCardAction } = props;
-  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const toast = useToast();
+  const { updateWorkoutExercises } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
-  const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
+  const exercisesList: any[] = useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
 
   // Sort exercises by the 'order' key
 
@@ -59,7 +62,11 @@ const DraggableExercises = (props: {
     onSuccess: async data => {
       queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
       // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(data?.data);
+      // setWorkoutDetail(data?.data);
+      updateWorkoutExercises(data?.data?.exercises);
+    },
+    onError: (error: string) => {
+      toast.show(error, { type: 'danger' });
     },
   });
 
@@ -89,7 +96,7 @@ const DraggableExercises = (props: {
   const scrollSpeed = 5; // Pixels to scroll per frame
 
   // Function to handle reordering of items
-  const handleOrderChange = (newOrder: ExerciseElement[]) => {
+  const handleOrderChange: any = (newOrder: ExerciseElement[]) => {
     setItems(newOrder);
   };
 
@@ -138,9 +145,9 @@ const DraggableExercises = (props: {
 
   return (
     <div
-      className="space-y-1 overflow-x-hidden overflow-y-scroll pb-40"
+      className="space-y-1 overflow-x-hidden overflow-y-scroll"
       ref={scrollContainerRef}
-      style={{ maxHeight: '80vh' }}>
+      style={{ maxHeight: '60vh' }}>
       <ReactSortable
         list={items} // List of items to sort
         setList={handleOrderChange} // Function to update the list when items are moved

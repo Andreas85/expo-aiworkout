@@ -36,7 +36,7 @@ const LabelContainer = (props: {
       disabled={disabled || isLoading}
       style={({ pressed }) => [
         tailwind('flex-row items-center gap-x-2 self-center '),
-        { opacity: pressed ? 0.5 : 1 },
+        { opacity: pressed || isLoading ? 0.5 : 1 },
         containerStyle,
       ]}>
       {right}

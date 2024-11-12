@@ -19,12 +19,13 @@ import { LayoutAnimation, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
 import { queryClient } from '@/utils/helper';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
 export default function MyWorkout() {
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-
+  const { setWorkoutDetail } = useWorkoutDetailStore();
   // const toggleSwitch = () => setIsEnabled(!isEnabled);
 
   // Using LayoutAnimation for smooth transitions
@@ -40,7 +41,7 @@ export default function MyWorkout() {
     return await fetchMyWorkoutService();
   };
 
-  const { data, error, isPending, refetch, isSuccess, isLoading } = useFetchData({
+  const { data, error, isPending, refetch, isLoading } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
     staleTime: 60 * 1000, // 1 minute
@@ -54,28 +55,41 @@ export default function MyWorkout() {
     }, []),
   );
 
-  const prefetchWorkouts = (id: string) => {
-    // The results of this query will be cached like a normal query
-    queryClient.prefetchQuery({
-      queryFn: () => getWorkoutDetailById({ id: id }),
-      queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, id],
-      // staleTime: 60 * 1000, // 1 minute
-    });
-  };
+  // const prefetchWorkouts = (id: string) => {
+  //   The results of this query will be cached like a normal query
+  //   queryClient.prefetchQuery({
+  //     queryFn: () => getWorkoutDetailById({ id: id }),
+  //     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, id],
+  //     staleTime: 1000, // 1 minutes
+  //     // gcTime: 1000,
+  //   });
+  // };
+
+  // const { data, refetch:refetchDetails, isLoading } = useFetchData({
+  //   queryFn: async () => {
+  //     const response = await getWorkoutDetailById({ id: slug });
+  //     console.log({ response });
+  //     setWorkoutDetail(response);
+  //     return response;
+  //   },
+  //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+  //   enabled: false,
+  // });
 
   const handleAddWorkout = () => {
     showModal();
   };
 
-  useEffect(() => {
-    if (data && isSuccess) {
-      data?.data?.map((item: any) => {
-        prefetchWorkouts(item?._id);
-      });
-    }
-  }, [data, isSuccess]);
+  // useEffect(() => {
+  //   if (data && isSuccess) {
+  //     data?.data?.map((item: any) => {
+  //       prefetchWorkouts(item?._id);
+  //     });
+  //   }
+  // }, [data, isSuccess]);
 
   const handleCardClick = (item: any) => {
+    // setWorkoutDetail(item);
     router.push(`/workout/${item?._id}`);
   };
 

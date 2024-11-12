@@ -12,5 +12,6 @@ module.exports = {
     'no-extra-boolean-cast': 'off',
     'import/namespace': 'off',
     'react-hooks/exhaustive-deps': 'off',
+    'no-unused-vars': 'off',
   },
 };

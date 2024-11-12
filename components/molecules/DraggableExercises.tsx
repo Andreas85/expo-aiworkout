@@ -21,9 +21,9 @@ const DraggableExercises = (props: {
   setIsPendingExerciseCardAction: (loading: boolean) => void;
 }) => {
   const { setIsPendingExerciseCardAction } = props;
-  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const { setWorkoutDetail, updateWorkoutExercises } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
-  const exercisesList = useWorkoutDetailStore(state => state.workoutDetail)?.exercises ?? [];
+  const exercisesList: any[] = useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
 
   const [data, setData] = useState<ExerciseElement[]>(
     [...exercisesList].sort((a, b) => a.order - b.order),
@@ -34,7 +34,7 @@ const DraggableExercises = (props: {
     onSuccess: async data => {
       queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
       // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      setWorkoutDetail(data?.data);
+      updateWorkoutExercises(data?.data?.exercises);
     },
   });
 
@@ -50,11 +50,13 @@ const DraggableExercises = (props: {
     }
   }, [isPending, setIsPendingExerciseCardAction]);
 
-  const renderItem = ({ item, drag, isActive }: RenderItemParams<ExerciseElement>) => {
+  const renderItem = ({ item, drag, isActive, getIndex }: RenderItemParams<ExerciseElement>) => {
+    const index = getIndex();
     return (
       <ScaleDecorator>
         <ExerciseCard
           data={item}
+          index={index}
           handleSubmit={() => {}}
           setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}>
           <TouchableOpacity onPressIn={drag} onLongPress={drag} onPress={drag} disabled={isActive}>
