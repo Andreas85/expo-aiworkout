@@ -100,8 +100,6 @@ const WorkoutDetail = () => {
     onSuccess: async data => {
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-        type: 'all',
-        refetchType: 'none',
       });
       toast.show('Duplicate success', { type: 'success' });
       router.push(`/workout/${data?.data?._id}`);
@@ -151,7 +149,7 @@ const WorkoutDetail = () => {
           style={[
             Platform.select({
               web: tailwind(
-                `${isLargeScreen ? ' p-4' : 'absolute bottom-3  mx-auto items-center justify-center self-center px-4'}`,
+                `${isLargeScreen ? ' p-4' : 'absolute bottom-3   items-center justify-center self-center px-4'}`,
               ),
 
               native: tailwind(
@@ -444,7 +442,7 @@ const WorkoutDetail = () => {
           <Container
             style={[
               Platform.select({
-                web: tailwind(`flex-1 ${isLargeScreen ? '' : 'pb-8'}`),
+                web: tailwind(` ${isLargeScreen ? '' : 'pb-8'}`),
                 native: tailwind('mb-1 flex-1 '),
               }),
             ]}>

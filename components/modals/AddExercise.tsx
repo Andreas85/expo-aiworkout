@@ -11,6 +11,7 @@ import {
   addExerciseToWorkoutRequest,
   exerciseAutoSuggest,
   fetchExerciseService,
+  fetchPublicExerciseService,
   sortExercisesRequest,
 } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
@@ -78,7 +79,9 @@ function AddExercise(props: {
   const [filteredExercises, setFilteredExercises] = useState<any>([]);
   const [isNewExercise, setIsNewExercise] = useState<boolean>(false);
   const queryClient = useQueryClient();
-
+  const cachedPublicExerciseData: any = queryClient.getQueryData([
+    REACT_QUERY_API_KEYS.PUBLIC_EXERCISES,
+  ]);
   const { mutate: mutateAddExerciseToWorkout, isPending } = useMutation({
     mutationFn: addExerciseToWorkoutRequest,
     onSuccess: async data => {
@@ -151,19 +154,17 @@ function AddExercise(props: {
     mutateAddExerciseToWorkout(payload);
   };
 
-  const { data, refetch, isSuccess } = useFetchData({
-    queryFn: fetchExerciseService,
-    queryKey: [REACT_QUERY_API_KEYS.MY_EXERCISES],
-    enabled: false,
-  });
-
   useEffect(() => {
-    if (isSuccess && Array.isArray(data)) {
+    if (cachedPublicExerciseData) {
       setFilteredExercises(
-        data.map((item: any) => ({ ...item, label: item.name, value: item._id })),
+        cachedPublicExerciseData.map((item: any) => ({
+          ...item,
+          label: item?.name,
+          value: item?._id,
+        })),
       );
     }
-  }, [data, isSuccess]);
+  }, [cachedPublicExerciseData]);
 
   const isLabelValueObject = (input: any): boolean =>
     input && typeof input === 'object' && 'label' in input && 'value' in input;
@@ -179,28 +180,6 @@ function AddExercise(props: {
       return [];
     }
   };
-
-  useEffect(() => {
-    refetch();
-  }, []);
-
-  // const findExercise = async (input: string) => {
-  //   setQuery(input);
-  //   onchange?.(input);
-
-  //   // If input is empty, display cached `data`
-  //   if (!input && isSuccess) {
-  //     setFilteredExercises(data || []);
-  //     setHideResults(false);
-  //     return;
-  //   }
-
-  //   // Otherwise, fetch matching exercises from API
-  //   const result = (await handleExercisesOptionsFetch(input)) ?? [];
-  //   result > 0 ? setIsNewExercise(false) : setIsNewExercise(true);
-  //   setFilteredExercises(result);
-
-  // };
 
   return (
     <>

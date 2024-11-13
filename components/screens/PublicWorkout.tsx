@@ -6,7 +6,7 @@ import { fetchPublicWorkoutService, fetchPublicWorkoutServiceById } from '@/serv
 import { tailwind } from '@/utils/tailwind';
 import { useCallback, useEffect, useState } from 'react';
 import CustomSwitch from '../atoms/CustomSwitch';
-import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
 import { useAuthStore } from '@/store/authStore';
 import { LayoutAnimation, Platform } from 'react-native';
 import { router } from 'expo-router';
@@ -40,7 +40,7 @@ export default function PublicWorkout() {
   const { data, isPending, refetch, isLoading, fetchStatus } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT],
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: REACT_QUERY_STALE_TIME.PUBLIC_WORKOUT,
     // enabled: false,
   });
 
@@ -49,7 +49,7 @@ export default function PublicWorkout() {
     queryClient.prefetchQuery({
       queryFn: () => fetchPublicWorkoutServiceById({ id: id }),
       queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, id],
-      staleTime: 60 * 1000, // 1 minute
+      staleTime: REACT_QUERY_STALE_TIME.PUBLIC_WORKOUT_DETAILS,
     });
   };
 

@@ -3,7 +3,7 @@ import GradientBackground from '@/components/atoms/GradientBackground';
 import { useLocalSearchParams } from 'expo-router';
 import Loading from '@/components/atoms/Loading';
 import { fetchPublicWorkoutServiceById } from '@/services/workouts';
-import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { tailwind } from '@/utils/tailwind';
@@ -28,25 +28,28 @@ const PublicWorkoutDetailIndex = () => {
   const { data, isLoading, refetch } = useQuery({
     queryFn: () => fetchPublicWorkoutServiceById({ id: slug }),
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, slug],
-    // staleTime: 30000, // Eg: 60 * 1000 = 1 minute,
+    staleTime: REACT_QUERY_STALE_TIME.PUBLIC_WORKOUT_DETAILS,
     enabled: false,
   });
-  // console.log(cachedData, 'cachedData');
+
   useEffect(() => {
-    if (cachedData) {
-      setWorkoutDetail(cachedData);
-    }
-  }, [cachedData]);
-  useEffect(() => {
-    if (data) {
-      setWorkoutDetail(data);
-    }
-  }, [data]);
-  useEffect(() => {
-    if (!cachedData) {
+    const cachedData: any = queryClient.getQueryData([
+      REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS,
+      slug,
+    ]);
+    const requiredData = data || cachedData;
+    // console.log('Refetch: ', { isStale }, { data });
+    // console.log({ requiredData });
+    if (requiredData) {
+      setWorkoutDetail(requiredData);
+    } else {
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, slug],
+        refetchType: 'all',
+      });
       refetch();
     }
-  }, []);
+  }, [slug, refetch, data]);
 
   const renderWorkingDetails = () => {
     if (isLoading) {

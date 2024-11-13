@@ -55,4 +55,14 @@ export const REACT_QUERY_API_KEYS = {
   MY_WORKOUT_DETAILS: 'my-workout-details',
   PUBLIC_WORKOUT_DETAILS: 'public-workout-details',
   MY_EXERCISES: 'my-exercises',
+  PUBLIC_EXERCISES: 'public-exercises',
+};
+
+export const REACT_QUERY_STALE_TIME = {
+  PUBLIC_WORKOUT: 1000 * 60, // 10 minutes
+  MY_WORKOUT: 1000 * 60, // 10 minutes
+  MY_WORKOUT_DETAILS: 1000 * 60, // 1 minute
+  PUBLIC_WORKOUT_DETAILS: 0, // 1 minute
+  MY_EXERCISES: 1000 * 60 * 10, // 10 minutes
+  PUBLIC_EXERCISES: 1000 * 60 * 10, // 10 minutes
 };

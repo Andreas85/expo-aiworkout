@@ -13,7 +13,7 @@ import { AntDesign } from '@expo/vector-icons';
 import CustomSwitch from '../atoms/CustomSwitch';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import useModal from '@/hooks/useModal';
-import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
 import { router, useFocusEffect } from 'expo-router';
 import { LayoutAnimation, Platform } from 'react-native';
 import { debounce } from 'lodash';
@@ -45,7 +45,7 @@ export default function MyWorkout() {
   const { data, error, isPending, refetch, isLoading, isSuccess } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: REACT_QUERY_STALE_TIME.MY_WORKOUT,
   });
 
   // useFocusEffect(
@@ -61,7 +61,7 @@ export default function MyWorkout() {
     queryClient.prefetchQuery({
       queryFn: () => getWorkoutDetailById({ id: id }),
       queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, id],
-      staleTime: 60 * 1000, // 1 minutes
+      staleTime: REACT_QUERY_STALE_TIME.MY_WORKOUT_DETAILS,
       // gcTime: 1000,
     });
 

@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import GradientBackground from '@/components/atoms/GradientBackground';
 import WorkoutDetail from '@/components/screens/WorkoutDetail';
 import { useLocalSearchParams } from 'expo-router';
-import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
-import { getWorkoutDetailById } from '@/services/workouts';
+import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
+import { fetchPublicExerciseService, getWorkoutDetailById } from '@/services/workouts';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Loading from '@/components/atoms/Loading';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +21,11 @@ const WorkoutDetailIndex = () => {
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
 
   // const cachedData: any = queryClient.getQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug]);
+  const { data: exerciseDAta } = useFetchData({
+    queryFn: fetchPublicExerciseService,
+    queryKey: [REACT_QUERY_API_KEYS.PUBLIC_EXERCISES],
+    staleTime: REACT_QUERY_STALE_TIME.PUBLIC_EXERCISES,
+  });
 
   const { data, refetch, isLoading, isStale } = useFetchData({
     queryFn: async () => {
@@ -29,7 +34,7 @@ const WorkoutDetailIndex = () => {
       setWorkoutDetail(response);
       return response;
     },
-    staleTime: 0, // 1 minute
+    staleTime: REACT_QUERY_STALE_TIME.MY_WORKOUT_DETAILS,
     enabled: false,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
   });

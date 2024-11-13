@@ -299,3 +299,15 @@ export const fetchExerciseService = async () => {
     throw extractedErrorMessage(error?.response);
   }
 };
+
+export const fetchPublicExerciseService = async () => {
+  try {
+    const URL = API_ENPOINTS.PUBLIC_EXERCISES + '?selectedProperties=_id,deleted,name';
+    const { data } = await getRequest({
+      API: URL,
+    });
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};

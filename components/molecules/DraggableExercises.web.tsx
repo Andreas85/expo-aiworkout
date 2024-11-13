@@ -12,6 +12,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useToast } from 'react-native-toast-notifications';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 // Sortable item component
 const SortableItem: React.FC<{
@@ -45,6 +46,7 @@ const DraggableExercises = (props: {
   const queryClient = useQueryClient();
   const { setIsPendingExerciseCardAction } = props;
   const toast = useToast();
+  const { isLargeScreen } = useWebBreakPoints();
   const { updateWorkoutExercises } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
   const exercisesList: any[] = useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
@@ -144,17 +146,19 @@ const DraggableExercises = (props: {
     };
   }, []);
 
+  const containerHeight = isLargeScreen ? 'calc(80vh - 150px)' : 'calc(80vh - 160px)'; // Dynamic height based on screen size
+
   return (
     <div
-      className="space-y-1 overflow-x-hidden overflow-y-scroll"
+      className={`relative mb-12 space-y-1 overflow-y-auto ${isLargeScreen ? '' : 'p-3'}`}
       ref={scrollContainerRef}
-      style={{ maxHeight: '60vh' }}>
+      style={{ height: containerHeight }}>
       <ReactSortable
         list={items} // List of items to sort
         setList={handleOrderChange} // Function to update the list when items are moved
         onEnd={handleDragOnEnd} // Callback after reordering
         handle=".drag-handle"
-        className="space-y-1 overflow-x-hidden overflow-y-scroll">
+        className="space-y-1  ">
         {items.map((item, index) => (
           <div key={item?._id} data-id={item?._id + index?.toString()}>
             <SortableItem
