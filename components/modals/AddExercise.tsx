@@ -101,7 +101,6 @@ function AddExercise(props: {
       console.log({ slug });
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-        stale: true,
       });
       queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       // setWorkoutDetail(_.cloneDeep(data?.data));

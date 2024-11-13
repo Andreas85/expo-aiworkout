@@ -10,11 +10,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { tailwind } from '@/utils/tailwind';
 import { Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { keepPreviousData } from '@tanstack/react-query';
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import { useFetchData } from '@/hooks/useFetchData';
-import { queryClient } from '@/utils/helper';
 
 const WorkoutDetailIndex = () => {
+  const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams();
   const { isLargeScreen } = useWebBreakPoints();
   const { setWorkoutDetail } = useWorkoutDetailStore();

@@ -13,10 +13,11 @@ import { router } from 'expo-router';
 import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
 import useBreakPoints from '@/hooks/useBreakPoints';
-import { queryClient } from '@/utils/helper';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function PublicWorkout() {
   const { isAuthenticated } = useAuthStore();
+  const queryClient = useQueryClient();
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [productData, setProductData] = useState<any[]>([]);
@@ -43,21 +44,21 @@ export default function PublicWorkout() {
     // enabled: false,
   });
 
-  // const prefetchWorkouts = (id: string) => {
-  //   // The results of this query will be cached like a normal query
-  //   // queryClient.prefetchQuery({
-  //   //   queryFn: () => fetchPublicWorkoutServiceById({ id: id }),
-  //   //   queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, id],
-  //   //   staleTime: 60 * 1000, // 1 minute
-  //   // });
-  // };
+  const prefetchWorkouts = (id: string) => {
+    // The results of this query will be cached like a normal query
+    queryClient.prefetchQuery({
+      queryFn: () => fetchPublicWorkoutServiceById({ id: id }),
+      queryKey: [REACT_QUERY_API_KEYS.PUBLIC_WORKOUT_DETAILS, id],
+      staleTime: 60 * 1000, // 1 minute
+    });
+  };
 
   useEffect(() => {
     if (data && fetchStatus === 'idle') {
       setProductData(data?.data);
-      // data?.data.map((item: any) => {
-      //   prefetchWorkouts(item?._id);
-      // });
+      data?.data.map((item: any) => {
+        prefetchWorkouts(item?._id);
+      });
     }
   }, [data, fetchStatus]);
 

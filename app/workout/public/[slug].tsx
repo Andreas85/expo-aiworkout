@@ -10,12 +10,12 @@ import { tailwind } from '@/utils/tailwind';
 import PublicWorkoutDetail from '@/components/screens/PublicWorkoutDetail';
 import { Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { useQuery } from '@tanstack/react-query';
-import { queryClient } from '@/utils/helper';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const PublicWorkoutDetailIndex = () => {
   const { slug } = useLocalSearchParams();
   const { isLargeScreen } = useWebBreakPoints();
+  const queryClient = useQueryClient();
 
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);

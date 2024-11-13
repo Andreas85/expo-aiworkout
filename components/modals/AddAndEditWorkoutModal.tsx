@@ -6,14 +6,13 @@ import ModalWrapper from './ModalWrapper';
 import { ActionButton } from '../atoms/ActionButton';
 import { Formik } from 'formik';
 import { AppTextInput } from '../atoms/AppTextInput';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addWorkoutService, updateWorkoutDataRequest } from '@/services/workouts';
 // import CustomImagePicker from '../atoms/CustomImagePicker';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import * as yup from 'yup';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { useLocalSearchParams } from 'expo-router';
-import { queryClient } from '@/utils/helper';
 
 const validationSchema = yup.object().shape({
   workoutName: yup.string().required('Workout name is required'),
@@ -25,6 +24,7 @@ function AddAndEditWorkoutModal(props: {
   isEditWorkout?: boolean;
   refetch?: () => void;
 }) {
+  const queryClient = useQueryClient();
   const { isModalVisible, closeModal, isEditWorkout, refetch } = props;
   const { slug } = useLocalSearchParams();
   const workoutname = useWorkoutDetailStore(state => state.workoutDetail)?.name ?? '';
@@ -34,8 +34,11 @@ function AddAndEditWorkoutModal(props: {
   const { mutate: mutateAddWorkout, isPending } = useMutation({
     mutationFn: addWorkoutService,
     onSuccess: async data => {
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      });
       closeModal();
-      refetch?.();
+      // refetch?.();
     },
     onError: (error: string) => {
       setResponseError(error);

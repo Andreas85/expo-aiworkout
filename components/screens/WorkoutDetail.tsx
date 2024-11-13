@@ -68,12 +68,6 @@ const WorkoutDetail = () => {
   const { mutate: mutateUpdatedWorkout, isPending } = useMutation({
     mutationFn: updateWorkoutDataRequest,
     onSuccess: async data => {
-      // queryClient.invalidateQueries({
-      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      //   type: 'all',
-      //   refetchType: 'all',
-      //   stale: true,
-      // });
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
       });
@@ -91,9 +85,6 @@ const WorkoutDetail = () => {
     onSuccess: async data => {
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-        type: 'all',
-        refetchType: 'all',
-        stale: true,
       });
 
       hideModalDeleteWorkout();

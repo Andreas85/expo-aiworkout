@@ -8,8 +8,8 @@ import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { tailwind } from '@/utils/tailwind';
 import { useLocalSearchParams } from 'expo-router';
 import { sortExercisesRequest } from '@/services/workouts';
-import { useMutation } from '@tanstack/react-query';
-import { getReorderItemsForSortingWorkoutExercises, queryClient } from '@/utils/helper';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useToast } from 'react-native-toast-notifications';
 
@@ -42,6 +42,7 @@ const SortableItem: React.FC<{
 const DraggableExercises = (props: {
   setIsPendingExerciseCardAction: (loading: boolean) => void;
 }) => {
+  const queryClient = useQueryClient();
   const { setIsPendingExerciseCardAction } = props;
   const toast = useToast();
   const { updateWorkoutExercises } = useWorkoutDetailStore();
@@ -61,7 +62,7 @@ const DraggableExercises = (props: {
     mutationFn: sortExercisesRequest,
     onSuccess: async data => {
       queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       // setWorkoutDetail(data?.data);
       updateWorkoutExercises(data?.data?.exercises);
     },

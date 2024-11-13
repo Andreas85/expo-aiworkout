@@ -16,14 +16,15 @@ import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { router, useFocusEffect } from 'expo-router';
 import { LayoutAnimation, Platform } from 'react-native';
-import { debounce, set } from 'lodash';
+import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
-import { queryClient } from '@/utils/helper';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function MyWorkout() {
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
+  const queryClient = useQueryClient();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const { setWorkoutDetail } = useWorkoutDetailStore();
   // const toggleSwitch = () => setIsEnabled(!isEnabled);
@@ -47,13 +48,13 @@ export default function MyWorkout() {
     staleTime: 60 * 1000, // 1 minute
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      // if (!isStale) {
-      refetch();
-      // }
-    }, []),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // if (!isStale) {
+  //     refetch();
+  //     // }
+  //   }, []),
+  // );
 
   const prefetchWorkouts = (id: string) => {
     // The results of this query will be cached like a normal query

@@ -143,7 +143,6 @@ const ExerciseCard = (props: IExerciseCard) => {
     onSuccess: async (data, variables) => {
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-        stale: true,
       });
       queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       updateWorkoutExercises(data?.data?.exercises);

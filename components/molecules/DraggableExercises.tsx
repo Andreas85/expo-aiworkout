@@ -11,8 +11,8 @@ import { tailwind } from '@/utils/tailwind';
 import { Image } from 'expo-image';
 import { IMAGES } from '@/utils/images';
 import ExerciseCard from '../atoms/ExerciseCard';
-import { getReorderItemsForSortingWorkoutExercises, queryClient } from '@/utils/helper';
-import { useMutation } from '@tanstack/react-query';
+import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { sortExercisesRequest } from '@/services/workouts';
 import { useLocalSearchParams } from 'expo-router';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
@@ -20,6 +20,7 @@ import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 const DraggableExercises = (props: {
   setIsPendingExerciseCardAction: (loading: boolean) => void;
 }) => {
+  const queryClient = useQueryClient();
   const { setIsPendingExerciseCardAction } = props;
   const { setWorkoutDetail, updateWorkoutExercises } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
