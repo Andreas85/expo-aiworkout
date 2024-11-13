@@ -19,7 +19,7 @@ import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import DraggableExercises from '../molecules/DraggableExercises';
 import useModal from '@/hooks/useModal';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createWorkoutCopy,
   deleteWorkoutDetail,
@@ -27,12 +27,13 @@ import {
 } from '@/services/workouts';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import { useToast } from 'react-native-toast-notifications';
-import { queryClient } from '@/utils/helper';
+
 import AddExercise from '../modals/AddExercise';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
   const toast = useToast();
+  const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams() as any;
   const { hideModal, showModal, openModal } = useModal();
   const {
@@ -67,13 +68,16 @@ const WorkoutDetail = () => {
   const { mutate: mutateUpdatedWorkout, isPending } = useMutation({
     mutationFn: updateWorkoutDataRequest,
     onSuccess: async data => {
-      queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-        type: 'all',
-        refetchType: 'all',
-        stale: true,
+      // queryClient.invalidateQueries({
+      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      //   type: 'all',
+      //   refetchType: 'all',
+      //   stale: true,
+      // });
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
       });
-      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      await queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       setWorkoutDetail(data?.data);
       setIsCurrentWorkoutPublic(data?.data?.isPublic);
     },

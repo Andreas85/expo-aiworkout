@@ -16,7 +16,7 @@ import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { router, useFocusEffect } from 'expo-router';
 import { LayoutAnimation, Platform } from 'react-native';
-import { debounce } from 'lodash';
+import { debounce, set } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
 import { queryClient } from '@/utils/helper';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
@@ -41,7 +41,7 @@ export default function MyWorkout() {
     return await fetchMyWorkoutService();
   };
 
-  const { data, error, isPending, refetch, isLoading } = useFetchData({
+  const { data, error, isPending, refetch, isLoading, isSuccess } = useFetchData({
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
     staleTime: 60 * 1000, // 1 minute
@@ -55,15 +55,23 @@ export default function MyWorkout() {
     }, []),
   );
 
-  // const prefetchWorkouts = (id: string) => {
-  //   The results of this query will be cached like a normal query
-  //   queryClient.prefetchQuery({
-  //     queryFn: () => getWorkoutDetailById({ id: id }),
-  //     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, id],
-  //     staleTime: 1000, // 1 minutes
-  //     // gcTime: 1000,
-  //   });
-  // };
+  const prefetchWorkouts = (id: string) => {
+    // The results of this query will be cached like a normal query
+    queryClient.prefetchQuery({
+      queryFn: () => getWorkoutDetailById({ id: id }),
+      queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, id],
+      staleTime: 60 * 1000, // 1 minutes
+      // gcTime: 1000,
+    });
+
+    setTimeout(() => {
+      const cachedData: any = queryClient.getQueryData([
+        REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS,
+        id,
+      ]);
+      console.log({ cachedData }, id);
+    }, 5000);
+  };
 
   // const { data, refetch:refetchDetails, isLoading } = useFetchData({
   //   queryFn: async () => {
@@ -80,13 +88,13 @@ export default function MyWorkout() {
     showModal();
   };
 
-  // useEffect(() => {
-  //   if (data && isSuccess) {
-  //     data?.data?.map((item: any) => {
-  //       prefetchWorkouts(item?._id);
-  //     });
-  //   }
-  // }, [data, isSuccess]);
+  useEffect(() => {
+    if (data && isSuccess) {
+      data?.data?.map((item: any) => {
+        prefetchWorkouts(item?._id);
+      });
+    }
+  }, [data, isSuccess]);
 
   const handleCardClick = (item: any) => {
     // setWorkoutDetail(item);

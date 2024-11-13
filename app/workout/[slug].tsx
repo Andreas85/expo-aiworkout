@@ -30,39 +30,43 @@ const WorkoutDetailIndex = () => {
       return response;
     },
     staleTime: 0, // 1 minute
+    enabled: false,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
   });
 
   // Uncomment this block of code if you want to use the fresh data
-  useEffect(() => {
-    if (slug) {
-      refetch();
-    }
-  }, [slug]);
+  // useEffect(() => {
+  //   if (slug) {
+  //     refetch();
+  //   }
+  // }, [slug]);
 
-  useEffect(() => {
-    if (data) {
-      setWorkoutDetail(data); // Update store with the latest data
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data) {
+  //     setWorkoutDetail(data); // Update store with the latest data
+  //   }
+  // }, [data]);
 
   // Uncomment this block of code if you want to use the cached data
 
-  // useEffect(() => {
-  //   const cachedData: any = queryClient.getQueryData([
-  //     REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS,
-  //     slug,
-  //   ]);
-  //   const requiredData = data || cachedData;
-  //   console.log('Refetch: ', { isStale }, { data });
-  //   console.log({ requiredData });
-  //   if (requiredData) {
-  //     setWorkoutDetail(requiredData);
-  //   } else {
-  //     queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-  //     refetch();
-  //   }
-  // }, [slug, refetch, data]);
+  useEffect(() => {
+    const cachedData: any = queryClient.getQueryData([
+      REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS,
+      slug,
+    ]);
+    const requiredData = data || cachedData;
+    console.log('Refetch: ', { isStale }, { data });
+    console.log({ requiredData });
+    if (requiredData) {
+      setWorkoutDetail(requiredData);
+    } else {
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+        refetchType: 'all',
+      });
+      refetch();
+    }
+  }, [slug, refetch, data]);
 
   const renderWorkingDetails = () => {
     if (isLoading) {

@@ -12,7 +12,7 @@ import CustomSwitch from './CustomSwitch';
 import AppTextSingleInput from './AppTextSingleInput';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import useModal from '@/hooks/useModal';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   addExerciseToWorkoutRequest,
   removeExerciseToWorkoutRequest,
@@ -24,7 +24,7 @@ import { useToast } from 'react-native-toast-notifications';
 import AddExercise from '../modals/AddExercise';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { debounce } from 'lodash';
-import { getReorderItemsForSortingWorkoutExercises, queryClient } from '@/utils/helper';
+import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 
 interface IExerciseCard {
   data: ExerciseElement;
@@ -36,7 +36,7 @@ interface IExerciseCard {
 
 const ExerciseCard = (props: IExerciseCard) => {
   const { data, children, handleSubmit, setIsPendingExerciseCardAction, index } = props;
-
+  const queryClient = useQueryClient();
   const { setWorkoutDetail, updateWorkoutExercises } = useWorkoutDetailStore() as any;
   const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail) ?? [];
   const workoutDetailExercises =
@@ -44,6 +44,7 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { slug } = useLocalSearchParams() as any;
   const toast = useToast();
   const { isLargeScreen, isMobileDeviceOnly } = useWebBreakPoints();
+  const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
   const { hideModal, openModal, showModal } = useModal();
   const {
     hideModal: hideModalDeleteWorkoutExercise,
@@ -136,48 +137,17 @@ const ExerciseCard = (props: IExerciseCard) => {
     });
   }, 1000); // Adjust debounce time as needed
 
-  const { mutate: mutateSortExercise, isPending: isPendingSortExercise } = useMutation({
-    mutationFn: sortExercisesRequest,
-    onSuccess: async data => {
-      queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-        refetchType: 'all',
-      });
-      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      updateWorkoutExercises(data?.data?.exercises);
-      // setWorkoutDetail(data?.data);
-    },
-    onError: (error: any) => {
-      toast.show(error, { type: 'danger' });
-    },
-  });
-
-  const { mutate: mutateAddExercise, isPending: isPendingDuplicate } = useMutation({
+  const { mutate: mutateDuplicateExercise, isPending: isPendingDuplicate } = useMutation({
     mutationFn: addExerciseToWorkoutRequest,
 
     onSuccess: async (data, variables) => {
-      if (variables?.isDuplicated) {
-        toast.show('Exercise duplicated successfully', { type: 'success' });
-        const lastIndex = data?.data?.exercises?.length - 1;
-        const reorderedItems = data?.data?.exercises?.sort(
-          (a: ExerciseElement, b: ExerciseElement) => a?.order - b?.order,
-        );
-        const [movedItem] = reorderedItems.splice(lastIndex, 1);
-        reorderedItems.splice(index + 1, 0, movedItem); // Insert it at the new index
-        const modifiedData = getReorderItemsForSortingWorkoutExercises(reorderedItems);
-        const payload = {
-          queryParams: { id: slug },
-          formData: { ...modifiedData },
-        };
-        mutateSortExercise(payload);
-        return;
-      }
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+        stale: true,
       });
       queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      toast.show('Exercise added successfully', { type: 'success' });
       updateWorkoutExercises(data?.data?.exercises);
+      toast.show('Exercise added successfully', { type: 'success' });
     },
   });
 
@@ -195,7 +165,7 @@ const ExerciseCard = (props: IExerciseCard) => {
       isDuplicated: true,
     };
 
-    mutateAddExercise(payload);
+    mutateDuplicateExercise(payload);
   };
 
   const {
@@ -204,18 +174,22 @@ const ExerciseCard = (props: IExerciseCard) => {
   } = useMutation({
     mutationFn: removeExerciseToWorkoutRequest,
     onSuccess: async data => {
-      toast.show('Exercise deleted successfully', { type: 'success' });
-      updateWorkoutExercises(data?.data?.exercises);
-      return await queryClient.invalidateQueries({
+      // queryClient.refetchQueries({
+      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+      // });
+      console.table(data?.data?.exercises);
+      queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-        refetchType: 'none',
+        // refetchType: 'all',
       });
+      // setWorkoutDetail(_.cloneDeep(data?.data));
+      updateWorkoutExercises(data?.data?.exercises);
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      hideModalDeleteWorkoutExercise();
+      // toast.show('Exercise deleted successfully', { type: 'success' });
     },
     onError: (error: any) => {
       toast.show(error, { type: 'danger' });
-    },
-    onSettled: () => {
-      hideModalDeleteWorkoutExercise();
     },
   });
 
@@ -390,10 +364,10 @@ const ExerciseCard = (props: IExerciseCard) => {
                     // native: tailwind('flex-1'),
                   }),
                 ]}
-                isLoading={isPendingDuplicate || isPendingSortExercise}
+                isLoading={isPendingDuplicate}
                 onPress={handleDuplicateExerciseCard}
                 left={
-                  isPendingDuplicate || isPendingSortExercise ? (
+                  isPendingDuplicate ? (
                     <ActivityIndicator size={ICON_SIZE} color="#A27DE1" />
                   ) : (
                     <Ionicons
@@ -725,7 +699,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                   native: tailwind('text-xl font-bold'),
                 }),
               ]}
-              isLoading={isPendingDuplicate || isPendingSortExercise}
+              isLoading={isPendingDuplicate}
               onPress={handleDuplicateExerciseCard}
               containerStyle={[
                 Platform.select({
@@ -734,7 +708,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                 }),
               ]}
               left={
-                isPendingDuplicate || isPendingSortExercise ? (
+                isPendingDuplicate ? (
                   <ActivityIndicator size={ICON_SIZE} />
                 ) : (
                   <Ionicons name="duplicate-sharp" color="#A27DE1" size={ICON_SIZE} />

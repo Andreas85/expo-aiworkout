@@ -98,24 +98,12 @@ function AddExercise(props: {
         mutateSortExercise(payload);
         return;
       }
-
-      // queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-
-      // queryClient.invalidateQueries({
-      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      //   type: 'all',
-      //   refetchType: 'all',
-      //   stale: true,
-      // });
-      // queryClient.invalidateQueries({
-      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      // });
-      // queryClient.invalidateQueries({
-      //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-      //   stale: true,
-      // });
-      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
+      console.log({ slug });
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+        stale: true,
+      });
+      queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
       // setWorkoutDetail(_.cloneDeep(data?.data));
       updateWorkoutExercises(data?.data?.exercises);
       closeModal();
