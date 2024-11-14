@@ -434,7 +434,7 @@ const WorkoutDetail = () => {
           style={[
             Platform.select({
               web: tailwind(`
-                mx-auto w-full
+                web:h-[100%] web:pb-[180px] mx-auto h-full w-full 
             `),
               native: tailwind('flex-1'),
             }),
@@ -442,7 +442,7 @@ const WorkoutDetail = () => {
           <Container
             style={[
               Platform.select({
-                web: tailwind(` ${isLargeScreen ? '' : 'pb-8'}`),
+                web: tailwind(` ${isLargeScreen ? '' : ''}  web:h-[96%] `),
                 native: tailwind('mb-1 flex-1 '),
               }),
             ]}>

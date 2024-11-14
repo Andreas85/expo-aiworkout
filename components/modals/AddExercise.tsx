@@ -14,7 +14,7 @@ import {
   fetchPublicExerciseService,
   sortExercisesRequest,
 } from '@/services/workouts';
-import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
 import * as yup from 'yup';
 import { useLocalSearchParams } from 'expo-router';
 import CustomSwitch from '../atoms/CustomSwitch';
@@ -79,9 +79,9 @@ function AddExercise(props: {
   const [filteredExercises, setFilteredExercises] = useState<any>([]);
   const [isNewExercise, setIsNewExercise] = useState<boolean>(false);
   const queryClient = useQueryClient();
-  const cachedPublicExerciseData: any = queryClient.getQueryData([
-    REACT_QUERY_API_KEYS.PUBLIC_EXERCISES,
-  ]);
+  const cachedPublicExerciseData: any =
+    queryClient.getQueryData([REACT_QUERY_API_KEYS.PUBLIC_EXERCISES]) ?? [];
+  const cachedMyExerciseData: any = queryClient.getQueryData([REACT_QUERY_API_KEYS.MY_EXERCISES]);
   const { mutate: mutateAddExerciseToWorkout, isPending } = useMutation({
     mutationFn: addExerciseToWorkoutRequest,
     onSuccess: async data => {
@@ -154,17 +154,24 @@ function AddExercise(props: {
     mutateAddExerciseToWorkout(payload);
   };
 
+  const { data, refetch, isSuccess } = useFetchData({
+    queryFn: fetchExerciseService,
+    queryKey: [REACT_QUERY_API_KEYS.MY_EXERCISES],
+    staleTime: REACT_QUERY_STALE_TIME.MY_EXERCISES,
+  });
+
   useEffect(() => {
-    if (cachedPublicExerciseData) {
+    if (cachedPublicExerciseData || cachedMyExerciseData) {
+      // console.log({ cachedMyExerciseData }, { data });
       setFilteredExercises(
-        cachedPublicExerciseData.map((item: any) => ({
+        [...(cachedMyExerciseData ?? []), ...cachedPublicExerciseData].map((item: any) => ({
           ...item,
           label: item?.name,
           value: item?._id,
         })),
       );
     }
-  }, [cachedPublicExerciseData]);
+  }, [cachedPublicExerciseData, isSuccess, cachedMyExerciseData, data]);
 
   const isLabelValueObject = (input: any): boolean =>
     input && typeof input === 'object' && 'label' in input && 'value' in input;
@@ -180,6 +187,24 @@ function AddExercise(props: {
       return [];
     }
   };
+
+  // const findExercise = async (input: string) => {
+  //   setQuery(input);
+  //   onchange?.(input);
+
+  //   // If input is empty, display cached `data`
+  //   if (!input && isSuccess) {
+  //     setFilteredExercises(data || []);
+  //     setHideResults(false);
+  //     return;
+  //   }
+
+  //   // Otherwise, fetch matching exercises from API
+  //   const result = (await handleExercisesOptionsFetch(input)) ?? [];
+  //   result > 0 ? setIsNewExercise(false) : setIsNewExercise(true);
+  //   setFilteredExercises(result);
+
+  // };
 
   return (
     <>

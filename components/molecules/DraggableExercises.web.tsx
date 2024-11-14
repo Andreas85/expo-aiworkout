@@ -150,9 +150,9 @@ const DraggableExercises = (props: {
 
   return (
     <div
-      className={`relative mb-12 space-y-1 overflow-y-auto ${isLargeScreen ? '' : 'p-3'}`}
+      className={`relative space-y-1 overflow-y-auto ${isLargeScreen ? '' : 'pb-2'}`}
       ref={scrollContainerRef}
-      style={{ height: containerHeight }}>
+      style={{ height: '80vh ' }}>
       <ReactSortable
         list={items} // List of items to sort
         setList={handleOrderChange} // Function to update the list when items are moved
