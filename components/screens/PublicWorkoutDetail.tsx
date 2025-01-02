@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 
 import { LayoutAnimation, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
@@ -115,7 +115,8 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           <ActionButton
             label="Start workout"
             uppercase
-            disabled
+            // disabled
+            onPress={() => router.push(`/start-workout/${workoutDetail?._id}` as any)}
             style={[
               Platform.select({
                 // web: tailwind('mx-auto w-56 cursor-pointer'),

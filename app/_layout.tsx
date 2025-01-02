@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastProvider } from 'react-native-toast-notifications';
 import { useReactQueryDevTools } from '@dev-plugins/react-query';
+import React from 'react';
 
 export {
   // Catch any errors thrown by the Layout component.

@@ -56,7 +56,7 @@ export default function PublicWorkout() {
   useEffect(() => {
     if (data && fetchStatus === 'idle') {
       setProductData(data?.data);
-      data?.data.map((item: any) => {
+      data?.data?.map((item: any) => {
         prefetchWorkouts(item?._id);
       });
     }
