@@ -1,28 +1,55 @@
 import React, { memo, useCallback } from 'react';
 import { FlatList, Platform } from 'react-native';
 
-import WorkoutCard from '../atoms/WorkoutCard';
 import { tailwind } from '@/utils/tailwind';
 import Container from '../atoms/Container';
 
-import WorkoutCardShort from '../atoms/WorkoutCardShort';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import TextContainer from '../atoms/TextContainer';
+import StartWorkoutExerciseCardWrapper from './StartWorkoutExerciseCardWrapper';
 
-const PublicWorkoutExercisesRender = (props: any) => {
-  const { data, isEnabled = false, onRefresh = () => {}, refreshing } = props;
+const StartWorkoutExercisesRender = (props: any) => {
+  const { data, isEnabled = false, onRefresh = () => {}, refreshing, key } = props;
   const { isLargeScreen } = useWebBreakPoints();
+  const MemoizedStartWorkoutExerciseCardWrapper = React.memo(StartWorkoutExerciseCardWrapper);
+  const onIncrement = () => {
+    console.log('Increment');
+  };
+
+  const onDecrement = () => {
+    console.log('Decrement');
+  };
 
   // Memoize the renderItem to avoid re-renders
-  const renderListItem = useCallback(({ item, index }: { item: any; index: number }) => {
-    return <WorkoutCard key={item?._id} item={item} />;
-  }, []);
+  const renderListItem = useCallback(
+    ({ item, index }: { item: any; index: number }) => {
+      // return <WorkoutCard key={item?._id} item={item} />;
+      return (
+        <MemoizedStartWorkoutExerciseCardWrapper
+          key={item?._id}
+          exercise={item}
+          isLast={false}
+          onIncrement={onIncrement}
+          onDecrement={onDecrement}
+        />
+      );
+    },
+    [data, key],
+  );
 
   const renderListItemIsShortVersion = useCallback(
     ({ item, index }: { item: any; index: number }) => {
-      return <WorkoutCardShort item={item} />;
+      return (
+        <MemoizedStartWorkoutExerciseCardWrapper
+          key={item?._id}
+          exercise={item}
+          isLast={false}
+          onIncrement={onIncrement}
+          onDecrement={onDecrement}
+        />
+      );
     },
-    [],
+    [data, key],
   );
 
   const renderHeader = () => {
@@ -111,6 +138,8 @@ const PublicWorkoutExercisesRender = (props: any) => {
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEndReachedThreshold={0.5}
+        removeClippedSubviews={true}
+        // windowSize={10} // Adjust based on the number of items visible on screen
       />
     );
   }
@@ -126,8 +155,8 @@ const PublicWorkoutExercisesRender = (props: any) => {
       renderItem={renderListItem}
       contentContainerStyle={[
         Platform.select({
-          web: tailwind(` ${isLargeScreen ? 'gap-[0.5rem]' : 'gap-[1.25rem] '} `),
-          native: tailwind(` gap-y-4 py-4 pt-0 `),
+          web: tailwind(` `),
+          native: tailwind(``),
         }),
       ]}
       style={
@@ -139,8 +168,10 @@ const PublicWorkoutExercisesRender = (props: any) => {
       refreshing={refreshing}
       onRefresh={onRefresh}
       onEndReachedThreshold={0.5}
+      removeClippedSubviews={true}
+      // windowSize={10} // Adjust based on the number of items visible on screen
     />
   );
 };
 
-export default memo(PublicWorkoutExercisesRender);
+export default memo(StartWorkoutExercisesRender);

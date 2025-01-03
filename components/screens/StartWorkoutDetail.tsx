@@ -76,8 +76,8 @@ const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
         style={[
           Platform.select({
             web: tailwind(`
-                mx-auto 
-              ${isLargeScreen ? 'w-full' : 'w-[56rem] flex-1 '}
+                mx-auto  flex-1 
+              ${isLargeScreen ? 'w-full' : 'w-full px-32 '}
             `),
             native: tailwind('flex-1'),
           }),

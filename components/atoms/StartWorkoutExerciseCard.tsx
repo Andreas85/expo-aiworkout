@@ -1,120 +1,163 @@
+import { Platform } from 'react-native';
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, Platform, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Container from './Container';
+import ImageContainer from './ImageContainer';
+import { tailwind } from '@/utils/tailwind';
+import ShowLabelValue from './ShowLabelValue';
+import { ExerciseElement } from '@/services/interfaces';
+import { IMAGES } from '@/utils/images';
+import { pluralise } from '@/utils/helper';
+import { Text } from '../Themed';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 interface StartWorkoutExerciseCardProps {
-  exercise: any;
-  isLast: boolean;
-  onIncrement: () => void;
-  onDecrement: () => void;
+  item: ExerciseElement;
+  isEnabled?: boolean;
+  onDecrementHandler: () => void;
+  onIncrementHandler: () => void;
 }
 
 const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
-  const { exercise, isLast, onIncrement, onDecrement } = props;
+  const { item, isEnabled } = props;
+  const { isLargeScreen } = useWebBreakPoints();
   return (
-    <View style={styles.cardContainer}>
-      {/* Timeline Line */}
-      {!isLast && <View style={styles.timelineLine} />}
-
-      {/* Card Content */}
-      <View style={styles.cardContent}>
-        {/* Image and Info */}
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: exercise.image }} style={styles.image} />
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.exerciseName}>{exercise.name}</Text>
-          <Text style={styles.details}>
-            {exercise.type === 'duration'
-              ? `Duration: ${exercise.duration} seconds`
-              : `No. of Reps: ${exercise.reps}`}
+    <Container
+      style={[
+        Platform.select({
+          web: tailwind('flex-1 flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-4 py-2'),
+          native: tailwind('flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-2  py-1'),
+        }),
+      ]}
+      key={item._id}>
+      {!isEnabled && (
+        <ImageContainer
+          source={IMAGES.dummyWorkout}
+          styleNative={[
+            Platform.select({
+              web: tailwind(
+                `${isLargeScreen ? 'h-[4.875rem] w-[8.1875rem]' : 'h-[9.9375rem] w-[21.1875rem] shrink-0'} flex-1.5 aspect-video rounded-lg`,
+              ),
+              native: tailwind('aspect-video flex-1 self-center rounded-lg'),
+            }),
+          ]}
+          contentFit="cover"
+          contentPosition={'right top'}
+        />
+      )}
+      <Container
+        style={[
+          Platform.select({
+            web: isLargeScreen
+              ? tailwind('flex-2 flex flex-col gap-[0.25rem]')
+              : tailwind('flex-2 flex flex-col items-start gap-[1.25rem]'),
+            native: tailwind('flex-2 '),
+          }),
+        ]}>
+        <Container
+          style={[
+            Platform.select({
+              web: tailwind(`flex-1 flex-row items-center ${isLargeScreen ? '' : ''}`),
+              native: tailwind('flex-1 flex-row items-start'),
+            }),
+          ]}>
+          <Text
+            style={[
+              Platform.select({
+                web: tailwind(
+                  styles.customLineClamp +
+                    ' ' +
+                    `${isLargeScreen ? 'line-clamp-1 text-[1rem]' : 'text-[1.625rem] font-bold not-italic'} font-inter`,
+                ),
+                native: tailwind('text-[1rem] font-extrabold'),
+              }),
+              {
+                fontWeight: '700',
+              },
+            ]}
+            numberOfLines={2}>
+            {`${item?.exercise?.name || item?.name}${item?.weight ? ` (${item?.weight} kg)` : ''}`}
           </Text>
-        </View>
-
-        {/* Controls */}
-        {exercise.type === 'reps' && (
-          <View style={styles.controls}>
-            <TouchableOpacity onPress={onDecrement}>
-              <Ionicons name="remove-circle" size={24} color="#6B6B6B" />
-            </TouchableOpacity>
-            <Text style={styles.counter}>{exercise.reps}</Text>
-            <TouchableOpacity onPress={onIncrement}>
-              <Ionicons name="add-circle" size={24} color="#6B6B6B" />
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-    </View>
+        </Container>
+        <Container
+          style={[
+            Platform.select({
+              web: isLargeScreen ? styles.MOBILE.labelValue : styles.DESKTOP.labelValue,
+              native: tailwind('flex-1 '),
+            }),
+          ]}>
+          <ShowLabelValue label="No. of Reps" value={`${item?.reps ? item?.reps : '-'}`} />
+          {item?.reps ? <ShowLabelValue label="Duration" value={`${item?.duration}`} /> : null}
+          <ShowLabelValue
+            label="Rest"
+            value={`${item?.rest ? pluralise(item?.rest, `${item?.rest} second`) : '-'}`}
+          />
+        </Container>
+      </Container>
+    </Container>
   );
 };
 
-const styles = StyleSheet.create({
-  cardContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-    marginLeft: 20,
-    height: 80,
-    marginRight: 10,
-  },
-  timelineLine: {
-    position: 'absolute',
-    top: 0,
-    left: 15,
-    height: '100%',
-    width: 2,
-    // backgroundColor: '#6B6B6B',
-    backgroundColor: 'red',
-  },
-  cardContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-    borderRadius: 10,
-    backgroundColor: '#282828',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
-  },
-  imageContainer: {
-    marginRight: 15,
-  },
-  image: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-  },
-  infoContainer: {
-    flex: 1,
-  },
-  exerciseName: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  details: {
-    color: '#BBBBBB',
-    fontSize: 14,
-    marginTop: 4,
-  },
-  controls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  counter: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginHorizontal: 10,
-  },
-});
-
 export default StartWorkoutExerciseCard;
+
+const styles = {
+  MOBILE: {
+    cardContainer: {
+      display: 'flex',
+      paddingVertical: '0.5rem',
+      paddingHorizontal: '0.75rem',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      alignSelf: 'stretch',
+      gap: '1rem',
+    },
+    cardDetails: {
+      display: 'flex',
+      flexDirection: 'column',
+      // alignItems: 'flex-start',
+      gap: '0.5rem',
+    },
+    labelValue: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '0.25rem',
+      width: '100%',
+    },
+    image: {
+      width: '339px',
+      height: '159px',
+      flexShrink: 0,
+    },
+  },
+  DESKTOP: {
+    cardContainer: {
+      display: 'flex',
+      width: '56rem',
+      paddingLeft: '2rem',
+      paddingVertical: '1.25rem',
+      paddingRight: '6.5rem',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '4.5rem',
+    },
+    cardDetails: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '1.25rem',
+    },
+    labelValue: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '1rem',
+      width: '100%',
+    },
+  },
+  customLineClamp: {
+    overflow: 'hidden',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: 1,
+  },
+};

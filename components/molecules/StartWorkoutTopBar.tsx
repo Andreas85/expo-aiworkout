@@ -91,7 +91,7 @@ const StartWorkoutTopBar = () => {
   return (
     <Container
       style={Platform.select({
-        web: isLargeScreen ? tailwind('hidden') : styles.desktop.container,
+        web: isLargeScreen ? tailwind('flex flex-col gap-4 p-4') : styles.desktop.container,
         native: tailwind('flex flex-col gap-4 p-4'),
       })}>
       <Container
@@ -122,7 +122,9 @@ const StartWorkoutTopBar = () => {
 
         <Container
           style={Platform.select({
-            web: tailwind(`
+            web: isLargeScreen
+              ? tailwind('hidden')
+              : tailwind(`
               mx-auto w-[50.5625rem] flex-row items-center justify-between
             `),
             native: tailwind('hidden'),

@@ -12,15 +12,17 @@ import TextContainer from '../atoms/TextContainer';
 const PublicWorkoutExercisesRender = (props: any) => {
   const { data, isEnabled = false, onRefresh = () => {}, refreshing } = props;
   const { isLargeScreen } = useWebBreakPoints();
+  const MemoizedWorkoutCard = React.memo(WorkoutCard);
+  const MemoizedWorkoutCardShort = React.memo(WorkoutCardShort);
 
   // Memoize the renderItem to avoid re-renders
   const renderListItem = useCallback(({ item, index }: { item: any; index: number }) => {
-    return <WorkoutCard key={item?._id} item={item} />;
+    return <MemoizedWorkoutCard key={item?._id} item={item} />;
   }, []);
 
   const renderListItemIsShortVersion = useCallback(
     ({ item, index }: { item: any; index: number }) => {
-      return <WorkoutCardShort item={item} />;
+      return <MemoizedWorkoutCardShort item={item} />;
     },
     [],
   );
@@ -111,6 +113,7 @@ const PublicWorkoutExercisesRender = (props: any) => {
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEndReachedThreshold={0.5}
+        removeClippedSubviews={true}
       />
     );
   }
@@ -135,6 +138,7 @@ const PublicWorkoutExercisesRender = (props: any) => {
       refreshing={refreshing}
       onRefresh={onRefresh}
       onEndReachedThreshold={0.5}
+      removeClippedSubviews={true}
     />
   );
 };
