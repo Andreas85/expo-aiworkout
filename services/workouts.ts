@@ -14,7 +14,7 @@ import {
   ICreateWorkoutCopy,
 } from './interfaces';
 import { deleteRequest, getRequest, postRequest, putRequest } from '@/utils/axios';
-import { extractedErrorMessage } from '@/utils/helper';
+import { expandRestAsExercises, extractedErrorMessage } from '@/utils/helper';
 
 export const fetchMyWorkoutService = async () => {
   try {
@@ -48,7 +48,9 @@ export const fetchPublicWorkoutServiceById = async (payload: IPayloadWorkoutDeta
     const { data } = await getRequest({
       API: URL,
     });
-    return data?.data;
+    const response = expandRestAsExercises(data)?.data;
+    console.log('response', { id: response?.data?._id, response });
+    return response;
   } catch (error: any) {
     throw extractedErrorMessage(error?.response);
   }

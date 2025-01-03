@@ -99,7 +99,9 @@ const PublicWorkoutExercisesRender = (props: any) => {
         maxToRenderPerBatch={1}
         updateCellsBatchingPeriod={50}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item, index) => item?._id.toString() + 'is-short-version' + index.toString()}
+        keyExtractor={(item, index) =>
+          item?._id?.toString() + 'is-short-version' + index.toString()
+        }
         ListHeaderComponent={renderHeader}
         renderItem={renderListItemIsShortVersion}
         contentContainerStyle={[
@@ -125,7 +127,7 @@ const PublicWorkoutExercisesRender = (props: any) => {
       maxToRenderPerBatch={1}
       updateCellsBatchingPeriod={50}
       showsVerticalScrollIndicator={false}
-      keyExtractor={(item, index) => item?._id.toString() + 'is-full-version' + index.toString()}
+      keyExtractor={(item, index) => item?._id?.toString() + 'is-full-version' + index.toString()}
       renderItem={renderListItem}
       contentContainerStyle={[
         Platform.select({

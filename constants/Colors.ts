@@ -20,4 +20,5 @@ export default {
   white: '#fff',
   black: '#000',
   gray: '#808080',
+  lightGray: '#f2f2f2',
 };

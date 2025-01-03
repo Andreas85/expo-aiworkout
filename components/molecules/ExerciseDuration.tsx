@@ -15,9 +15,16 @@ const ExerciseDuration: React.FC<ExerciseProps> = ({
   elapsedTime,
   totalWorkoutTime,
 }) => {
+  const showRemainingTime = () => {
+    if (remainingTime > 0) {
+      return formatTime(remainingTime);
+    }
+    return formatTime(0);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.remainingText}>{formatTime(remainingTime)}</Text>
+      <Text style={styles.remainingText}>{showRemainingTime()}</Text>
       <View style={{ borderColor: Colors.gray, borderWidth: 1, width: '100%' }} />
       <View>
         <Text style={styles.text}>

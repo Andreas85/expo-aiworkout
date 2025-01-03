@@ -16,50 +16,62 @@ import TextContainer from '../atoms/TextContainer';
 const StartWorkoutTopBar = () => {
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+  const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
+  const isWorkoutTimerRunning =
+    useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
+  const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
 
+  const { updateWorkoutTimer } = useWorkoutDetailStore();
   // Timer states
   const [isEnabled, setIsEnabled] = useState(false);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(300); // Total 5 minutes
-  const totalWorkoutTime = 300; // Total workout time in seconds
+  const [remainingTime, setRemainingTime] = useState(totalWorkoutTime ?? 0); // Total 5 minutes
 
   const timerRef = useRef<any>(null);
 
   const handleTimer = () => {
     setElapsedTime(prev => prev + 1);
-    setRemainingTime(prev => prev - 1);
+    setRemainingTime(prev => {
+      return prev - 1 > 0 ? prev - 1 : 0;
+    });
   };
 
   // Initialize the pauseable timer
   useEffect(() => {
-    setIsTimerRunning(true);
     timerRef.current = pauseable.setInterval(() => {
-      handleTimer();
+      if (isWorkoutTimerRunning) {
+        handleTimer();
+        return;
+      }
+      handlePause();
     }, 1000);
     return () => {
       timerRef.current?.clear();
     };
+  }, [isWorkoutTimerRunning]);
+
+  useEffect(() => {
+    updateWorkoutTimer(true);
   }, []);
 
   // Timer controls
   const handlePlay = () => {
-    console.log('Play', { isTimerRunning, reftime: timerRef.current });
-    setIsTimerRunning(true);
+    console.log('Play', { isWorkoutTimerRunning, reftime: timerRef.current });
+    updateWorkoutTimer(true);
     if (timerRef.current) {
       timerRef.current.resume(); // Ensure `start` is called on a valid instance
     }
   };
 
   const handlePause = () => {
-    setIsTimerRunning(false);
+    updateWorkoutTimer(false);
     if (timerRef.current) {
       timerRef.current.pause(); // Ensure `pause` is called on a valid instance
     }
   };
 
   const handleStop = () => {
-    setIsTimerRunning(false);
+    updateWorkoutTimer(false);
     if (timerRef.current) {
       timerRef.current.clear(); // Clear the timer and reset values
     }
@@ -148,10 +160,11 @@ const StartWorkoutTopBar = () => {
           />
           {/* Timer Controls */}
           <ExerciseStartAndPause
-            isTimerRunning={isTimerRunning}
+            isTimerRunning={isWorkoutTimerRunning}
             onPlay={handlePlay}
             onPause={handlePause}
             onStop={handleStop}
+            disableControls={isWorkoutCompleted}
           />
         </Container>
       </Container>

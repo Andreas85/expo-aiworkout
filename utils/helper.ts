@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
-import { ERROR_MESSAGE } from './appConstants';
+import { ERROR_MESSAGE, STRING_DATA } from './appConstants';
+import { ExerciseElement } from '@/services/interfaces';
 
 export const queryClient = new QueryClient();
 
@@ -59,4 +60,62 @@ export const formatTime = (seconds: number) => {
   const formattedSeconds = remainingSeconds < 10 ? `0${remainingSeconds}` : `${remainingSeconds}`;
 
   return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+};
+
+export const calculateTotalDuration = (exercises: ExerciseElement[]) => {
+  return (
+    exercises?.length &&
+    exercises.reduce((totalDuration: any, exercise: { duration: any }) => {
+      return totalDuration + exercise.duration;
+    }, 0)
+  );
+};
+
+export const calculateElapsedTimeInSec = (exerciseData: any) => {
+  let cumulativeTime = 0;
+
+  return (
+    exerciseData?.length &&
+    exerciseData.map((exercise: ExerciseElement) => {
+      if (!exercise.reps) {
+        cumulativeTime += exercise.duration;
+      }
+      return {
+        ...exercise,
+        elapsedTime: cumulativeTime,
+      };
+    })
+  );
+};
+
+export const expandRestAsExercises = (exercises: any) => {
+  if (!exercises || !exercises.data || !exercises.data.exercises) {
+    return exercises;
+  }
+
+  const expandedExercises = [];
+
+  for (const exercise of exercises.data.exercises) {
+    expandedExercises.push(exercise);
+
+    if (exercise.rest > 0) {
+      const restExercise = {
+        type: STRING_DATA.REST,
+        duration: exercise.rest,
+        exercise: {
+          name: 'Rest',
+        },
+      };
+      expandedExercises.push(restExercise);
+    }
+  }
+
+  // Remove last element if it's a rest
+  const lastExercise = expandedExercises[expandedExercises.length - 1];
+  if (lastExercise && lastExercise.type === STRING_DATA.REST) {
+    expandedExercises.pop();
+  }
+
+  exercises.data.exercises = expandedExercises;
+  return exercises;
 };

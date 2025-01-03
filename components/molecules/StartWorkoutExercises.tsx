@@ -11,7 +11,7 @@ const StartWorkoutExercises = () => {
   return (
     <Container
       style={Platform.select({
-        web: isLargeScreen ? tailwind('flex-1') : tailwind('flex-1  pt-10'),
+        web: isLargeScreen ? tailwind('flex-1') : tailwind('flex-1  pt-2'),
         native: tailwind('flex-1'),
       })}>
       <StartWorkoutDetail />

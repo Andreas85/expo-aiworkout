@@ -5,28 +5,16 @@ import Colors from '@/constants/Colors';
 import StartWorkoutExerciseCard from '../atoms/StartWorkoutExerciseCard';
 import { tailwind } from '@/utils/tailwind';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import StartWorkoutExerciseCardActive from '../atoms/StartWorkoutExerciseCardActive';
 
 interface StartWorkoutExerciseCardWrapperProps {
   exercise: any;
   isLast: boolean;
-  isSelectedWorkout?: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
-  handleNextExercise?: () => void;
-  isRestCard?: boolean;
 }
 
 const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperProps) => {
-  const {
-    exercise,
-    isLast,
-    onIncrement,
-    onDecrement,
-    isSelectedWorkout,
-    handleNextExercise,
-    isRestCard = false,
-  } = props;
+  const { exercise, isLast, onIncrement, onDecrement } = props;
   const { isLargeScreen } = useWebBreakPoints();
 
   const onIncrementHandler = () => {
@@ -41,39 +29,18 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
     onDecrement?.();
   };
 
-  const handleExerciseTimeFinished = (
-    exerciseDurationTaken: number,
-    currentExerciseCompleted: boolean,
-  ) => {
-    console.log('Exercise Time Finished', { exerciseDurationTaken, currentExerciseCompleted });
-    handleNextExercise?.();
-  };
-
-  const handleRepsWorkoutFinished = (totalElapsedTime: number) => {
-    console.log('Reps Workout Finished', { totalElapsedTime });
-    // handleNextExercise?.();
-  };
-
-  const renderExerciseCard = () => {
-    if (isSelectedWorkout) {
-      return (
-        <StartWorkoutExerciseCardActive
-          item={exercise}
-          onIncrementHandler={onIncrementHandler}
-          onDecrementHandler={onDecrementHandler}
-          isExerciseTimeFinished={handleExerciseTimeFinished}
-          isRepsWorkoutFinished={handleRepsWorkoutFinished}
-        />
-      );
-    } else {
-      return (
-        <StartWorkoutExerciseCard
-          item={exercise}
-          onIncrementHandler={onIncrementHandler}
-          onDecrementHandler={onDecrementHandler}
-        />
-      );
-    }
+  const exerciseTimerFinishedEvent = (props: any) => {
+    console.log('currentTimerrrfinshed', { props });
+    // const isRest = getCurrentExerciseData()?.type === STRING_DATA.REST;
+    // currentExerciseDurationTaken.value = exerciseDurationTaken
+    // isCurrentExerciseTimerFinished.value = currentExerciseCompleted
+    // extraTimeOfReps.value=0
+    // finishExercise()
+    // handleNextExercise()
+    // if (!isRest) {
+    //   playSound();
+    //   setTimeout(() => {stopSound()},1000)
+    // }
   };
 
   return (
@@ -94,12 +61,16 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
       {/* Card Content */}
       <View
         style={Platform.select({
-          web: tailwind(
-            `flex-1 ${isLargeScreen ? `flex-1 flex-col  py-1 ${isSelectedWorkout ? 'px-2' : 'px-10'} py-1` : `${isSelectedWorkout ? 'px-[150px]' : 'px-[220px]'} py-2`}`,
-          ),
-          native: tailwind(`flex-1 flex-col  py-1 ${isSelectedWorkout ? 'px-2' : 'px-10'} py-2`),
+          web: tailwind(`flex-1 ${isLargeScreen ? 'flex-col px-10 py-1' : 'px-[220px] py-2'}`),
+          native: tailwind('flex-1 flex-col px-10 py-1'),
         })}>
-        {renderExerciseCard()}
+        <StartWorkoutExerciseCard
+          item={exercise}
+          onIncrementHandler={onIncrementHandler}
+          onDecrementHandler={onDecrementHandler}
+          isExerciseTimeFinished={exerciseTimerFinishedEvent}
+          isRepsWorkoutFinished={exerciseTimerFinishedEvent}
+        />
       </View>
     </View>
   );

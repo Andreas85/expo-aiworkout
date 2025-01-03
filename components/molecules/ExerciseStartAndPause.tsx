@@ -4,6 +4,7 @@ import Container from '../atoms/Container';
 import { AntDesign, Feather, FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { tailwind } from '@/utils/tailwind';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
 interface IExerciseStartAndPause {
   isTimerRunning: boolean;
@@ -32,7 +33,9 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
           name="pause"
           size={40}
           color={Colors.white}
-          style={tailwind('rounded-full bg-WORKOUT_PURPLE p-2 ')}
+          style={[
+            tailwind(`rounded-full bg-WORKOUT_PURPLE p-2 ${disableControls ? 'opacity-50' : ''}`),
+          ]}
         />
       );
     }
@@ -41,7 +44,9 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
         name="play"
         size={40}
         color={Colors.white}
-        style={tailwind('rounded-full bg-WORKOUT_PURPLE p-2')}
+        style={[
+          tailwind(`rounded-full bg-WORKOUT_PURPLE p-2 ${disableControls ? 'opacity-50' : ''}`),
+        ]}
       />
     );
   };
@@ -86,5 +91,6 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.5,
+    backgroundColor: Colors.lightGray,
   },
 });

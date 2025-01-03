@@ -29,7 +29,7 @@ const StartWorkoutDetail = () => {
       slug,
     ]);
     const requiredData = data || cachedData;
-    // console.log('Refetch: ', { isStale }, { data });
+    console.log('Refetch: ', { data });
     // console.log({ requiredData });
     if (requiredData) {
       setWorkoutDetail(requiredData);
