@@ -3,7 +3,7 @@ import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
 import { useNavigation } from 'expo-router';
 
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
@@ -12,7 +12,7 @@ import NoDataSvg from '../svgs/NoDataSvg';
 import { useQueryClient } from '@tanstack/react-query';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
-import PublicWorkoutExercisesRender from '../molecules/PublicWorkoutExercisesRender';
+import StartWorkoutExercisesRender from '../molecules/StartWorkoutExercisesRender';
 
 const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
@@ -59,49 +59,30 @@ const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     }
 
     return (
-      <>
-        <PublicWorkoutExercisesRender
+      <View style={tailwind('flex-1 pb-4')}>
+        <StartWorkoutExercisesRender
           data={workoutDetail?.exercises}
           isEnabled={isEnabled}
           onRefresh={onRefresh}
           refreshing={refreshing}
         />
-      </>
+      </View>
     );
   };
 
   return (
-    <Container style={[tailwind(`flex-1  bg-transparent`)]}>
+    <Container style={[tailwind(`flex-1 `)]}>
       <Container
         style={[
           Platform.select({
-            web: tailwind(`mx-auto flex w-full flex-col gap-2 px-32
-                ${isLargeScreen && 'px-4'}
-              `),
-            native: tailwind('flex flex-col gap-4 p-4'),
-          }),
-          tailwind('flex-1'),
-        ]}>
-        <Container
-          style={[
-            Platform.select({
-              web: tailwind(`
+            web: tailwind(`
                 mx-auto 
-              ${isLargeScreen ? 'w-full' : 'h-[12.4375rem] w-[56rem]'}
+              ${isLargeScreen ? 'w-full' : 'w-[56rem] flex-1 '}
             `),
-            }),
-            tailwind('flex-1'),
-          ]}>
-          <Container
-            style={[
-              Platform.select({
-                web: tailwind(`${isLargeScreen ? 'mb-16' : ' '} flex-1 `),
-                native: tailwind('mb-10 flex-1 pb-8'),
-              }),
-            ]}>
-            {renderWorkoutExercises()}
-          </Container>
-        </Container>
+            native: tailwind('flex-1'),
+          }),
+        ]}>
+        {renderWorkoutExercises()}
       </Container>
     </Container>
   );

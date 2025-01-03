@@ -7,7 +7,7 @@ import { tailwind } from '@/utils/tailwind';
 
 const StartWorkoutScreen = () => {
   return (
-    <Container style={Platform.select({ web: tailwind(''), native: tailwind('flex-1') })}>
+    <Container style={Platform.select({ web: tailwind('flex-1'), native: tailwind('flex-1') })}>
       <StartWorkoutTopBar />
       <StartWorkoutExercises />
     </Container>
