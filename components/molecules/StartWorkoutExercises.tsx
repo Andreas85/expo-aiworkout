@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import StartWorkoutDetail from '../screens/StartWorkoutDetail';
 
 import { tailwind } from '@/utils/tailwind';
@@ -19,4 +19,4 @@ const StartWorkoutExercises = () => {
   );
 };
 
-export default StartWorkoutExercises;
+export default memo(StartWorkoutExercises);

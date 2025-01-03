@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import React from 'react';
+import React, { memo } from 'react';
 import Container from '../atoms/Container';
 import StartWorkoutTopBar from '../molecules/StartWorkoutTopBar';
 import StartWorkoutExercises from '../molecules/StartWorkoutExercises';
@@ -11,11 +11,11 @@ const StartWorkoutScreen = () => {
   const { isLargeScreen } = useWebBreakPoints();
   return (
     <Container style={Platform.select({ web: tailwind('flex-1'), native: tailwind('flex-1') })}>
-      {<StartWorkoutTopBar />}
+      <StartWorkoutTopBar />
       <StartWorkoutExercises />
       {isLargeScreen && <StartWorkoutBottomBar />}
     </Container>
   );
 };
 
-export default StartWorkoutScreen;
+export default memo(StartWorkoutScreen);

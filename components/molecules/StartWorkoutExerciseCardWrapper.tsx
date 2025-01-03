@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Platform, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -130,4 +130,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StartWorkoutExerciseCardWrapper;
+export default memo(StartWorkoutExerciseCardWrapper);

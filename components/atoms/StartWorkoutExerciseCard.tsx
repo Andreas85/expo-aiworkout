@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import React from 'react';
+import React, { memo } from 'react';
 import Container from './Container';
 import ImageContainer from './ImageContainer';
 import { tailwind } from '@/utils/tailwind';
@@ -97,7 +97,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
   );
 };
 
-export default StartWorkoutExerciseCard;
+export default memo(StartWorkoutExerciseCard);
 
 const styles = {
   MOBILE: {

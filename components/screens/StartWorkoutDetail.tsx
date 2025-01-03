@@ -12,7 +12,7 @@ import NoDataSvg from '../svgs/NoDataSvg';
 import { useQueryClient } from '@tanstack/react-query';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
-import StartWorkoutExercisesRender from '../molecules/StartWorkoutExercisesRender';
+import StartWorkoutExercisesList from '../molecules/StartWorkoutExercisesList';
 
 const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
@@ -60,7 +60,7 @@ const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
 
     return (
       <View style={tailwind('flex-1 pb-4')}>
-        <StartWorkoutExercisesRender
+        <StartWorkoutExercisesList
           data={workoutDetail?.exercises}
           isEnabled={isEnabled}
           onRefresh={onRefresh}
