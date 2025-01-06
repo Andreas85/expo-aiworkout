@@ -1,3 +1,5 @@
+import { string } from 'yup';
+
 export interface ICreateWorkoutFormData {
   name?: string;
   isPublic?: boolean;
@@ -124,6 +126,7 @@ export interface ExerciseElement {
   weight: number;
   duration: number;
   order: number;
+  type?: string;
 }
 
 export interface ExerciseExercise {

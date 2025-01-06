@@ -5,16 +5,24 @@ import { tailwind } from '@/utils/tailwind';
 import { Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
-const ShowLabelValue = (props: { label: string; value?: string }) => {
-  const { label, value } = props;
+const ShowLabelValue = (props: {
+  label: string;
+  value?: string;
+  container?: { web?: string; native?: string };
+  labelContainer?: { web?: string; native?: string };
+  valueContainer?: { web?: string; native?: string };
+}) => {
+  const { label, value, container, labelContainer, valueContainer } = props;
   const { isLargeScreen } = useWebBreakPoints();
   return (
     <Container
       style={[
-        tailwind('w-full flex-1 flex-row items-start'),
         Platform.select({
           web: tailwind(
-            `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} w-full `,
+            `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} w-full  flex-1 flex-row items-start ${container?.web ? container.web : ''}`,
+          ),
+          native: tailwind(
+            `w-full flex-1 flex-row items-start ${container?.native ? container.native : ''}`,
           ),
         }),
       ]}>
@@ -22,18 +30,22 @@ const ShowLabelValue = (props: { label: string; value?: string }) => {
         data={label}
         style={[
           Platform.select({
-            web: tailwind(`${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '}`),
+            web: tailwind(
+              `${isLargeScreen ? 'text-[0.8175rem]' : ' text-[1.25rem] not-italic'} flex-1  ${labelContainer?.web ? labelContainer.web : ''}`,
+            ),
+            native: tailwind(`flex-1  ${labelContainer?.native ? labelContainer.native : ''}`),
           }),
-          tailwind('flex-1'),
         ]}
       />
       <TextContainer
         data={value}
         style={[
           Platform.select({
-            web: tailwind(`${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '}`),
+            web: tailwind(
+              `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} flex-1  ${valueContainer?.web ? valueContainer.web : ''}`,
+            ),
+            native: tailwind(`flex-1   ${valueContainer?.native ? valueContainer.native : ''}`),
           }),
-          tailwind('flex-1'),
         ]}
       />
     </Container>

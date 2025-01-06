@@ -48,9 +48,7 @@ export const fetchPublicWorkoutServiceById = async (payload: IPayloadWorkoutDeta
     const { data } = await getRequest({
       API: URL,
     });
-    const response = expandRestAsExercises(data)?.data;
-    console.log('response', { id: response?.data?._id, response });
-    return response;
+    return data?.data;
   } catch (error: any) {
     throw extractedErrorMessage(error?.response);
   }

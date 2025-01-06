@@ -1,16 +1,26 @@
-import React, { memo, useCallback, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, Platform } from 'react-native';
 
 import { tailwind } from '@/utils/tailwind';
 import StartWorkoutExerciseCardWrapper from './StartWorkoutExerciseCardWrapper';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { STRING_DATA } from '@/utils/appConstants';
+import { expandRestAsExercisesInExistingExercises } from '@/utils/helper';
+import { ExerciseElement } from '@/services/interfaces';
 
 const StartWorkoutExercisesList = (props: any) => {
   const { data, onRefresh = () => {}, refreshing } = props;
+  const [exerciseData, setExerciseData] = useState<ExerciseElement[]>();
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
-
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      const updateData = expandRestAsExercisesInExistingExercises(data) as ExerciseElement[];
+      setExerciseData(updateData);
+    }
+  }, [data]);
+
   const { updateWorkoutTimer, updateWorkoutCompleted } = useWorkoutDetailStore();
 
   const onIncrement = () => {
@@ -63,14 +73,7 @@ const StartWorkoutExercisesList = (props: any) => {
     }
 
     startNextExercise();
-    console.log(
-      hasReps,
-      isRest,
-      'isRest',
-      getNextExerciseData()?.type,
-      getNextExerciseData(),
-      data,
-    );
+    console.log(hasReps, isRest, 'isRest', getNextExerciseData()?.type, getNextExerciseData());
 
     // if (!hasReps && isRest) {
     //   startNextExercise();
@@ -108,7 +111,7 @@ const StartWorkoutExercisesList = (props: any) => {
   return (
     <FlatList
       ref={flatListRef} // Attach the ref
-      data={data}
+      data={exerciseData}
       initialNumToRender={7}
       maxToRenderPerBatch={7}
       updateCellsBatchingPeriod={50}

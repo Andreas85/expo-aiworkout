@@ -59,6 +59,7 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
       return (
         <StartWorkoutExerciseCardActive
           item={exercise}
+          isRestCard={isRestCard}
           onIncrementHandler={onIncrementHandler}
           onDecrementHandler={onDecrementHandler}
           isExerciseTimeFinished={handleExerciseTimeFinished}
@@ -69,6 +70,7 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
       return (
         <StartWorkoutExerciseCard
           item={exercise}
+          isRestCard={isRestCard}
           onIncrementHandler={onIncrementHandler}
           onDecrementHandler={onDecrementHandler}
         />

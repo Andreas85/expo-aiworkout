@@ -89,6 +89,7 @@ export const calculateElapsedTimeInSec = (exerciseData: any) => {
 };
 
 export const expandRestAsExercises = (exercises: any) => {
+  console.log('expandRestAsExercises', exercises);
   if (!exercises || !exercises.data || !exercises.data.exercises) {
     return exercises;
   }
@@ -118,4 +119,35 @@ export const expandRestAsExercises = (exercises: any) => {
 
   exercises.data.exercises = expandedExercises;
   return exercises;
+};
+
+export const expandRestAsExercisesInExistingExercises = (exercises: ExerciseElement[]) => {
+  if (!exercises) {
+    return exercises;
+  }
+
+  const expandedExercises = [];
+
+  for (const exercise of exercises) {
+    expandedExercises.push(exercise);
+
+    if (exercise.rest > 0) {
+      const restExercise = {
+        type: STRING_DATA.REST,
+        duration: exercise.rest,
+        exercise: {
+          name: 'Rest',
+        },
+      };
+      expandedExercises.push(restExercise);
+    }
+  }
+
+  // Remove last element if it's a rest
+  const lastExercise = expandedExercises[expandedExercises.length - 1];
+  if (lastExercise && lastExercise.type === STRING_DATA.REST) {
+    expandedExercises.pop();
+  }
+
+  return expandedExercises;
 };

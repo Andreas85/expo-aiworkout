@@ -13,51 +13,98 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 interface StartWorkoutExerciseCardProps {
   item: ExerciseElement;
   isEnabled?: boolean;
+  isRestCard?: boolean;
   onDecrementHandler: () => void;
   onIncrementHandler: () => void;
 }
 
 const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
-  const { item, isEnabled } = props;
+  const { item, isEnabled, isRestCard } = props;
   const { isLargeScreen } = useWebBreakPoints();
-  return (
-    <Container
-      style={[
-        Platform.select({
-          web: tailwind('flex-1 flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-4 py-2'),
-          native: tailwind('flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-2  py-1'),
-        }),
-      ]}
-      key={item._id}>
-      {!isEnabled && (
+
+  const renderExerciseImage = () => {
+    if (!isRestCard) {
+      return (
         <ImageContainer
           source={IMAGES.dummyWorkout}
           styleNative={[
             Platform.select({
               web: tailwind(
-                `${isLargeScreen ? 'h-[4.875rem] w-[8.1875rem]' : 'h-[9.9375rem] w-[21.1875rem] shrink-0'} flex-1.5 aspect-video rounded-lg`,
+                `${isLargeScreen ? ' w-[6.625rem]' : 'h-[9.9375rem] w-[21.1875rem] shrink-0'} aspect-video flex-1 rounded-lg`,
               ),
-              native: tailwind('aspect-video flex-1 self-center rounded-lg'),
+              native: tailwind('aspect-video w-[6.625rem] self-center rounded-lg'),
             }),
           ]}
           contentFit="cover"
           contentPosition={'right top'}
         />
-      )}
+      );
+    }
+  };
+
+  const renderExerciseCardItemLabels = () => {
+    if (isRestCard) {
+      return (
+        <ShowLabelValue
+          container={{ web: 'gap-[0.75rem] w-auto self-center ' }}
+          label="Duration "
+          labelContainer={{ web: `${isRestCard ? 'flex-0' : ''}` }}
+          // valueContainer={`${isRestCard ? 'flex-0' : ''}`}
+          value={`${item?.duration ? pluralise(item?.duration, `${item?.duration} second`) : '-'}`}
+        />
+      );
+    }
+    return (
+      <>
+        <ShowLabelValue
+          container={{
+            web: `${isLargeScreen ? 'gap-[0.75rem] justify-center' : ''}`,
+          }}
+          label="No. of Reps "
+          value={`${item?.reps ? pluralise(item?.reps, `${item?.reps} second`) : '-'}`}
+        />
+      </>
+    );
+  };
+
+  return (
+    <Container
+      style={[
+        Platform.select({
+          // web: tailwind(`flex-1 flex-row gap-4  rounded-lg bg-NAVBAR_BACKGROUND px-4 py-2`),
+          web: [
+            { height: isLargeScreen ? '5.4375rem' : '183px' },
+            tailwind(
+              `flex-row gap-12  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center px-4' : 'px-12'} py-2 opacity-75`,
+            ),
+          ] as any,
+          native: tailwind(
+            `h-5.4375rem flex-row justify-center gap-6 rounded-lg  bg-NAVBAR_BACKGROUND px-2 py-1 opacity-75`,
+          ),
+        }),
+      ]}
+      key={item._id}>
+      {!isEnabled && renderExerciseImage()}
       <Container
         style={[
           Platform.select({
             web: isLargeScreen
-              ? tailwind('flex-2 flex flex-col gap-[0.25rem]')
-              : tailwind('flex-2 flex flex-col items-start gap-[1.25rem]'),
-            native: tailwind('flex-2 '),
+              ? tailwind(
+                  `flex-1 flex-col  ${isRestCard ? 'items-center' : 'flex-2 items-start'} justify-center gap-[0.75rem]`,
+                )
+              : tailwind(
+                  ` flex-1 flex-col ${isRestCard ? 'items-center' : 'items-start'}  mx-auto w-[537px] justify-center gap-[1.25rem]`,
+                ),
+            native: tailwind(
+              `flex-col justify-center ${isRestCard ? ' w-3/5 items-center ' : 'flex-2 items-start '}  mx-auto `,
+            ),
           }),
         ]}>
         <Container
           style={[
             Platform.select({
-              web: tailwind(`flex-1 flex-row items-center ${isLargeScreen ? '' : ''}`),
-              native: tailwind('flex-1 flex-row items-start'),
+              web: tailwind(`flex-row items-center ${isLargeScreen ? '' : ''}`),
+              native: tailwind('flex-1 flex-row items-center'),
             }),
           ]}>
           <Text
@@ -81,16 +128,14 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
         <Container
           style={[
             Platform.select({
-              web: isLargeScreen ? styles.MOBILE.labelValue : styles.DESKTOP.labelValue,
-              native: tailwind('flex-1 '),
+              web: [
+                isLargeScreen ? styles.MOBILE.labelValue : styles.DESKTOP.labelValue,
+                tailwind(`self-center`),
+              ] as any,
+              native: tailwind(` flex-1 flex-col `),
             }),
           ]}>
-          <ShowLabelValue label="No. of Reps" value={`${item?.reps ? item?.reps : '-'}`} />
-          {item?.reps ? <ShowLabelValue label="Duration" value={`${item?.duration}`} /> : null}
-          <ShowLabelValue
-            label="Rest"
-            value={`${item?.rest ? pluralise(item?.rest, `${item?.rest} second`) : '-'}`}
-          />
+          {renderExerciseCardItemLabels()}
         </Container>
       </Container>
     </Container>
