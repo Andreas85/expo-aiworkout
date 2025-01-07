@@ -32,7 +32,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
               web: tailwind(
                 `${isLargeScreen ? ' w-[6.625rem]' : 'h-[9.9375rem] w-[21.1875rem] shrink-0'} aspect-video flex-1 rounded-lg`,
               ),
-              native: tailwind('aspect-video w-[6.625rem] self-center rounded-lg'),
+              native: tailwind('aspect-video w-[6.625rem] flex-1 self-center rounded-lg'),
             }),
           ]}
           contentFit="cover"
@@ -75,11 +75,11 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           web: [
             { height: isLargeScreen ? '5.4375rem' : '183px' },
             tailwind(
-              `flex-row gap-12  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center px-4' : 'px-12'} py-2 opacity-75`,
+              `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center gap-8 px-4' : 'gap-12 px-12 '} py-2 opacity-75`,
             ),
           ] as any,
           native: tailwind(
-            `h-5.4375rem flex-row justify-center gap-6 rounded-lg  bg-NAVBAR_BACKGROUND px-2 py-1 opacity-75`,
+            `h-5.4375rem flex-row justify-center gap-6 rounded-lg  bg-NAVBAR_BACKGROUND px-2 py-1 opacity-55`,
           ),
         }),
       ]}
@@ -90,13 +90,13 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           Platform.select({
             web: isLargeScreen
               ? tailwind(
-                  `flex-1 flex-col  ${isRestCard ? 'items-center' : 'flex-2 items-start'} justify-center gap-[0.75rem]`,
+                  `flex-1 flex-col  ${isRestCard ? 'flex-2 items-center' : ' items-start'} justify-center gap-[0.75rem]`,
                 )
               : tailwind(
                   ` flex-1 flex-col ${isRestCard ? 'items-center' : 'items-start'}  mx-auto w-[537px] justify-center gap-[1.25rem]`,
                 ),
             native: tailwind(
-              `flex-col justify-center ${isRestCard ? ' w-3/5 items-center ' : 'flex-2 items-start '}  mx-auto `,
+              `flex-col justify-center ${isRestCard ? ' w-3/5 items-center ' : 'flex-1 items-start '}  mx-auto `,
             ),
           }),
         ]}>

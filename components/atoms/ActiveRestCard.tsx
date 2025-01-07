@@ -29,9 +29,10 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
           ),
           webStyles.container,
         ] as any,
-        native: tailwind(
-          'relative flex-1 flex-col gap-4 rounded-lg bg-NAVBAR_BACKGROUND px-2 py-1',
-        ),
+        native: [
+          tailwind('relative flex-1 flex-col gap-4 rounded-lg bg-NAVBAR_BACKGROUND px-2 py-1'),
+          webStyles.container,
+        ],
       })}>
       <ActiveWorkoutIcon />
       <Container
@@ -107,6 +108,11 @@ const webStyles = {
   container: {
     backgroundColor: '#252425',
     // height: '100%',
-    boxShadow: '0px 12px 24px 4px rgba(95, 63, 102, 0.50)',
+    boxShadow: '0 0 64px 2px rgba(162, 125, 225, 0.6)',
+    shadowColor: '#A27DE1', // Shadow color for iOS
+    shadowOffset: { width: 0, height: 10 }, // Offset for iOS
+    shadowOpacity: 0.6, // Opacity for iOS
+    shadowRadius: 16, // Blur radius for iOS
+    elevation: 8, // Shadow for Android
   },
 };
