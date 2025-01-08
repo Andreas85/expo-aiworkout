@@ -1,11 +1,12 @@
 import React, { memo } from 'react';
-import { View, Platform, StyleSheet } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Platform, StyleSheet, Image } from 'react-native';
 import Colors from '@/constants/Colors';
 import StartWorkoutExerciseCard from '../atoms/StartWorkoutExerciseCard';
 import { tailwind } from '@/utils/tailwind';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import StartWorkoutExerciseCardActive from '../atoms/StartWorkoutExerciseCardActive';
+import { IMAGES } from '@/utils/images';
+import { Entypo } from '@expo/vector-icons';
 
 interface StartWorkoutExerciseCardWrapperProps {
   exercise: any;
@@ -15,6 +16,8 @@ interface StartWorkoutExerciseCardWrapperProps {
   onDecrement: () => void;
   handleNextExercise?: () => void;
   isRestCard?: boolean;
+  isFirst?: boolean;
+  isCompleted?: boolean;
 }
 
 const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperProps) => {
@@ -26,6 +29,8 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
     isSelectedWorkout,
     handleNextExercise,
     isRestCard = false,
+    isFirst = false,
+    isCompleted = false,
   } = props;
   const { isLargeScreen } = useWebBreakPoints();
 
@@ -78,20 +83,61 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
     }
   };
 
+  const renderIcons = () => {
+    if (!isCompleted) {
+      return (
+        <Entypo
+          name="circle"
+          size={isLargeScreen ? 20 : 30}
+          color={Colors.gray}
+          style={Platform.select({
+            web: tailwind(`${isLargeScreen ? 'ml-[2px] h-6 w-6' : 'ml-[6px] h-10 w-10'} `),
+            native: tailwind(`ml-2.8 h-6 w-6`),
+          })}
+        />
+      );
+    }
+    return (
+      <Image
+        source={IMAGES.muscleIcon}
+        resizeMode="contain"
+        style={Platform.select({
+          web: tailwind(`aspect-video ${isLargeScreen ? 'h-6 w-6' : 'h-10 w-10'}`),
+          native: tailwind('aspect-video h-10 w-10'),
+        })}
+      />
+    );
+  };
+
   return (
     <View style={{ ...styles.cardContainer }}>
       {/* Timeline Line */}
-      <MaterialIcons
-        name="fitness-center"
-        size={20}
-        color={Colors.white}
-        style={{
-          backgroundColor: Colors.brandColor,
-          borderRadius: 12,
-          padding: 5,
-        }}
+
+      {renderIcons()}
+      <View
+        style={Platform.select({
+          web: {
+            ...styles.timelineLine,
+            left: isLargeScreen ? 10 : 20,
+            height: isFirst ? '50%' : isLast ? '50%' : '100%',
+            top: isFirst ? '50%' : 0,
+            backgroundColor: isCompleted ? Colors.brandColor : 'transparent',
+            borderColor: isCompleted ? Colors.brandColor : Colors.gray,
+            borderWidth: 1.8,
+            borderStyle: isCompleted ? 'solid' : 'dashed', // Dashed for incomplete
+          } as any,
+          native: {
+            ...styles.timelineLine,
+            left: 20,
+            height: isFirst ? '50%' : isLast ? '50%' : '100%',
+            top: isFirst ? '50%' : 0,
+            backgroundColor: isCompleted ? Colors.brandColor : 'transparent',
+            borderColor: isCompleted ? Colors.brandColor : Colors.gray,
+            borderWidth: 1,
+            borderStyle: isCompleted ? 'solid' : 'dashed', // Dashed for incomplete
+          } as any,
+        })}
       />
-      {!isLast && <View style={styles.timelineLine} />}
 
       {/* Card Content */}
       <View
@@ -114,16 +160,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     // marginVertical: 10,
     marginLeft: 20,
+    backgroundColor: 'transparent',
   },
   timelineLine: {
     position: 'absolute',
     top: 0,
-    left: 15,
     height: '100%',
     width: 2,
-    backgroundColor: Colors.brandColor,
     zIndex: -1,
-    // backgroundColor: 'red',
+    backgroundColor: 'transparent',
   },
   cardContent: {
     flex: 1,

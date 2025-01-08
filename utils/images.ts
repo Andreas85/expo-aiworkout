@@ -7,6 +7,8 @@ import dummyWorkout from '@/assets/images/dummy-workout.jpg';
 import dragDot from '@/assets/images/drag-dot.png';
 import fitness from '@/assets/images/fitness.webp';
 import workoutactive from '@/assets/images/workoutactiveicon.png';
+import muscleIcon from '@/assets/images/muscle-icon.png';
+
 export const IMAGES = {
   logo,
   gradientBg,
@@ -17,4 +19,5 @@ export const IMAGES = {
   dragDot,
   fitness,
   workoutactive,
+  muscleIcon,
 };

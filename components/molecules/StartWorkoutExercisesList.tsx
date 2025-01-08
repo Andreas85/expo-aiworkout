@@ -90,7 +90,9 @@ const StartWorkoutExercisesList = (props: any) => {
         <StartWorkoutExerciseCardWrapper
           key={item?._id}
           exercise={item}
-          isLast={false}
+          isLast={exerciseData?.length ? index === exerciseData?.length - 1 : false}
+          isFirst={index === 0}
+          isCompleted={index < selectedIndex}
           onIncrement={onIncrement}
           onDecrement={onDecrement}
           isSelectedWorkout={selectedIndex === index}
@@ -99,7 +101,7 @@ const StartWorkoutExercisesList = (props: any) => {
         />
       );
     },
-    [selectedIndex],
+    [selectedIndex, exerciseData],
   );
 
   const getItemLayout = (data: any, index: number) => ({
