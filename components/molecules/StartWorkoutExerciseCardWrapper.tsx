@@ -86,15 +86,15 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
   const renderIcons = () => {
     if (!isCompleted) {
       return (
-        <Entypo
-          name="circle"
-          size={isLargeScreen ? 20 : 30}
-          color={Colors.gray}
+        <View
           style={Platform.select({
-            web: tailwind(`${isLargeScreen ? 'ml-[2px] h-6 w-6' : 'ml-[6px] h-10 w-10'} `),
-            native: tailwind(`ml-2.8 h-6 w-6`),
-          })}
-        />
+            web: tailwind(
+              `${isLargeScreen ? ' h-6 w-6' : 'ml-[2px] h-10 w-10'} z-20 items-center justify-center rounded-full border-[2px] border-gray-400 bg-NAVBAR_BACKGROUND`,
+            ),
+            native: tailwind(
+              `ml-2 h-6 w-6 items-center justify-center rounded-full border-[3px] border-gray-400 bg-NAVBAR_BACKGROUND`,
+            ),
+          })}></View>
       );
     }
     return (
