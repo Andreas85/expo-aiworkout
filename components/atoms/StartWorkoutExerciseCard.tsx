@@ -59,9 +59,12 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
         <ShowLabelValue
           container={{
             web: `${isLargeScreen ? 'gap-[0.75rem] justify-center' : ''}`,
+            native: 'gap-[0.75rem] justify-center',
           }}
           label="No. of Reps "
-          value={`${item?.reps ? pluralise(item?.reps, `${item?.reps} second`) : '-'}`}
+          labelContainer={{ web: isLargeScreen ? 'flex-none' : '', native: 'flex-none' }}
+          valueContainer={{ web: isLargeScreen ? '' : 'flex-none', native: 'flex-1 text-right' }}
+          value={`${item?.reps ? item?.reps : '-'}`}
         />
       </>
     );
@@ -75,11 +78,11 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           web: [
             { height: isLargeScreen ? '5.4375rem' : '183px' },
             tailwind(
-              `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center gap-8 px-4' : 'gap-12 px-12 '} py-2 opacity-75`,
+              `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center gap-8 gap-[0.75rem] px-4' : 'gap-12 px-12 '} py-2 opacity-75`,
             ),
           ] as any,
           native: tailwind(
-            `h-5.4375rem flex-row justify-center gap-6 rounded-lg  bg-NAVBAR_BACKGROUND px-2 py-1 opacity-55`,
+            `h-5.4375rem flex-row justify-center gap-[0.75rem]  rounded-lg bg-NAVBAR_BACKGROUND p-[0.75rem] opacity-55`,
           ),
         }),
       ]}

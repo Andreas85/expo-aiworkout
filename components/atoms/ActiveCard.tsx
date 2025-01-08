@@ -157,7 +157,7 @@ const ActiveCard = ({
               })}>
               <ShowLabelValue
                 label="No. of Reps"
-                value={`${item?.reps ? pluralise(item?.reps, `${item?.reps} second`) : '-'}`}
+                value={`${item?.reps ? item?.reps : '-'}`}
                 container={{
                   web: `${isLargeScreen ? 'gap-[0.75rem]' : 'gap-[rem]'} self-center w-full `,
                   native: 'gap-[0.75rem]  ',
