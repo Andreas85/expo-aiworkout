@@ -1,10 +1,9 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import Container from '../atoms/Container';
 import { AntDesign, Feather, FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { tailwind } from '@/utils/tailwind';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
 interface IExerciseStartAndPause {
   isTimerRunning: boolean;
@@ -29,25 +28,35 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
     if (isTimerRunning) {
       // add stop icons
       return (
-        <AntDesign
-          name="pause"
-          size={40}
-          color={Colors.white}
-          style={[
-            tailwind(`rounded-full bg-WORKOUT_PURPLE p-2 ${disableControls ? 'opacity-50' : ''}`),
-          ]}
-        />
+        <>
+          <View
+            style={Platform.select({
+              web: tailwind(
+                `${' h-15 w-15 p-2'} z-20 items-center justify-center rounded-full bg-WORKOUT_PURPLE`,
+              ),
+              native: tailwind(
+                `h-15 w-15 items-center justify-center rounded-full  bg-WORKOUT_PURPLE p-2`,
+              ),
+            })}>
+            <AntDesign name="pause" size={40} color={Colors.white} />
+          </View>
+        </>
       );
     }
     return (
-      <Feather
-        name="play"
-        size={40}
-        color={Colors.white}
-        style={[
-          tailwind(`rounded-full bg-WORKOUT_PURPLE p-2 ${disableControls ? 'opacity-50' : ''}`),
-        ]}
-      />
+      <>
+        <View
+          style={Platform.select({
+            web: tailwind(
+              `${' h-15 w-15 py-1 py-2 pl-2'} z-20 items-center justify-center rounded-full bg-WORKOUT_PURPLE`,
+            ),
+            native: tailwind(
+              `h-15 w-15 items-center justify-center rounded-full  bg-WORKOUT_PURPLE py-1 py-2 pl-2`,
+            ),
+          })}>
+          <Feather name="play" size={40} color={Colors.white} />
+        </View>
+      </>
     );
   };
   return (

@@ -39,7 +39,7 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
         style={[
           Platform.select({
             web: [
-              { width: isLargeScreen ? '292px' : '537px' },
+              { width: isLargeScreen ? '' : '537px' },
               tailwind(
                 `mx-auto  flex-col items-center  justify-center ${isLargeScreen ? 'gap-4' : 'gap-12'}`,
               ),

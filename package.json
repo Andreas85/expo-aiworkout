@@ -4,6 +4,17 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "build-prod-android": "eas build --profile production --platform android",
+    "build-dev-android": "eas build --profile development --platform android",
+    "build-prod-ios": "eas build --profile production --platform ios",
+    "build-dev-ios": "eas build --profile development --platform ios",
+    "build-local-android": "eas build --profile local --platform android",
+    "build-preview-android": "eas build --profile preview --platform android",
+    "build-preview-ios": "eas build --profile preview --platform ios",
+    "submit-dev-android": "eas submit --profile development --platform android",
+    "submit-prod-android": "eas submit --profile production --platform android",
+    "submit-dev-ios": "eas submit --profile development --platform ios",
+    "submit-prod-ios": "eas submit --profile production --platform ios",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
@@ -63,7 +74,8 @@
     "sortablejs": "^1.15.3",
     "twrnc": "^4.5.1",
     "yup": "^1.4.0",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "expo-dev-client": "~4.0.29"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
