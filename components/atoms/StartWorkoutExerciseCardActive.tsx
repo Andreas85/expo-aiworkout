@@ -38,12 +38,12 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
 
   const updateTimer = () => {
     const { duration, reps } = item ?? {};
-    console.log('Timer running:', {
-      totalElapsedTime,
-      duration,
-      reps,
-      refElapsed: elapsedTimeRef.current,
-    });
+    // console.log('Timer running:', {
+    //   totalElapsedTime,
+    //   duration,
+    //   reps,
+    //   refElapsed: elapsedTimeRef.current,
+    // });
 
     if (elapsedTimeRef.current >= duration && !reps) {
       console.log('Duration reached without reps, triggering event');
@@ -82,15 +82,7 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
     return <ActiveRestCard item={item} />;
   }
 
-  return (
-    <ActiveCard
-      item={item}
-      // onDecrementHandler={onDecrementHandler}
-      // onIncrementHandler={onIncrementHandler}
-      isExerciseTimeFinished={isExerciseTimeFinished}
-      isRepsWorkoutFinished={isRepsWorkoutFinished}
-    />
-  );
+  return <ActiveCard item={item} />;
 };
 
 export default memo(StartWorkoutExerciseCardActive);

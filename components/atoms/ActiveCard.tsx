@@ -16,22 +16,9 @@ import PlusActionButton from './PlusActionButton';
 
 interface ActiveCardProps {
   item: ExerciseElement;
-  onDecrementHandler?: () => void;
-  onIncrementHandler?: () => void;
-  isExerciseTimeFinished: (
-    exerciseDurationTaken: number,
-    currentExerciseCompleted: boolean,
-  ) => void;
-  isRepsWorkoutFinished: (totalElapsedTime: number) => void;
 }
 
-const ActiveCard = ({
-  item,
-  onDecrementHandler,
-  onIncrementHandler,
-  isExerciseTimeFinished,
-  isRepsWorkoutFinished,
-}: ActiveCardProps) => {
+const ActiveCard = ({ item }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
 
   const renderExerciseInfo = () => {

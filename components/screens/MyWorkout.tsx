@@ -20,6 +20,7 @@ import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { useQueryClient } from '@tanstack/react-query';
+import React from 'react';
 
 export default function MyWorkout() {
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
@@ -64,14 +65,6 @@ export default function MyWorkout() {
       staleTime: REACT_QUERY_STALE_TIME.MY_WORKOUT_DETAILS,
       // gcTime: 1000,
     });
-
-    setTimeout(() => {
-      const cachedData: any = queryClient.getQueryData([
-        REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS,
-        id,
-      ]);
-      console.log({ cachedData }, id);
-    }, 5000);
   };
 
   // const { data, refetch:refetchDetails, isLoading } = useFetchData({

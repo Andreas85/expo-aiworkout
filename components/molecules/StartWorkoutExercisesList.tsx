@@ -10,7 +10,7 @@ import { ExerciseElement } from '@/services/interfaces';
 
 const StartWorkoutExercisesList = (props: any) => {
   const { data, onRefresh = () => {}, refreshing } = props;
-  const [exerciseData, setExerciseData] = useState<ExerciseElement[]>();
+  const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
 
@@ -63,7 +63,8 @@ const StartWorkoutExercisesList = (props: any) => {
     const hasReps = getCurrentExerciseData()?.reps;
     const isRest = getNextExerciseData()?.type === STRING_DATA.REST;
 
-    if (selectedIndex + 1 >= data.length) {
+    if (selectedIndex + 1 >= exerciseData?.length) {
+      console.log('Workout finished 1');
       if (!hasReps) {
         console.log('Workout finished');
         updateWorkoutTimer(false);
@@ -73,7 +74,7 @@ const StartWorkoutExercisesList = (props: any) => {
     }
 
     startNextExercise();
-    console.log(hasReps, isRest, 'isRest', getNextExerciseData()?.type, getNextExerciseData());
+    // console.log(hasReps, isRest, 'isRest', getNextExerciseData()?.type, getNextExerciseData());
 
     // if (!hasReps && isRest) {
     //   startNextExercise();

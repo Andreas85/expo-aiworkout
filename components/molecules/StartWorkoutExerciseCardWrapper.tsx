@@ -56,7 +56,7 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
 
   const handleRepsWorkoutFinished = (totalElapsedTime: number) => {
     console.log('Reps Workout Finished', { totalElapsedTime });
-    // handleNextExercise?.();
+    handleNextExercise?.();
   };
 
   const renderExerciseCard = () => {
