@@ -38,17 +38,19 @@ const ActiveCard = ({
     return (
       <Container
         style={Platform.select({
-          web: tailwind(`flex-1 ${'flex-row gap-12'} items-center justify-center  `),
-          native: tailwind('flex-1 flex-row items-center justify-center gap-4 self-center'),
+          web: tailwind(
+            `flex-1 ${isLargeScreen ? '' : 'gap-12'} flex-row  items-center justify-center  `,
+          ),
+          native: tailwind('flex-1 flex-row items-center justify-center  self-center'),
         })}>
         <Container
           style={Platform.select({
-            web: tailwind(`${' gap-[0.75rem]'} `),
+            web: tailwind(`${isLargeScreen ? 'flex-1' : ''} gap-[0.75rem]`),
             native: tailwind(' flex-1 items-center justify-center gap-[0.75rem] self-center'),
           })}>
           <ShowLabelValue
             label="No. of Reps"
-            value={`${item?.reps ? pluralise(item?.reps, `${item?.reps} second`) : '-'}`}
+            value={`${item?.reps ? item?.reps : '-'}`}
             container={{
               web: `${'gap-12'}  flex-1 flex-row item-center justify-center `,
               native: 'gap-[0.75rem]   flex-1 item-center justify-center',
@@ -65,8 +67,8 @@ const ActiveCard = ({
         </Container>
         <Container
           style={Platform.select({
-            web: tailwind(`flex-1 flex-row  justify-end gap-4`),
-            native: tailwind('flex-1 flex-row items-center justify-end gap-4 self-center'),
+            web: tailwind(`flex-1 flex-row  justify-between gap-4`),
+            native: tailwind('flex-1 flex-row items-center justify-between gap-4 self-center'),
           })}>
           <MinusActionButton />
           <PlusActionButton />
@@ -191,7 +193,7 @@ const ActiveCard = ({
           style={[
             Platform.select({
               web: tailwind(
-                `mx-auto ${isLargeScreen ? 'w-[8.75rem]' : 'w-56'} cursor-pointer rounded-lg`,
+                `mx-auto ${isLargeScreen ? 'w-[8.75rem]' : 'w-[23.0625rem]'} cursor-pointer rounded-lg`,
               ),
             }),
           ]}

@@ -25,7 +25,7 @@ const StartWorkoutTopBar = () => {
   // Timer states
   const [isEnabled, setIsEnabled] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(totalWorkoutTime ?? 0); // Total 5 minutes
+  const [remainingTime, setRemainingTime] = useState(0); // Total 5 minutes
 
   const timerRef = useRef<any>(null);
 
@@ -35,6 +35,12 @@ const StartWorkoutTopBar = () => {
       return prev - 1 > 0 ? prev - 1 : 0;
     });
   };
+
+  useEffect(() => {
+    if (totalWorkoutTime) {
+      setRemainingTime(totalWorkoutTime);
+    }
+  }, [totalWorkoutTime]);
 
   // Initialize the pauseable timer
   useEffect(() => {
@@ -103,14 +109,14 @@ const StartWorkoutTopBar = () => {
   return (
     <Container
       style={Platform.select({
-        web: isLargeScreen ? tailwind('flex flex-col gap-4 p-4') : styles.desktop.container,
+        web: isLargeScreen ? tailwind('flex flex-col  p-4') : styles.desktop.container,
         native: tailwind('flex flex-col gap-4 p-4'),
       })}>
       <Container
         style={[
           Platform.select({
             web: tailwind(`
-              px-32 pt-4 ${isLargeScreen ? 'px-4' : ''}
+               ${isLargeScreen ? '' : 'px-32 pt-4'}
             `),
             native: tailwind('flex-row items-center justify-between space-y-4'),
           }),

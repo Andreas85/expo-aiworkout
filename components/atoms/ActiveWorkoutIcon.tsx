@@ -10,15 +10,15 @@ const ActiveWorkoutIcon = () => {
   return (
     <Container
       style={Platform.select({
-        web: tailwind('absolute right-0 right-4 top-4 z-50'),
-        native: tailwind('absolute right-0 right-4 top-4 z-50'),
+        web: tailwind('absolute  right-4 top-4 z-50'),
+        native: tailwind('absolute  right-0 top-0 z-50'),
       })}>
       <Image
         source={IMAGES.workoutactive}
         resizeMode="contain"
         style={Platform.select({
           web: tailwind(
-            `aspect-square ${isLargeScreen ? 'h-[20px] w-[20px]' : 'h-[3.4375rem] w-[3.5rem] '} `,
+            `aspect-square ${isLargeScreen ? 'h-[2.5rem] w-[2.5rem]' : 'h-[3.4375rem] w-[3.5rem] '} `,
           ),
           native: tailwind('aspect-square h-10 w-10'),
         })}

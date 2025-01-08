@@ -143,9 +143,9 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
       <View
         style={Platform.select({
           web: tailwind(
-            `flex-1 ${isLargeScreen ? `flex-1 flex-col  py-1 ${isSelectedWorkout ? 'px-2' : 'px-10'} py-1` : `${isSelectedWorkout ? 'px-[150px]' : 'px-[220px]'} py-2`}`,
+            `flex-1 ${isLargeScreen ? `flex-1 flex-col   ${isSelectedWorkout ? 'px-2' : 'px-10'} py-[2px]` : `${isSelectedWorkout ? 'px-[150px]' : 'px-[220px]'} py-1`}`,
           ),
-          native: tailwind(`flex-1 flex-col  py-1 ${isSelectedWorkout ? 'px-2' : 'px-10'} py-2`),
+          native: tailwind(`flex-1 flex-col  py-1 ${isSelectedWorkout ? 'px-2' : 'px-10'} `),
         })}>
         {renderExerciseCard()}
       </View>

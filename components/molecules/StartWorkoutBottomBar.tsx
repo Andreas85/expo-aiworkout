@@ -15,7 +15,7 @@ const StartWorkoutBottomBar = () => {
   const isWorkoutTimerRunning =
     useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
   const { updateWorkoutTimer } = useWorkoutDetailStore();
-  const [remainingTime, setRemainingTime] = useState(totalWorkoutTime ?? 0); // Total 5 minutes
+  const [remainingTime, setRemainingTime] = useState(0); // Total 5 minutes
 
   const timerRef = useRef<any>(null);
 
@@ -23,6 +23,12 @@ const StartWorkoutBottomBar = () => {
     setElapsedTime(prev => prev + 1);
     setRemainingTime(prev => prev - 1);
   };
+
+  useEffect(() => {
+    if (totalWorkoutTime) {
+      setRemainingTime(totalWorkoutTime);
+    }
+  }, [totalWorkoutTime]);
 
   // Timer controls
   const handlePlay = () => {
@@ -71,12 +77,16 @@ const StartWorkoutBottomBar = () => {
   return (
     <Container
       style={Platform.select({
-        web: tailwind('flex-0.12 flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-8 py-2'),
-        native: tailwind('flex-0.12 flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-7 '),
+        web: tailwind(
+          'flex-0.12 flex-row justify-center gap-4  rounded-lg bg-NAVBAR_BACKGROUND px-[3.31rem] py-[0.63rem]',
+        ),
+        native: tailwind(
+          'flex-0.12 flex-row gap-4 rounded-lg  bg-NAVBAR_BACKGROUND px-[3.31rem] py-[0.63rem] ',
+        ),
       })}>
       <Container
         style={Platform.select({
-          web: tailwind('w-full flex-row items-center justify-between'),
+          web: tailwind(' w-full flex-row items-center justify-between'),
           native: tailwind('w-full flex-row items-center justify-between'),
         })}>
         {/* Timer Display */}

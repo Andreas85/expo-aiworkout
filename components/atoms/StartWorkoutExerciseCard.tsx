@@ -46,7 +46,9 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
     if (isRestCard) {
       return (
         <ShowLabelValue
-          container={{ web: 'gap-[0.75rem] w-auto self-center ' }}
+          container={{
+            web: `${isLargeScreen ? 'gap-[0.75rem]' : ' gap-[6rem]'} w-auto self-center `,
+          }}
           label="Duration "
           labelContainer={{ web: `${isRestCard ? 'flex-0' : ''}` }}
           // valueContainer={`${isRestCard ? 'flex-0' : ''}`}
@@ -78,7 +80,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           web: [
             { height: isLargeScreen ? '5.4375rem' : '183px' },
             tailwind(
-              `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center gap-8 gap-[0.75rem] px-4' : 'gap-12 px-12 '} py-2 opacity-75`,
+              `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center  gap-[0.75rem] px-4' : 'gap-12 px-12 '} py-2 opacity-75`,
             ),
           ] as any,
           native: tailwind(
