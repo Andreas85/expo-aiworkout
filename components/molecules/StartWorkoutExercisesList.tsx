@@ -48,8 +48,8 @@ const StartWorkoutExercisesList = (props: any) => {
       }
     };
   }, [data]);
-
-  const playSound = async () => {
+  // Play a sound
+  const playSound = useCallback(async () => {
     try {
       const { sound } = await Audio.Sound.createAsync(
         require('@/assets/sounds/buzzer-countdown.mp3'), // Replace with your sound file
@@ -59,7 +59,20 @@ const StartWorkoutExercisesList = (props: any) => {
     } catch (error) {
       console.error('Error playing sound:', error);
     }
-  };
+  }, []);
+
+  // Stop and unload the sound
+  const stopSound = useCallback(async () => {
+    if (sound) {
+      try {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null); // Clear sound after unloading
+      } catch (error) {
+        console.error('Error stopping sound:', error);
+      }
+    }
+  }, [sound]);
 
   const { updateWorkoutTimer, updateWorkoutCompleted } = useWorkoutDetailStore();
 
@@ -106,21 +119,18 @@ const StartWorkoutExercisesList = (props: any) => {
   const startNextExercise = () => {
     console.log('Start Next Exercise');
 
-    setSelectedIndex(prev => prev + 1);
+    const nextIndex = selectedIndex + 1;
+    console.log('Scrolling to index:', nextIndex);
+    if (nextIndex > exerciseData.length) return;
+    setSelectedIndex(nextIndex);
 
-    const index = selectedIndex + 1;
-    console.log('Scrolling to index:', index);
-    if (flatListRef.current && index >= 0 && index < data.length) {
-      flatListRef.current.scrollToIndex({ index, animated: true });
+    if (flatListRef.current && nextIndex <= exerciseData.length - 1) {
+      flatListRef.current.scrollToIndex({
+        index: nextIndex,
+        animated: true,
+        viewPosition: nextIndex === 0 || nextIndex === exerciseData.length - 1 ? 0 : 0.5, // Keep center for non-edge indices
+      });
     }
-
-    // centerIndex.value = centerIndex.value + 1;
-    // const currentExercise = getCurrentExerciseData()
-    // if (!!currentExercise?.reps) {
-    //   isRepsAvaliableInExercise.value =
-    //     !!currentExercise?.reps;
-    // }
-    // debouncedScrollIntoView(centerIndex.value);
   };
 
   // Scroll to a specific item by index
@@ -142,6 +152,7 @@ const StartWorkoutExercisesList = (props: any) => {
     }
     // startNextExercise();
     console.log(hasReps, isRest, 'isRest');
+
     if (!hasReps && isRest) {
       startNextExercise();
       updateWorkoutTimer(true);
@@ -150,8 +161,17 @@ const StartWorkoutExercisesList = (props: any) => {
       updateWorkoutTimer(false);
       openModal();
     } else {
-      updateWorkoutTimer(true);
-      startNextExercise();
+      if (!isRest) {
+        playSound();
+        setTimeout(() => {
+          stopSound();
+          updateWorkoutTimer(true);
+          startNextExercise();
+        }, 500);
+      } else {
+        updateWorkoutTimer(true);
+        startNextExercise();
+      }
     }
   };
 
@@ -177,11 +197,15 @@ const StartWorkoutExercisesList = (props: any) => {
     [selectedIndex, exerciseData],
   );
 
-  const getItemLayout = (data: any, index: number) => ({
-    length: 200, // height of each item
-    offset: 100 * index,
-    index,
-  });
+  // Layout optimization for FlatList
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: 200,
+      offset: 200 * index,
+      index,
+    }),
+    [],
+  );
 
   const renderButtonInWeb = () => {
     if (isWeb) {

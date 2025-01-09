@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, Platform } from 'react-native';
+import { StyleSheet, Text, View, Platform, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
 import { Audio } from 'expo-av';
 import StartWorkoutExerciseCard from '../atoms/StartWorkoutExerciseCard';
@@ -13,7 +13,6 @@ interface IBaseTimerProps {
   isVisible: boolean;
   toggleModal: () => void;
   currentExercise: ExerciseElement;
-
   onComplete: () => void; // Callback when timer finishes
 }
 
@@ -21,6 +20,8 @@ const BaseTimer = (props: IBaseTimerProps) => {
   const { isVisible, currentExercise, onComplete } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const [countdown, setCountdown] = useState<number>(5);
+  const [isMuted, setIsMuted] = useState<boolean>(Platform.OS === 'web'); // Default mute state based on platform
+  const [hasInteracted, setHasInteracted] = useState<boolean>(false); // Tracks user interaction
   const soundRef = useRef<Audio.Sound | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -35,7 +36,7 @@ const BaseTimer = (props: IBaseTimerProps) => {
 
   const playSound = async () => {
     try {
-      if (soundRef.current) {
+      if (!isMuted && soundRef.current) {
         await soundRef.current.replayAsync(); // Replay the loaded sound
       }
     } catch (error) {
@@ -48,6 +49,13 @@ const BaseTimer = (props: IBaseTimerProps) => {
       await soundRef.current.stopAsync();
       await soundRef.current.unloadAsync();
       soundRef.current = null;
+    }
+  };
+
+  const handleUserInteraction = () => {
+    // Mark interaction as completed and allow unmuting on web
+    if (!hasInteracted) {
+      setHasInteracted(true);
     }
   };
 
@@ -81,33 +89,58 @@ const BaseTimer = (props: IBaseTimerProps) => {
     };
   }, [isVisible]);
 
+  const handleMuteToggle = () => {
+    if (!hasInteracted && Platform.OS === 'web') {
+      // On web, ensure interaction is registered
+      setHasInteracted(true);
+    }
+    setIsMuted(prevState => !prevState);
+  };
+
   return (
-    <Modal isVisible={isVisible} backdropOpacity={0.5}>
-      <View
-        style={Platform.select({
-          web: tailwind(
-            `items-center rounded-lg bg-NAVBAR_BACKGROUND p-4 ${isLargeScreen ? '' : 'mx-auto w-[55rem]'}`,
-          ),
-          native: tailwind(`items-center rounded-lg bg-NAVBAR_BACKGROUND p-4`),
-        })}>
-        {/* Circular Progress Indicator */}
-        <PercentageCircle totalDurationTime={5} remainingTime={countdown} />
+    <TouchableOpacity activeOpacity={1} onPress={handleUserInteraction} style={{ flex: 1 }}>
+      <Modal isVisible={isVisible} backdropOpacity={0.5}>
+        <View
+          style={Platform.select({
+            web: tailwind(
+              `items-center rounded-lg bg-NAVBAR_BACKGROUND p-4 ${isLargeScreen ? '' : 'mx-auto w-[55rem]'}`,
+            ),
+            native: tailwind(`items-center rounded-lg bg-NAVBAR_BACKGROUND p-4`),
+          })}>
+          {/* Mute Icon */}
+          <TouchableOpacity onPress={handleMuteToggle} style={styles.muteIconContainer}>
+            <Text style={styles.muteIconText}>{isMuted ? '🔇' : '🔊'}</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.nextText}>NEXT</Text>
+          {/* Circular Progress Indicator */}
+          <PercentageCircle totalDurationTime={5} remainingTime={countdown} />
 
-        <StartWorkoutExerciseCard
-          item={currentExercise}
-          onDecrementHandler={() => {}}
-          onIncrementHandler={() => {}}
-        />
-      </View>
-    </Modal>
+          <Text style={styles.nextText}>NEXT</Text>
+
+          <StartWorkoutExerciseCard
+            item={currentExercise}
+            onDecrementHandler={() => {}}
+            onIncrementHandler={() => {}}
+          />
+        </View>
+      </Modal>
+    </TouchableOpacity>
   );
 };
 
 export default BaseTimer;
 
 const styles = StyleSheet.create({
+  muteIconContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+  },
+  muteIconText: {
+    fontSize: 24,
+    color: '#fff',
+  },
   circle: {
     width: 80,
     height: 80,

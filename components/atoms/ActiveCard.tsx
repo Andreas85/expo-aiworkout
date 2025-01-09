@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import Container from './Container';
 import ImageContainer from './ImageContainer';
@@ -9,7 +9,6 @@ import { Text } from '../Themed';
 import { IMAGES } from '@/utils/images';
 import { ActionButton } from './ActionButton';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { pluralise } from '@/utils/helper';
 import ActiveWorkoutIcon from './ActiveWorkoutIcon';
 import MinusActionButton from './MinusActionButton';
 import PlusActionButton from './PlusActionButton';
@@ -21,6 +20,11 @@ interface ActiveCardProps {
 
 const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
+  const [hasReps, setHasReps] = useState<boolean>(false);
+
+  useEffect(() => {
+    setHasReps(!!item?.reps);
+  }, [item]);
 
   const renderExerciseInfo = () => {
     return (
@@ -85,6 +89,25 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
 
   const handleFinishClick = () => {
     handleFinish?.();
+  };
+
+  const renderFinishButton = () => {
+    if (hasReps) {
+      return (
+        <ActionButton
+          label="Finish"
+          onPress={handleFinishClick}
+          uppercase
+          style={[
+            Platform.select({
+              web: tailwind(
+                `mx-auto ${isLargeScreen ? 'w-[8.75rem]' : 'w-[23.0625rem]'} cursor-pointer rounded-lg`,
+              ),
+            }),
+          ]}
+        />
+      );
+    }
   };
 
   return (
@@ -179,18 +202,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
       </Container>
       {isLargeScreen && renderExerciseInfo()}
       <Container style={tailwind('mb-2 items-center justify-center')}>
-        <ActionButton
-          label="Finish"
-          onPress={handleFinishClick}
-          uppercase
-          style={[
-            Platform.select({
-              web: tailwind(
-                `mx-auto ${isLargeScreen ? 'w-[8.75rem]' : 'w-[23.0625rem]'} cursor-pointer rounded-lg`,
-              ),
-            }),
-          ]}
-        />
+        {renderFinishButton()}
       </Container>
     </Container>
   );
