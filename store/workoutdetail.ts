@@ -19,6 +19,7 @@ type Action = {
   updateWorkoutExercises: (payload: ExerciseElement[]) => void;
   updateWorkoutTimer: (payload: boolean) => void;
   updateWorkoutCompleted: (payload: boolean) => void;
+  updateTotalWorkoutTime: (payload: number) => void;
 };
 
 export interface IWorkoutDetailStore extends State, Action {}
@@ -62,6 +63,11 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
 
     updateWorkoutCompleted: async (payload: any) => {
       set({ isWorkoutCompleted: payload });
+    },
+
+    // update total workout time
+    updateTotalWorkoutTime: async (payload: number) => {
+      set({ totalWorkoutTime: payload });
     },
   })),
 );

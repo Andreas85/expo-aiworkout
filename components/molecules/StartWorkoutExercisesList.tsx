@@ -4,18 +4,29 @@ import { FlatList, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import StartWorkoutExerciseCardWrapper from './StartWorkoutExerciseCardWrapper';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { STRING_DATA } from '@/utils/appConstants';
-import { expandRestAsExercisesInExistingExercises } from '@/utils/helper';
+import { STRING_DATA, WORKOUT_STATUS } from '@/utils/appConstants';
+import {
+  expandRestAsExercisesInExistingExercises,
+  findFirstIncompleteExercise,
+  getTotalDurationTaken,
+} from '@/utils/helper';
 import { ExerciseElement } from '@/services/interfaces';
 import { Audio } from 'expo-av';
 import BaseTimer from '../modals/BaseTimer';
 import usePlatform from '@/hooks/usePlatform';
 import WorkoutComplete from '../modals/WorkoutComplete';
 import useModal from '@/hooks/useModal';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import {
+  getWorkoutSessionById,
+  updateExerciseInSession,
+  updateWorkoutSessionStatus,
+} from '@/utils/workoutSessionHelper';
 
 const StartWorkoutExercisesList = (props: any) => {
   const { data, onRefresh = () => {}, refreshing } = props;
+  const { sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  const { updateTotalWorkoutTime } = useWorkoutDetailStore();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
@@ -37,10 +48,31 @@ const StartWorkoutExercisesList = (props: any) => {
     setShowModel(false);
   };
 
+  const processDataBasedOnSession = async (workoutExercises: ExerciseElement[]) => {
+    const workoutSessionOfExercises = await getWorkoutSessionById(sessionId ?? '');
+
+    if (workoutSessionOfExercises) {
+      const unfinishedExerciseData = findFirstIncompleteExercise(
+        workoutSessionOfExercises?.exercises,
+      );
+      const totalElapsedTime = getTotalDurationTaken(workoutSessionOfExercises?.exercises);
+      console.log('totalElapsedTime', totalElapsedTime);
+      updateTotalWorkoutTime(totalElapsedTime);
+      if (unfinishedExerciseData) {
+        const reqIndex = workoutExercises.findIndex(
+          (item: any) => item?._id === unfinishedExerciseData?.exerciseId,
+        );
+
+        setSelectedIndex(reqIndex);
+      }
+    }
+  };
+
   useEffect(() => {
     if (data && data.length > 0) {
       const updateData = expandRestAsExercisesInExistingExercises(data) as ExerciseElement[];
       setExerciseData(updateData);
+      processDataBasedOnSession(updateData);
     }
     return () => {
       if (sound) {
@@ -48,6 +80,7 @@ const StartWorkoutExercisesList = (props: any) => {
       }
     };
   }, [data]);
+
   // Play a sound
   const playSound = useCallback(async () => {
     try {
@@ -104,8 +137,16 @@ const StartWorkoutExercisesList = (props: any) => {
     }, 500);
   };
 
+  const updateWorkoutStatus = async () => {
+    const result = await updateWorkoutSessionStatus(sessionId ?? '', 'COMPLETED');
+    console.log('Workout status updated');
+  };
+
   const workoutCycleCompleted = () => {
     console.log('Workout cycle completed');
+    updateWorkoutStatus();
+    // update workout status
+
     updateWorkoutTimer(false);
     updateWorkoutCompleted(true);
     showModelWorkoutComplete();
@@ -114,6 +155,24 @@ const StartWorkoutExercisesList = (props: any) => {
   const handleModalWorkoutClick = () => {
     console.log('Workout completed clicked');
     router.back();
+  };
+
+  const saveWorkoutSessionExerciseRecord = async () => {
+    const currentExercise = getCurrentExerciseData();
+    if (!currentExercise) return;
+    const payload = {
+      sessionId: sessionId ?? '',
+      exerciseId: currentExercise._id ?? '',
+      durationTaken: currentExercise.duration,
+      repsTaken: currentExercise.reps,
+    };
+
+    await updateExerciseInSession(
+      payload.sessionId,
+      payload.exerciseId,
+      payload.durationTaken,
+      payload.repsTaken,
+    );
   };
 
   const startNextExercise = () => {
@@ -137,8 +196,12 @@ const StartWorkoutExercisesList = (props: any) => {
   const scrollToItem = () => {
     const hasReps = getCurrentExerciseData()?.reps;
     const isRest = getNextExerciseData()?.type === STRING_DATA.REST;
+
     const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
-    console.log('Workout finished 0', isLastExerciseCard);
+
+    // Save the current exercise record
+    saveWorkoutSessionExerciseRecord();
+
     if (isLastExerciseCard) {
       startNextExercise();
       console.log('Workout finished 1', isLastExerciseCard);

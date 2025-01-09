@@ -10,10 +10,11 @@ import { useLocalSearchParams } from 'expo-router';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { fetchPublicWorkoutServiceById } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
+import { getWorkoutSessionById } from '@/utils/workoutSessionHelper';
 
 const StartWorkoutDetail = () => {
   const queryClient = useQueryClient();
-  const { slug } = useLocalSearchParams();
+  const { slug, sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const { data, refetch } = useQuery({
@@ -22,6 +23,11 @@ const StartWorkoutDetail = () => {
     staleTime: REACT_QUERY_STALE_TIME.PUBLIC_WORKOUT_DETAILS,
     enabled: false,
   });
+
+  const getWorkoutSessionFromStorage = async () => {
+    const result = await getWorkoutSessionById(sessionId ?? '');
+    console.log('Get workout session from storage', result);
+  };
 
   useEffect(() => {
     const cachedData: any = queryClient.getQueryData([
@@ -32,6 +38,7 @@ const StartWorkoutDetail = () => {
     console.log('Refetch: ', { data });
     // console.log({ requiredData });
     if (requiredData) {
+      getWorkoutSessionFromStorage();
       setWorkoutDetail(requiredData);
     } else {
       queryClient.invalidateQueries({

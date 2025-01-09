@@ -19,10 +19,15 @@ import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
 import PublicWorkoutExercisesRender from '../molecules/PublicWorkoutExercisesRender';
 import { debounce } from 'lodash';
+import { addWorkoutSession } from '@/utils/workoutSessionHelper';
+import { generateBigNumberId } from '@/utils/helper';
+import { useAuthStore } from '@/store/authStore';
 
 const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
   const navigation = useNavigation();
+
+  const userData = useAuthStore(state => state.userData);
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
@@ -99,6 +104,25 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     );
   };
 
+  const handleStartWorkoutClick = async () => {
+    console.log('Start workout clicked');
+    const sessionId = generateBigNumberId();
+    const payload = {
+      _id: sessionId,
+      workoutId: workoutDetail?._id ?? '',
+      exercises: workoutDetail?.exercises ?? [],
+      status: 'pending',
+      totalDuration: 0,
+      totalExercisesCompleted: 0,
+      totalWeightTaken: 0,
+      totalRestTaken: 0,
+      duration: 0,
+      user: userData ? userData?._id : '',
+    };
+    await addWorkoutSession(payload);
+    router.push(`/start-workout/${workoutDetail?._id}?sessionId=${sessionId}` as any);
+  };
+
   const renderStartWorkoutButton = () => {
     if (hasExercise) {
       return (
@@ -116,7 +140,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
             label="Start workout"
             uppercase
             // disabled
-            onPress={() => router.push(`/start-workout/${workoutDetail?._id}` as any)}
+            onPress={handleStartWorkoutClick}
             style={[
               Platform.select({
                 // web: tailwind('mx-auto w-56 cursor-pointer'),

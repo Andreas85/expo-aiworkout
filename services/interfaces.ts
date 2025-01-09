@@ -127,6 +127,9 @@ export interface ExerciseElement {
   duration: number;
   order: number;
   type?: string;
+  isCompleted?: boolean;
+  exerciseId?: string;
+  durationTaken?: number;
 }
 
 export interface ExerciseExercise {

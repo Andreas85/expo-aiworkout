@@ -151,3 +151,40 @@ export const expandRestAsExercisesInExistingExercises = (exercises: ExerciseElem
 
   return expandedExercises;
 };
+
+export function generateBigNumberId(): string {
+  const randomPart = Math.floor(Math.random() * 1e18); // Generate a large random number
+  const timestamp = Date.now(); // Use the current timestamp
+
+  return `${timestamp}${randomPart}`; // Concatenate the timestamp and random part to form a big number string
+}
+
+// Utility function to map ExerciseElement to Exercise interface
+export const mapExerciseElementToExercise = (exerciseElement: ExerciseElement): ExerciseElement => {
+  return {
+    _id: exerciseElement._id,
+    exercise: exerciseElement.exercise,
+    order: exerciseElement.order,
+    exerciseId: exerciseElement._id, // Map _id to exerciseId
+    name: exerciseElement.name || '', // Use name from ExerciseElement, default to empty string if not available
+    reps: exerciseElement.reps,
+    duration: exerciseElement.duration,
+    rest: exerciseElement.rest,
+    weight: exerciseElement.weight,
+    isCompleted: false, // Initialize as false since the exercise isn't completed yet
+  };
+};
+
+export const findFirstIncompleteExercise = (exercises: ExerciseElement[]) => {
+  return exercises?.find((item: ExerciseElement) => !item?.isCompleted);
+};
+
+export const getTotalDurationTaken = (workoutSession: ExerciseElement[]) => {
+  let totalDurationTaken = 0;
+  for (let i = 0; i < workoutSession.length; i++) {
+    if (workoutSession?.[i]?.durationTaken) {
+      totalDurationTaken += workoutSession[i]?.duration;
+    }
+  }
+  return totalDurationTaken;
+};

@@ -67,3 +67,15 @@ export const REACT_QUERY_STALE_TIME = {
   MY_EXERCISES: 1000 * 60, // 1 minutes
   PUBLIC_EXERCISES: 1000 * 60 * 10, // 10 minutes
 };
+
+export const STORAGES_KEYS = {
+  WORKOUT_SESSION_LIST: 'workout-session-list',
+  WORKOUT_SESSION: 'workout-session',
+};
+
+export const WORKOUT_STATUS = {
+  COMPLETED: 'COMPLETED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  NOT_STARTED: 'NOT_STARTED',
+  PENDING: 'PENDING',
+};
