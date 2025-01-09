@@ -81,7 +81,7 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
     return <ActiveRestCard item={item} />;
   }
 
-  return <ActiveCard item={item} />;
+  return <ActiveCard item={item} handleFinish={exerciseDurationCompletedEvent} />;
 };
 
 export default memo(StartWorkoutExerciseCardActive);

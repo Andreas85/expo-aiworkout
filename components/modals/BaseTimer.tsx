@@ -91,10 +91,7 @@ const BaseTimer = (props: IBaseTimerProps) => {
           native: tailwind(`items-center rounded-lg bg-NAVBAR_BACKGROUND p-4`),
         })}>
         {/* Circular Progress Indicator */}
-        <View style={styles.circle}>
-          <Text style={styles.stepNumber}>{countdown > 0 ? countdown : '0'}</Text>
-          <PercentageCircle totalQuestions={5} score={2} />
-        </View>
+        <PercentageCircle totalDurationTime={5} remainingTime={countdown} />
 
         <Text style={styles.nextText}>NEXT</Text>
 

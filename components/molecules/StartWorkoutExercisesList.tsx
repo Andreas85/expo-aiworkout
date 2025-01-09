@@ -88,7 +88,7 @@ const StartWorkoutExercisesList = (props: any) => {
       hideModal();
       startNextExercise(); // Proceed to the next exercise
       // scrollToItem();
-    }, 1000);
+    }, 500);
   };
 
   const workoutCycleCompleted = () => {
@@ -232,14 +232,12 @@ const StartWorkoutExercisesList = (props: any) => {
       />
       {/* Modal for next exercise */}
       <>
-        {showModal && (
-          <BaseTimer
-            isVisible={showModal}
-            toggleModal={() => handleModalClose()}
-            currentExercise={exerciseData?.[selectedIndex + 1]}
-            onComplete={() => handleModalClose()}
-          />
-        )}
+        <BaseTimer
+          isVisible={showModal}
+          toggleModal={() => handleModalClose()}
+          currentExercise={exerciseData?.[selectedIndex + 1]}
+          onComplete={() => handleModalClose()}
+        />
 
         <WorkoutComplete
           isVisible={openWorkoutComplete}

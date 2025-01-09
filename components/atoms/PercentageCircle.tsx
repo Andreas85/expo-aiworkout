@@ -3,16 +3,16 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 
-const PercentageCircle: React.FC<{ score: number; totalQuestions: number }> = ({
-  score,
-  totalQuestions,
+const PercentageCircle: React.FC<{ remainingTime: number; totalDurationTime: number }> = ({
+  remainingTime,
+  totalDurationTime,
 }) => {
-  const radius = 70; // Circle radius
-  const strokeWidth = 15; // Width of the stroke
+  const radius = 56; // Circle radius
+  const strokeWidth = 10; // Width of the stroke
   const circumference = 2 * Math.PI * radius; // Total circumference of the circle
-  const percentage = Math.min((score / totalQuestions) * 100, 100); // Dynamic percentage calculation
+  const percentage = Math.min((remainingTime / totalDurationTime) * 100, 100); // Dynamic percentage calculation
   const strokeDashoffset = circumference - (percentage / 100) * circumference; // Progress offset
-  const progressColor = Colors.brandColor; // Dynamic progress color based on score
+  const progressColor = Colors.brandColorDark; // Dynamic progress color based on remainingTime
 
   return (
     <View style={styles.container}>
@@ -22,7 +22,7 @@ const PercentageCircle: React.FC<{ score: number; totalQuestions: number }> = ({
           cx="90"
           cy="90"
           r={radius}
-          stroke="#e0e0e0" // Light gray background
+          stroke={Colors.lightGray} // Light gray background
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -41,12 +41,12 @@ const PercentageCircle: React.FC<{ score: number; totalQuestions: number }> = ({
         {/* Score Text */}
         <SvgText
           x="90"
-          y="95"
-          fontSize="20"
-          fontWeight="bold"
-          fill={Colors.lightGray}
+          y="120"
+          fontSize="90"
+          stroke={Colors.white}
+          fill={Colors.white}
           textAnchor="middle">
-          {`${score}/${totalQuestions}`}
+          {`${remainingTime}`}
         </SvgText>
       </Svg>
     </View>

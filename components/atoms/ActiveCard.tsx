@@ -16,9 +16,10 @@ import PlusActionButton from './PlusActionButton';
 
 interface ActiveCardProps {
   item: ExerciseElement;
+  handleFinish?: () => void;
 }
 
-const ActiveCard = ({ item }: ActiveCardProps) => {
+const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
 
   const renderExerciseInfo = () => {
@@ -80,6 +81,10 @@ const ActiveCard = ({ item }: ActiveCardProps) => {
         contentPosition={'right top'}
       />
     );
+  };
+
+  const handleFinishClick = () => {
+    handleFinish?.();
   };
 
   return (
@@ -176,6 +181,7 @@ const ActiveCard = ({ item }: ActiveCardProps) => {
       <Container style={tailwind('mb-2 items-center justify-center')}>
         <ActionButton
           label="Finish"
+          onPress={handleFinishClick}
           uppercase
           style={[
             Platform.select({
