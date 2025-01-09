@@ -53,7 +53,6 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
 
     if (reps && elapsedTimeRef.current >= duration) {
       console.log('Reps workout completed, triggering event');
-      exerciseDurationCompletedEvent();
       repsWorkoutFinishedEvent();
       return;
     }

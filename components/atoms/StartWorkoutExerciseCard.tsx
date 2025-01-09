@@ -80,7 +80,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           web: [
             { height: isLargeScreen ? '5.4375rem' : '183px' },
             tailwind(
-              `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'justify-center  gap-[0.75rem] px-4' : 'gap-12 px-12 '} py-2 opacity-75`,
+              `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'w-full  justify-center gap-[0.75rem] px-4' : 'w-full gap-12 px-12 '} py-2 opacity-75`,
             ),
           ] as any,
           native: tailwind(
@@ -88,7 +88,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           ),
         }),
       ]}
-      key={item._id}>
+      key={item?._id}>
       {!isEnabled && renderExerciseImage()}
       <Container
         style={[
