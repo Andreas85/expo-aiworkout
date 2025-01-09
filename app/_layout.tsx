@@ -10,7 +10,7 @@ import '../input.css';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import Navbar from '@/components/hoc/Navbar';
-import { AppState, AppStateStatus, Platform } from 'react-native';
+import { Alert, AppState, AppStateStatus, Platform } from 'react-native';
 import Header from '@/components/hoc/Header.web';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import Container from '@/components/atoms/Container';
@@ -20,6 +20,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider } from 'react-native-toast-notifications';
 import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import React from 'react';
+import * as Updates from 'expo-updates';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -95,7 +96,32 @@ function RootLayoutNav() {
     );
   };
 
+  async function checkForUpdates() {
+    if (Platform.OS === 'web' || Updates.isEmbeddedLaunch === false) {
+      console.log('Update checking is not supported in Expo Go.');
+      return;
+    }
+
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        Alert.alert('Update Available', 'An update is available. Do you want to install it now?', [
+          {
+            text: 'Update',
+            onPress: async () => {
+              await Updates.fetchUpdateAsync();
+              await Updates.reloadAsync();
+            },
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error checking for updates:', error);
+    }
+  }
+
   useEffect(() => {
+    checkForUpdates();
     const subscription = AppState.addEventListener('change', onAppStateChange);
 
     return () => subscription.remove();

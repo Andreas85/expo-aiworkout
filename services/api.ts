@@ -1,4 +1,5 @@
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+export const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || 'https://workout-app-backend1-daaf386ee119.herokuapp.com';
 
 export const API_ENPOINTS = {
   PUBLIC_EXERCISES: '/public/exercises',

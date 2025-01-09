@@ -11,7 +11,11 @@
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview"
+      "channel": "preview",
+      "env": {
+        "APP_ENV": "preview",
+        "EXPO_PUBLIC_API_URL": "https://workout-app-backend1-daaf386ee119.herokuapp.com"
+      }
     },
     "development": {
       "android": {
