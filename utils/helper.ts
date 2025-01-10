@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { ERROR_MESSAGE, STRING_DATA } from './appConstants';
 import { ExerciseElement } from '@/services/interfaces';
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
 export const queryClient = new QueryClient();
