@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import Container from './Container';
 import ImageContainer from './ImageContainer';
 import { tailwind } from '@/utils/tailwind';
@@ -21,6 +21,16 @@ interface StartWorkoutExerciseCardProps {
 const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
   const { item, isEnabled, isRestCard } = props;
   const { isLargeScreen } = useWebBreakPoints();
+  const [hasReps, setHasReps] = useState<boolean>(false);
+
+  useEffect(() => {
+    setHasReps(!!item?.reps);
+  }, [item]);
+
+  const repsValue = item?.reps ? `${item?.reps}` : '-';
+  const durationValue = item?.duration
+    ? pluralise(item?.duration, `${item?.duration} second`)
+    : '-';
 
   const renderExerciseImage = () => {
     if (!isRestCard) {
@@ -63,10 +73,10 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
             web: `${isLargeScreen ? 'gap-[0.75rem] justify-center' : ''}`,
             native: 'gap-[0.75rem] justify-center',
           }}
-          label="No. of Reps "
+          label={hasReps ? 'No. of Reps ' : 'Duration'}
+          value={hasReps ? repsValue : durationValue}
           labelContainer={{ web: isLargeScreen ? 'flex-none' : '', native: 'flex-none' }}
           valueContainer={{ web: isLargeScreen ? '' : 'flex-none', native: 'flex-1 text-right' }}
-          value={`${item?.reps ? item?.reps : '-'}`}
         />
       </>
     );

@@ -11,7 +11,7 @@ const StartWorkoutBottomBar = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
   const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
-
+  const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
   const isWorkoutTimerRunning =
     useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
   const { updateWorkoutTimer } = useWorkoutDetailStore();
@@ -25,10 +25,10 @@ const StartWorkoutBottomBar = () => {
   };
 
   useEffect(() => {
-    if (totalWorkoutTime) {
-      setRemainingTime(totalWorkoutTime);
+    if (workoutRemainingTime) {
+      setRemainingTime(workoutRemainingTime);
     }
-  }, [totalWorkoutTime]);
+  }, [workoutRemainingTime]);
 
   // Timer controls
   const handlePlay = () => {

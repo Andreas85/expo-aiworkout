@@ -179,11 +179,11 @@ export const findFirstIncompleteExercise = (exercises: ExerciseElement[]) => {
   return exercises?.find((item: ExerciseElement) => !item?.isCompleted);
 };
 
-export const getTotalDurationTaken = (workoutSession: ExerciseElement[]) => {
+export const getTotalDurationTaken = (workoutSessionExercises: ExerciseElement[]) => {
   let totalDurationTaken = 0;
-  for (let i = 0; i < workoutSession.length; i++) {
-    if (workoutSession?.[i]?.durationTaken) {
-      totalDurationTaken += workoutSession[i]?.duration;
+  for (let i = 0; i < workoutSessionExercises.length; i++) {
+    if (workoutSessionExercises?.[i]?.durationTaken) {
+      totalDurationTaken += workoutSessionExercises[i]?.duration;
     }
   }
   return totalDurationTaken;

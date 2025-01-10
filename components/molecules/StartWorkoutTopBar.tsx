@@ -17,6 +17,7 @@ const StartWorkoutTopBar = () => {
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
+  const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
   const isWorkoutTimerRunning =
     useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
   const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
@@ -37,10 +38,10 @@ const StartWorkoutTopBar = () => {
   };
 
   useEffect(() => {
-    if (totalWorkoutTime) {
-      setRemainingTime(totalWorkoutTime);
+    if (workoutRemainingTime) {
+      setRemainingTime(workoutRemainingTime);
     }
-  }, [totalWorkoutTime]);
+  }, [workoutRemainingTime]);
 
   // Initialize the pauseable timer
   useEffect(() => {

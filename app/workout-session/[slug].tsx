@@ -12,7 +12,7 @@ import { fetchPublicWorkoutServiceById } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
 import { getWorkoutSessionById } from '@/utils/workoutSessionHelper';
 
-const StartWorkoutDetail = () => {
+const WorkoutSessionDetail = () => {
   const queryClient = useQueryClient();
   const { slug, sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();
@@ -72,4 +72,4 @@ const StartWorkoutDetail = () => {
   );
 };
 
-export default StartWorkoutDetail;
+export default WorkoutSessionDetail;

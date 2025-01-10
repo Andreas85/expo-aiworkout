@@ -26,7 +26,7 @@ import {
 const StartWorkoutExercisesList = (props: any) => {
   const { data, onRefresh = () => {}, refreshing } = props;
   const { sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
-  const { updateTotalWorkoutTime } = useWorkoutDetailStore();
+  const { updateRemainingTime } = useWorkoutDetailStore();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
@@ -55,9 +55,10 @@ const StartWorkoutExercisesList = (props: any) => {
       const unfinishedExerciseData = findFirstIncompleteExercise(
         workoutSessionOfExercises?.exercises,
       );
-      const totalElapsedTime = getTotalDurationTaken(workoutSessionOfExercises?.exercises);
-      console.log('totalElapsedTime', totalElapsedTime);
-      updateTotalWorkoutTime(totalElapsedTime);
+      const remainingTime = workoutSessionOfExercises?.remainingTime ?? 0;
+      console.log('remainingTime', remainingTime);
+      updateRemainingTime(remainingTime);
+
       if (unfinishedExerciseData) {
         const reqIndex = workoutExercises.findIndex(
           (item: any) => item?._id === unfinishedExerciseData?.exerciseId,

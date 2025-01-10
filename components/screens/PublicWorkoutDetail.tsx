@@ -117,6 +117,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
       totalWeightTaken: 0,
       totalRestTaken: 0,
       duration: 0,
+      remainingTime: 0,
       user: userData ? userData?._id : '',
     };
     await addWorkoutSession(payload);

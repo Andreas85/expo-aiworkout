@@ -12,6 +12,9 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import ActiveWorkoutIcon from './ActiveWorkoutIcon';
 import MinusActionButton from './MinusActionButton';
 import PlusActionButton from './PlusActionButton';
+import { pluralise } from '@/utils/helper';
+import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
+import { useLocalSearchParams } from 'expo-router';
 
 interface ActiveCardProps {
   item: ExerciseElement;
@@ -20,11 +23,59 @@ interface ActiveCardProps {
 
 const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
+  const { sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const [hasReps, setHasReps] = useState<boolean>(false);
+  const [repsValue, setRepsValue] = useState<number>(0);
+  const [durationValue, setDurationValue] = useState<number>(0);
 
   useEffect(() => {
     setHasReps(!!item?.reps);
+
+    setRepsValue(item?.reps ?? 0);
+    setDurationValue(item?.duration ?? 0);
   }, [item]);
+
+  const onPressMinusHandler = async () => {
+    if (item.reps && item.reps > 0) {
+      setRepsValue((prev: number) => {
+        if (prev > 0) {
+          const newDuration = prev - 1;
+          console.log('item?.exerciseId', item);
+          // Call the async function before updating the state
+          updateExerciseProperty(sessionId ?? '', item?._id ?? '', 'reps', newDuration);
+          return newDuration;
+        }
+        return prev;
+      });
+    } else {
+      console.log(`Cannot decrement: No reps or reps already at 0 for ${item.name ?? 'exercise'}`);
+    }
+  };
+
+  const onPressPlusHandler = () => {
+    if (item.reps !== undefined) {
+      setRepsValue((prev: number) => {
+        const newDuration = prev + 1;
+        // Call the async function before updating the state
+        updateExerciseProperty(sessionId ?? '', item._id, 'reps', newDuration);
+        return newDuration; // Update the state with the new value
+      });
+    } else {
+      console.log(`Cannot increment: No reps defined for ${item.name ?? 'exercise'}`);
+    }
+    // onIncrementHandler?.(item.reps + 1);
+  };
+
+  const renderActionButtons = () => {
+    if (hasReps) {
+      return (
+        <>
+          <MinusActionButton onPressMinus={onPressMinusHandler} />
+          <PlusActionButton onPressPlus={onPressPlusHandler} />
+        </>
+      );
+    }
+  };
 
   const renderExerciseInfo = () => {
     return (
@@ -41,8 +92,12 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
             native: tailwind(' flex-1 items-center justify-center gap-[0.75rem] self-center'),
           })}>
           <ShowLabelValue
-            label="No. of Reps"
-            value={`${item?.reps ? item?.reps : '-'}`}
+            label={hasReps ? 'No. of Reps ' : 'Duration'}
+            value={
+              hasReps
+                ? `${repsValue}`
+                : `${durationValue ? `${pluralise(durationValue, `${durationValue} second`)}` : '-'}`
+            }
             container={{
               web: `${'gap-12'}  flex-1 flex-row item-center justify-center `,
               native: 'gap-[0.75rem]   flex-1 item-center justify-center',
@@ -62,8 +117,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
             web: tailwind(`flex-1 flex-row  justify-between gap-4`),
             native: tailwind('flex-1 flex-row items-center justify-between gap-4 self-center'),
           })}>
-          <MinusActionButton />
-          <PlusActionButton />
+          {renderActionButtons()}
         </Container>
       </Container>
     );
@@ -173,8 +227,12 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
                 native: tailwind('flex-1 gap-[0.75rem]'),
               })}>
               <ShowLabelValue
-                label="No. of Reps"
-                value={`${item?.reps ? item?.reps : '-'}`}
+                label={hasReps ? 'No. of Reps ' : 'Duration'}
+                value={
+                  hasReps
+                    ? `${repsValue}`
+                    : `${durationValue ? `${pluralise(durationValue, `${durationValue} second`)}` : ''}`
+                }
                 container={{
                   web: `${isLargeScreen ? 'gap-[0.75rem]' : 'gap-[rem]'} self-center w-full `,
                   native: 'gap-[0.75rem]  ',
@@ -194,8 +252,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
                 web: tailwind(`flex-1 flex-row justify-end gap-4`),
                 native: tailwind('mb-4 flex-1 flex-row  gap-4'),
               })}>
-              <MinusActionButton />
-              <PlusActionButton />
+              {renderActionButtons()}
             </Container>
           </Container>
         </Container>

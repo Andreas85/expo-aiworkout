@@ -12,6 +12,7 @@ interface WorkoutSession {
   totalExercisesCompleted: number;
   totalWeightTaken: number;
   totalRestTaken: number;
+  remainingTime: number;
   user: string;
   updatedAt?: string;
 }
@@ -159,11 +160,24 @@ export const updateExerciseInSession = async (
         return exercise;
       });
 
+      // Calculate the total duration from all exercises
+      const totalDuration = updatedExercises.reduce(
+        (total, exercise) => total + exercise.duration,
+        0,
+      );
+
+      // Calculate remaining time as the sum of durations of uncompleted exercises
+      const remainingTime = updatedExercises
+        .filter(exercise => !exercise.isCompleted)
+        .reduce((total, exercise) => total + exercise.duration, 0);
+
+      // Prepare the updated session object
       const updatedSession = {
         ...session,
         exercises: updatedExercises,
-        totalDuration: updatedExercises.reduce((total, exercise) => total + exercise.duration, 0),
+        totalDuration, // Updated total duration
         totalExercisesCompleted: updatedExercises.filter(exercise => exercise.isCompleted).length,
+        remainingTime, // Correct remaining time
       };
 
       await updateWorkoutSession(updatedSession); // Save the updated session
@@ -249,5 +263,42 @@ export const updateWorkoutSessionStatus = async (
   } catch (error) {
     console.error('Error updating workout session status:', error);
     return false; // In case of any error
+  }
+};
+
+export const updateExerciseProperty = async (
+  sessionId: string,
+  exerciseId: string,
+  property: keyof ExerciseElement, // Ensure the property exists on the Exercise type
+  value: any, // The new value for the property
+): Promise<void> => {
+  try {
+    const sessions = await getWorkoutSessions();
+    const session = sessions.find(s => s._id === sessionId);
+
+    if (session) {
+      const updatedExercises = session.exercises.map(exercise => {
+        if (exercise._id === exerciseId) {
+          return {
+            ...exercise,
+            [property]: value, // Dynamically update the property
+          };
+        }
+        return exercise;
+      });
+
+      console.log('Updated exercises-storage:', updatedExercises);
+
+      const updatedSession = {
+        ...session,
+        exercises: updatedExercises,
+      };
+
+      await updateWorkoutSession(updatedSession); // Save the updated session
+    } else {
+      console.error('Workout session not found');
+    }
+  } catch (error) {
+    console.error(`Error updating exercise ${property}:`, error);
   }
 };

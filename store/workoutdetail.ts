@@ -11,6 +11,7 @@ type State = {
   totalWorkoutTime?: number;
   isWorkoutTimerRunning?: boolean;
   isWorkoutCompleted?: boolean;
+  remainingTime?: number;
 };
 
 type Action = {
@@ -20,6 +21,7 @@ type Action = {
   updateWorkoutTimer: (payload: boolean) => void;
   updateWorkoutCompleted: (payload: boolean) => void;
   updateTotalWorkoutTime: (payload: number) => void;
+  updateRemainingTime: (payload: number) => void;
 };
 
 export interface IWorkoutDetailStore extends State, Action {}
@@ -32,6 +34,7 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
     totalWorkoutTime: 0,
     isWorkoutTimerRunning: false,
     isWorkoutCompleted: false,
+    remainingTime: 0,
     setWorkoutDetail: async payload => {
       if (payload) {
         const sortedExercisesList = _.sortBy(payload.exercises, ['order']); // Sort exercises
@@ -40,6 +43,7 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
           workoutDetail: { ...payload, exercises: sortedExercisesList },
           hasExercise: sortedExercisesList.length > 0,
           totalWorkoutTime,
+          remainingTime: totalWorkoutTime,
         });
       }
     },
@@ -68,6 +72,10 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
     // update total workout time
     updateTotalWorkoutTime: async (payload: number) => {
       set({ totalWorkoutTime: payload });
+    },
+
+    updateRemainingTime: async (payload: number) => {
+      set({ remainingTime: payload });
     },
   })),
 );

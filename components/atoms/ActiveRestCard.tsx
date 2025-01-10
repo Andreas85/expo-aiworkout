@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import Container from './Container';
 import ShowLabelValue from './ShowLabelValue';
@@ -10,6 +10,8 @@ import { pluralise } from '@/utils/helper';
 import MinusActionButton from './MinusActionButton';
 import PlusActionButton from './PlusActionButton';
 import ActiveWorkoutIcon from './ActiveWorkoutIcon';
+import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
+import { useLocalSearchParams } from 'expo-router';
 
 interface ActiveRestCardProps {
   item: ExerciseElement;
@@ -17,6 +19,41 @@ interface ActiveRestCardProps {
 
 const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
+  const [durationValue, setDurationValue] = useState<number>(0);
+  const { sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  useEffect(() => {
+    setDurationValue(item?.duration ?? 0);
+  }, [item]);
+
+  const onPressMinusHandler = async () => {
+    setDurationValue((prev: number) => {
+      if (prev > 0) {
+        const newDuration = prev - 1;
+        // Call the async function before updating the state
+        updateExerciseProperty(sessionId ?? '', item._id, 'duration', newDuration);
+        return newDuration; // Update the state with the new value
+      }
+      return prev;
+    });
+  };
+
+  const onPressPlusHandler = () => {
+    setDurationValue((prev: number) => {
+      const newDuration = prev + 1;
+      // Call the async function before updating the state
+      updateExerciseProperty(sessionId ?? '', item._id, 'duration', newDuration);
+      return newDuration; // Update the state with the new value
+    });
+  };
+
+  const renderActionButtons = () => {
+    return (
+      <>
+        <MinusActionButton onPressMinus={onPressMinusHandler} />
+        <PlusActionButton onPressPlus={onPressPlusHandler} />
+      </>
+    );
+  };
   return (
     <Container
       style={Platform.select({
@@ -85,7 +122,7 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
                 web: ``,
                 native: 'text-center',
               }}
-              value={`${item?.duration ? pluralise(item?.duration, `${item?.duration} second`) : '-'}`}
+              value={`${durationValue ? `${pluralise(durationValue, `${durationValue} second`)}` : '-'}`}
             />
           </Container>
           <Container
@@ -93,8 +130,7 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
               web: tailwind(`flex-1 flex-row gap-4`),
               native: tailwind('mb-4 flex-1 flex-row gap-4'),
             })}>
-            <MinusActionButton />
-            <PlusActionButton />
+            {renderActionButtons()}
           </Container>
         </Container>
       </Container>

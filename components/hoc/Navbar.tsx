@@ -11,6 +11,7 @@ const Navbar = () => {
       <Stack.Screen name="workouts/public/[slug]" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       <Stack.Screen name="start-workout/[slug]" options={{ headerShown: false }} />
+      <Stack.Screen name="workout-session/[slug]" options={{ headerShown: false }} />
     </Stack>
   );
 };
