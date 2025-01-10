@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
-import { useNavigation } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 
 import { Platform, View } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
@@ -9,36 +9,30 @@ import { tailwind } from '@/utils/tailwind';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import NoDataSvg from '../svgs/NoDataSvg';
 
-import { useQueryClient } from '@tanstack/react-query';
-import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
-
 import StartWorkoutExercisesList from '../molecules/StartWorkoutExercisesList';
+import { getWorkoutSessionById, WorkoutSession } from '@/utils/workoutSessionHelper';
+import { ExerciseElement } from '@/services/interfaces';
 
 const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
+  const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const navigation = useNavigation();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled] = useState<boolean>(false);
   const { isLargeScreen } = useWebBreakPoints();
-
-  const [refreshing, setRefreshing] = useState(false);
-  const queryClient = useQueryClient();
-
-  const onRefresh = async () => {
-    // Start the refreshing animation
-    try {
-      // Do the refresh
-      setRefreshing(true);
-      await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      });
-    } catch (error) {
-      console.log('error', error);
-    } finally {
-      setRefreshing(false);
+  const [workoutSessionExercises, setWorkoutSessionExercise] = useState<ExerciseElement[]>([]);
+  const getWorkoutSessionFromStorage = async () => {
+    const result: any = await getWorkoutSessionById(slug ?? '');
+    if (result) {
+      setWorkoutSessionExercise(result?.exercises);
+      return;
     }
   };
+
+  useEffect(() => {
+    getWorkoutSessionFromStorage();
+  }, []);
 
   useEffect(() => {
     if (workoutDetail) {
@@ -60,12 +54,7 @@ const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
 
     return (
       <View style={tailwind('flex-1 pb-4')}>
-        <StartWorkoutExercisesList
-          data={workoutDetail?.exercises}
-          isEnabled={isEnabled}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-        />
+        <StartWorkoutExercisesList isEnabled={isEnabled} />
       </View>
     );
   };

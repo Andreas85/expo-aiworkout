@@ -7,6 +7,7 @@ import ActiveRestCard from './ActiveRestCard';
 import ActiveCard from './ActiveCard';
 
 interface StartWorkoutExerciseCardActiveProps {
+  index: number;
   item: ExerciseElement;
   isEnabled?: boolean;
   isRestCard?: boolean;
@@ -20,7 +21,7 @@ interface StartWorkoutExerciseCardActiveProps {
 }
 
 const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActiveProps) => {
-  const { item, isExerciseTimeFinished, isRepsWorkoutFinished, isRestCard } = props;
+  const { item, index, isExerciseTimeFinished, isRepsWorkoutFinished, isRestCard } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const timerRef = useRef<any>(null);
   const [totalElapsedTime, setTotalElapsedTime] = useState<number>(1);
@@ -78,10 +79,10 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
   }, [item, isWorkoutTimerRunning]);
 
   if (isRestCard) {
-    return <ActiveRestCard item={item} />;
+    return <ActiveRestCard item={item} index={index} />;
   }
 
-  return <ActiveCard item={item} handleFinish={exerciseDurationCompletedEvent} />;
+  return <ActiveCard item={item} index={index} handleFinish={exerciseDurationCompletedEvent} />;
 };
 
 export default memo(StartWorkoutExerciseCardActive);

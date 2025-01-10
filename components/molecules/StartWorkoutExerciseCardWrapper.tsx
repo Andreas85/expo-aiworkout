@@ -19,6 +19,7 @@ interface StartWorkoutExerciseCardWrapperProps {
   isRestCard?: boolean;
   isFirst?: boolean;
   isCompleted?: boolean;
+  index: number;
 }
 
 const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperProps) => {
@@ -33,6 +34,7 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
     isRestCard = false,
     isFirst = false,
     isCompleted = false,
+    index,
   } = props;
   const { isLargeScreen } = useWebBreakPoints();
 
@@ -67,6 +69,7 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
         <StartWorkoutExerciseCardActive
           item={exercise}
           isRestCard={isRestCard}
+          index={index}
           onIncrementHandler={onIncrementHandler}
           onDecrementHandler={onDecrementHandler}
           isExerciseTimeFinished={handleExerciseTimeFinished}

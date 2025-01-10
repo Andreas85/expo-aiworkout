@@ -15,15 +15,19 @@ import PlusActionButton from './PlusActionButton';
 import { pluralise } from '@/utils/helper';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { debounce } from 'lodash';
 
 interface ActiveCardProps {
   item: ExerciseElement;
+  index: number;
   handleFinish?: () => void;
 }
 
 const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
-  const { sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  const { updateExercisePropertyZustand } = useWorkoutDetailStore();
   const [hasReps, setHasReps] = useState<boolean>(false);
   const [repsValue, setRepsValue] = useState<number>(0);
   const [durationValue, setDurationValue] = useState<number>(0);
@@ -35,14 +39,21 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
     setDurationValue(item?.duration ?? 0);
   }, [item]);
 
+  const updateExercisePropertyZustandDebounced = debounce(updateExercisePropertyZustand, 300);
+
+  const handlePress = async (newDuration: number) => {
+    console.log('Normal exercise-Active-card', { item });
+    await updateExerciseProperty(slug ?? '', item?._id ?? '', 'reps', newDuration);
+    updateExercisePropertyZustandDebounced(item.order, 'reps', newDuration);
+  };
+
   const onPressMinusHandler = async () => {
     if (item.reps && item.reps > 0) {
       setRepsValue((prev: number) => {
         if (prev > 0) {
           const newDuration = prev - 1;
           console.log('item?.exerciseId', item);
-          // Call the async function before updating the state
-          updateExerciseProperty(sessionId ?? '', item?._id ?? '', 'reps', newDuration);
+          newDuration && handlePress(newDuration);
           return newDuration;
         }
         return prev;
@@ -56,8 +67,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
     if (item.reps !== undefined) {
       setRepsValue((prev: number) => {
         const newDuration = prev + 1;
-        // Call the async function before updating the state
-        updateExerciseProperty(sessionId ?? '', item._id, 'reps', newDuration);
+        newDuration && handlePress(newDuration);
         return newDuration; // Update the state with the new value
       });
     } else {

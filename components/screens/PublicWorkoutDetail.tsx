@@ -20,7 +20,7 @@ import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import PublicWorkoutExercisesRender from '../molecules/PublicWorkoutExercisesRender';
 import { debounce } from 'lodash';
 import { addWorkoutSession } from '@/utils/workoutSessionHelper';
-import { generateBigNumberId } from '@/utils/helper';
+import { expandRestAsExercisesInExistingExercises, generateBigNumberId } from '@/utils/helper';
 import { useAuthStore } from '@/store/authStore';
 
 const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
@@ -121,7 +121,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
       user: userData ? userData?._id : '',
     };
     await addWorkoutSession(payload);
-    router.push(`/start-workout/${workoutDetail?._id}?sessionId=${sessionId}` as any);
+    router.push(`/workout-session/${sessionId}` as any);
   };
 
   const renderStartWorkoutButton = () => {

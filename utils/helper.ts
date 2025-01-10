@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { ERROR_MESSAGE, STRING_DATA } from './appConstants';
 import { ExerciseElement } from '@/services/interfaces';
+import { v4 as uuidv4 } from 'uuid';
 
 export const queryClient = new QueryClient();
 
@@ -122,41 +123,37 @@ export const expandRestAsExercises = (exercises: any) => {
 };
 
 export const expandRestAsExercisesInExistingExercises = (exercises: ExerciseElement[]) => {
-  if (!exercises) {
+  if (!exercises || exercises.length === 0) {
     return exercises;
   }
 
   const expandedExercises = [];
 
-  for (const exercise of exercises) {
+  for (let i = 0; i < exercises.length; i++) {
+    const exercise = exercises[i];
     expandedExercises.push(exercise);
 
-    if (exercise.rest > 0) {
+    // Add a rest exercise only if it's not the last exercise
+    if (exercise.rest > 0 && i < exercises.length - 1) {
       const restExercise = {
         type: STRING_DATA.REST,
         duration: exercise.rest,
         exercise: {
           name: 'Rest',
         },
+        preExerciseId: exercise._id, // Add preExerciseId to the rest exercise
+        preExerciseOrder: exercise.order,
       };
       expandedExercises.push(restExercise);
     }
-  }
-
-  // Remove last element if it's a rest
-  const lastExercise = expandedExercises[expandedExercises.length - 1];
-  if (lastExercise && lastExercise.type === STRING_DATA.REST) {
-    expandedExercises.pop();
   }
 
   return expandedExercises;
 };
 
 export function generateBigNumberId(): string {
-  const randomPart = Math.floor(Math.random() * 1e18); // Generate a large random number
-  const timestamp = Date.now(); // Use the current timestamp
-
-  return `${timestamp}${randomPart}`; // Concatenate the timestamp and random part to form a big number string
+  let id = uuidv4();
+  return id;
 }
 
 // Utility function to map ExerciseElement to Exercise interface

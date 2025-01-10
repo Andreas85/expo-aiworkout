@@ -24,9 +24,11 @@ import {
 } from '@/utils/workoutSessionHelper';
 
 const StartWorkoutExercisesList = (props: any) => {
-  const { data, onRefresh = () => {}, refreshing } = props;
-  const { sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
-  const { updateRemainingTime } = useWorkoutDetailStore();
+  const { data } = props;
+  const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+  const { updateRemainingTime, updateWorkoutTimer, updateWorkoutCompleted } =
+    useWorkoutDetailStore();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
@@ -49,14 +51,14 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   const processDataBasedOnSession = async (workoutExercises: ExerciseElement[]) => {
-    const workoutSessionOfExercises = await getWorkoutSessionById(sessionId ?? '');
+    const workoutSessionOfExercises = await getWorkoutSessionById(slug ?? '');
 
     if (workoutSessionOfExercises) {
       const unfinishedExerciseData = findFirstIncompleteExercise(
         workoutSessionOfExercises?.exercises,
       );
       const remainingTime = workoutSessionOfExercises?.remainingTime ?? 0;
-      console.log('remainingTime', remainingTime);
+      // console.log('remainingTime', { remainingTime, unfinishedExerciseData });
       updateRemainingTime(remainingTime);
 
       if (unfinishedExerciseData) {
@@ -70,17 +72,23 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   useEffect(() => {
-    if (data && data.length > 0) {
-      const updateData = expandRestAsExercisesInExistingExercises(data) as ExerciseElement[];
+    if (workoutDetail && workoutDetail?.exercises.length > 0) {
+      const workoutExercises = workoutDetail?.exercises;
+      const updateData = expandRestAsExercisesInExistingExercises(
+        workoutExercises,
+      ) as ExerciseElement[];
+      // console.log('workoutExercisesworkoutExercises', workoutDetail?.exercises);
       setExerciseData(updateData);
       processDataBasedOnSession(updateData);
+      // setExerciseData(workoutExercises);
+      // processDataBasedOnSession(workoutExercises);
     }
     return () => {
       if (sound) {
         sound.unloadAsync(); // Cleanup sound resource
       }
     };
-  }, [data]);
+  }, [workoutDetail]);
 
   // Play a sound
   const playSound = useCallback(async () => {
@@ -107,8 +115,6 @@ const StartWorkoutExercisesList = (props: any) => {
       }
     }
   }, [sound]);
-
-  const { updateWorkoutTimer, updateWorkoutCompleted } = useWorkoutDetailStore();
 
   const onIncrement = () => {
     console.log('Increment');
@@ -139,7 +145,7 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   const updateWorkoutStatus = async () => {
-    const result = await updateWorkoutSessionStatus(sessionId ?? '', 'COMPLETED');
+    const result = await updateWorkoutSessionStatus(slug ?? '', 'COMPLETED');
     console.log('Workout status updated');
   };
 
@@ -160,12 +166,27 @@ const StartWorkoutExercisesList = (props: any) => {
 
   const saveWorkoutSessionExerciseRecord = async () => {
     const currentExercise = getCurrentExerciseData();
-    if (!currentExercise) return;
+    const hasRest = currentExercise?.type === STRING_DATA.REST;
+
+    if (hasRest && currentExercise?.preExerciseOrder?.toString() === '0') {
+      // console.log('Rest exercise', { currentExercise, selectedIndex });
+      // updateExercisePropertyZustand(currentExercise?.preExerciseOrder, 'isCompleted', true);
+    } else {
+      // console.log('Normal exercise', { currentExercise });
+      // updateExercisePropertyZustand(currentExercise.order, 'isCompleted', true);
+    }
+    // const updateExercise: any = await getWorkoutSessionExerciseById(
+    //   slug ?? '',
+    //   currentExercise?._id ?? '',
+    // );
+    // updateExercisePropertyZustand(selectedIndex, 'isCompleted', true);
+    // console.log('Current Exercise:', { currentExercise, selectedIndex });
+    // if (!currentExercise) return;
     const payload = {
-      sessionId: sessionId ?? '',
-      exerciseId: currentExercise._id ?? '',
-      durationTaken: currentExercise.duration,
-      repsTaken: currentExercise.reps,
+      sessionId: slug ?? '',
+      exerciseId: currentExercise?._id ?? '',
+      durationTaken: currentExercise?.duration,
+      repsTaken: currentExercise?.reps,
     };
 
     await updateExerciseInSession(
@@ -180,7 +201,7 @@ const StartWorkoutExercisesList = (props: any) => {
     console.log('Start Next Exercise');
 
     const nextIndex = selectedIndex + 1;
-    console.log('Scrolling to index:', nextIndex);
+    console.log('Scrolling to index:', { nextIndex, exerciseData });
     if (nextIndex > exerciseData.length) return;
     setSelectedIndex(nextIndex);
 
@@ -199,11 +220,11 @@ const StartWorkoutExercisesList = (props: any) => {
     const isRest = getNextExerciseData()?.type === STRING_DATA.REST;
 
     const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
-
+    // console.log('exerciseDataexerciseData', { exerciseData });
     // Save the current exercise record
     saveWorkoutSessionExerciseRecord();
 
-    if (isLastExerciseCard) {
+    if (isLastExerciseCard && exerciseData?.length > 0) {
       startNextExercise();
       console.log('Workout finished 1', isLastExerciseCard);
       workoutCycleCompleted();
@@ -215,7 +236,7 @@ const StartWorkoutExercisesList = (props: any) => {
       return;
     }
     // startNextExercise();
-    console.log(hasReps, isRest, 'isRest');
+    // console.log(hasReps, isRest, 'isRest');
 
     if (!hasReps && isRest) {
       startNextExercise();
@@ -248,6 +269,7 @@ const StartWorkoutExercisesList = (props: any) => {
           exercise={item}
           isLast={exerciseData?.length ? index === exerciseData?.length - 1 : false}
           isFirst={index === 0}
+          index={index}
           isCompleted={index < selectedIndex}
           onIncrement={onIncrement}
           onDecrement={onDecrement}
@@ -311,8 +333,6 @@ const StartWorkoutExercisesList = (props: any) => {
             native: tailwind(` `),
           }) as any
         }
-        refreshing={refreshing}
-        onRefresh={onRefresh}
         onEndReachedThreshold={0.5}
         removeClippedSubviews={true}
         getItemLayout={getItemLayout}

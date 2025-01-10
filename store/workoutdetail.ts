@@ -22,6 +22,12 @@ type Action = {
   updateWorkoutCompleted: (payload: boolean) => void;
   updateTotalWorkoutTime: (payload: number) => void;
   updateRemainingTime: (payload: number) => void;
+
+  updateExercisePropertyZustand: (
+    exerciseIndex: number,
+    property: keyof ExerciseElement,
+    value: any,
+  ) => void;
 };
 
 export interface IWorkoutDetailStore extends State, Action {}
@@ -77,5 +83,21 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
     updateRemainingTime: async (payload: number) => {
       set({ remainingTime: payload });
     },
+
+    // Function to update exercise properties in the store
+    updateExercisePropertyZustand: (exerciseIndex, property, value) =>
+      set((state: any) => {
+        const updatedExercises = [...state.workoutDetail.exercises];
+        if (updatedExercises[exerciseIndex]) {
+          updatedExercises[exerciseIndex] = {
+            ...updatedExercises[exerciseIndex],
+            [property]: value,
+          }; // Update the exercise property by index
+        }
+        console.log('Updated exercises', updatedExercises[exerciseIndex]);
+        return {
+          workoutDetail: { ...state.workoutDetail, exercises: updatedExercises },
+        };
+      }),
   })),
 );

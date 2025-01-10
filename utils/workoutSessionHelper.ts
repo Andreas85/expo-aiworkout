@@ -3,7 +3,7 @@ import { STORAGES_KEYS } from './appConstants';
 import { mapExerciseElementToExercise } from './helper';
 import { ExerciseElement } from '@/services/interfaces';
 
-interface WorkoutSession {
+export interface WorkoutSession {
   _id: string;
   workoutId: string;
   exercises: ExerciseElement[];
@@ -152,9 +152,8 @@ export const updateExerciseInSession = async (
           return {
             ...exercise,
             isCompleted: true,
-            duration: durationTaken,
             durationTaken: durationTaken,
-            reps: repsTaken,
+            repsTaken: repsTaken,
           };
         }
         return exercise;
@@ -300,5 +299,26 @@ export const updateExerciseProperty = async (
     }
   } catch (error) {
     console.error(`Error updating exercise ${property}:`, error);
+  }
+};
+
+// get exercise by id
+export const getWorkoutSessionExerciseById = async (
+  sessionId: string,
+  exerciseId: string,
+): Promise<ExerciseElement | null> => {
+  try {
+    const sessions = await getWorkoutSessions();
+    const session = sessions.find(s => s._id === sessionId);
+    let foundExercise = null;
+    console.log('Session-get-exercise-by-id', session, sessions);
+    if (session) {
+      foundExercise = session.exercises.find(exercise => exercise._id === exerciseId);
+      console.log('Found exercise:', foundExercise, typeof exerciseId, exerciseId);
+    }
+    return foundExercise || null;
+  } catch (error) {
+    console.error('Error getting exercise:', error);
+    return null;
   }
 };
