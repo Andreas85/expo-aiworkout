@@ -25,6 +25,7 @@ import {
 
 const StartWorkoutExercisesList = (props: any) => {
   const { data } = props;
+  const hasRunInitially = useRef(false);
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const { updateRemainingTime, updateWorkoutTimer, updateWorkoutCompleted } =
@@ -58,13 +59,18 @@ const StartWorkoutExercisesList = (props: any) => {
         workoutSessionOfExercises?.exercises,
       );
       const remainingTime = workoutSessionOfExercises?.remainingTime ?? 0;
-      // console.log('remainingTime', { remainingTime, unfinishedExerciseData });
+      // console.log('unfinishedExerciseDataunfinishedExerciseData', {
+      //   remainingTime,
+      //   unfinishedExerciseData,
+      // });
       updateRemainingTime(remainingTime);
-
       if (unfinishedExerciseData) {
         const reqIndex = workoutExercises.findIndex(
           (item: any) => item?._id === unfinishedExerciseData?.exerciseId,
         );
+        // console.log('reqIndexreqIndex', reqIndex);
+        if (hasRunInitially.current) return;
+        hasRunInitially.current = true;
 
         setSelectedIndex(reqIndex);
       }
@@ -81,7 +87,6 @@ const StartWorkoutExercisesList = (props: any) => {
       setExerciseData(updateData);
       processDataBasedOnSession(updateData);
       // setExerciseData(workoutExercises);
-      // processDataBasedOnSession(workoutExercises);
     }
     return () => {
       if (sound) {
@@ -89,6 +94,10 @@ const StartWorkoutExercisesList = (props: any) => {
       }
     };
   }, [workoutDetail]);
+
+  useEffect(() => {
+    hasRunInitially.current = false;
+  }, []);
 
   // Play a sound
   const playSound = useCallback(async () => {

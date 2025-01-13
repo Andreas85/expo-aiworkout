@@ -144,6 +144,7 @@ export const expandRestAsExercisesInExistingExercises = (exercises: ExerciseElem
         },
         preExerciseId: exercise._id, // Add preExerciseId to the rest exercise
         preExerciseOrder: exercise.order,
+        rest: exercise.rest,
       };
       expandedExercises.push(restExercise);
     }

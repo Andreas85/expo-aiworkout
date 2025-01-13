@@ -38,13 +38,21 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
   };
 
   const updateTimer = () => {
-    const { duration, reps } = item ?? {};
+    const { duration, reps, rest } = item ?? {};
     // console.log('Timer running:', {
     //   totalElapsedTime,
     //   duration,
     //   reps,
     //   refElapsed: elapsedTimeRef.current,
+    //   isRestCard,
+    //   item,
     // });
+
+    if (isRestCard && elapsedTimeRef.current >= rest) {
+      console.log('Rest duration reached, triggering event');
+      exerciseDurationCompletedEvent();
+      return;
+    }
 
     if (elapsedTimeRef.current >= duration && !reps) {
       console.log('Duration reached without reps, triggering event');

@@ -34,7 +34,6 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
 
   const handlePress = async (newDuration: number) => {
     const hasRest = item?.type === 'rest';
-    await updateExerciseProperty(slug ?? '', item?._id ?? '', 'rest', newDuration);
     if (hasRest && item?.preExerciseId && item?.preExerciseOrder?.toString()) {
       // console.log('Rest exercise-Active-card', { item, hasRest });
       await updateExerciseProperty(slug ?? '', item?.preExerciseId ?? '', 'rest', newDuration);

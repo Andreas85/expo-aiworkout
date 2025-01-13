@@ -42,7 +42,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const updateExercisePropertyZustandDebounced = debounce(updateExercisePropertyZustand, 300);
 
   const handlePress = async (newDuration: number) => {
-    console.log('Normal exercise-Active-card', { item });
+    // console.log('Normal exercise-Active-card', { item });
     await updateExerciseProperty(slug ?? '', item?._id ?? '', 'reps', newDuration);
     updateExercisePropertyZustandDebounced(item.order, 'reps', newDuration);
   };
