@@ -1,23 +1,52 @@
 import Container from '@/components/atoms/Container';
 import GradientBackground from '@/components/atoms/GradientBackground';
-// import ImagePickerExpo from '@/components/atoms/ImagePickerExpo';
+import WorkoutSessions from '@/components/screens/WorkoutSessions';
 import NoDataSvg from '@/components/svgs/NoDataSvg';
 import { tailwind } from '@/utils/tailwind';
-import { ScrollView } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getWorkoutSessions } from '@/utils/workoutSessionHelper';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { Platform, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WorkoutSessionScreen() {
-  const insets = useSafeAreaInsets();
-  return (
-    <SafeAreaView style={[tailwind('flex-1'), { marginTop: insets.top }]}>
-      <GradientBackground>
+  const [productData, setProductData] = useState<any[]>([]);
+  const fetchInitials = async () => {
+    const result: any = await getWorkoutSessions();
+    setProductData(result);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchInitials();
+      // Cleanup function or additional logic when screen is unfocused
+      return async () => {
+        // console.log("Preference Screen is unfocused");
+      };
+    }, []),
+  );
+
+  const renderWorkingListing = () => {
+    if (productData.length === 0) {
+      return (
         <ScrollView
           contentContainerStyle={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Container>
             <NoDataSvg label="No workout session " />
-            {/* <ImagePickerExpo /> */}
           </Container>
         </ScrollView>
+      );
+    }
+    return <WorkoutSessions workoutSessionData={productData} />;
+  };
+
+  return (
+    <SafeAreaView style={[tailwind('flex-1')]}>
+      <GradientBackground
+        styleNative={Platform.select({
+          web: tailwind('mt-24'),
+        })}>
+        {renderWorkingListing()}
       </GradientBackground>
     </SafeAreaView>
   );

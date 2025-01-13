@@ -119,6 +119,8 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
       duration: 0,
       remainingTime: 0,
       user: userData ? userData?._id : '',
+      name: workoutDetail?.name ?? '',
+      createdAt: new Date().toISOString(),
     };
     await addWorkoutSession(payload);
     router.push(`/workout-session/${sessionId}` as any);
