@@ -27,12 +27,8 @@ const StartWorkoutExercisesList = (props: any) => {
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
 
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
-  const {
-    updateRemainingTime,
-    updateWorkoutTimer,
-    updateWorkoutCompleted,
-    updateWorkoutStatusInZustandStore,
-  } = useWorkoutDetailStore();
+  const { updateRemainingTime, updateWorkoutTimer, updateWorkoutCompleted } =
+    useWorkoutDetailStore();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
@@ -79,8 +75,15 @@ const StartWorkoutExercisesList = (props: any) => {
         // console.log('reqIndexreqIndex', reqIndex);
         if (hasRunInitially.current) return;
         hasRunInitially.current = true;
-
         setSelectedIndex(reqIndex);
+
+        if (flatListRef.current && reqIndex <= exerciseData.length - 1) {
+          flatListRef.current.scrollToIndex({
+            index: reqIndex,
+            animated: true,
+            viewPosition: reqIndex === 0 || reqIndex === exerciseData.length - 1 ? 0 : 0.5, // Keep center for non-edge indices
+          });
+        }
       }
     }
   };

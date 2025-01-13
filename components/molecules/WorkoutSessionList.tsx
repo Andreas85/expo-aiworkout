@@ -1,5 +1,5 @@
 import React, { useCallback, memo } from 'react';
-import { FlatList, Pressable, Platform } from 'react-native';
+import { FlatList, Pressable, Platform, View, Text } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import Container from '../atoms/Container';
 import ImageContainer from '../atoms/ImageContainer';
@@ -67,6 +67,18 @@ const WorkoutSessionList = ({
                 ),
               }),
             ]}>
+            {/* Workout Status */}
+            <View
+              style={tailwind(
+                ' absolute right-2 top-2 z-40 mb-2 flex-row items-center justify-center',
+              )}>
+              <View
+                style={tailwind('items-center justify-center rounded-full bg-gray-800 px-3 py-1')}>
+                <Text style={tailwind('text-center text-sm font-medium text-WORKOUT_PURPLE')}>
+                  {item?.status?.toUpperCase() || 'Unknown'}
+                </Text>
+              </View>
+            </View>
             {!isEnabled && (
               <ImageContainer
                 source={IMAGES.fitness}
@@ -74,15 +86,19 @@ const WorkoutSessionList = ({
                 contentFit="fill"
               />
             )}
-            <TextContainer
-              data={item?.name}
-              style={[
-                Platform.select({
-                  web: tailwind(`h-full w-full text-center ${isEnabled ? 'my-4' : 'mt-4'}`),
-                  native: tailwind(`my-4 flex-1 bg-transparent px-1 px-2 text-center`),
-                }),
-              ]}
-            />
+            {/* Workout Details */}
+            <Container style={tailwind('mt-2')}>
+              <TextContainer
+                data={item?.name || 'Workout Name'}
+                style={[
+                  tailwind('text-center text-base font-semibold'),
+                  Platform.select({
+                    web: tailwind('text-lg'),
+                    native: tailwind('text-base'),
+                  }),
+                ]}
+              />
+            </Container>
           </Container>
         </Pressable>
       );

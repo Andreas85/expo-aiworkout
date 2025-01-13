@@ -1,9 +1,11 @@
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import Container from '../atoms/Container';
 import { AntDesign, Feather, FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { tailwind } from '@/utils/tailwind';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 interface IExerciseStartAndPause {
   isTimerRunning: boolean;
@@ -23,6 +25,21 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
     disableControls = false,
     showStopButton = false,
   } = props;
+
+  const { isLargeScreen } = useWebBreakPoints();
+
+  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
+    state => state.isWorkoutSessionDetailScreenTimerPaused,
+  );
+
+  const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail);
+  const { updateIsWorkoutSessionDetailScreenTimerPaused, updateWorkoutTimer } =
+    useWorkoutDetailStore();
+
+  const onResume = () => {
+    updateIsWorkoutSessionDetailScreenTimerPaused(false);
+    updateWorkoutTimer(true);
+  };
 
   const renderIcon = () => {
     if (isTimerRunning) {
@@ -59,22 +76,66 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
       </>
     );
   };
-  return (
-    <Container>
-      {/* Play / Pause Button */}
-      <TouchableOpacity onPress={isTimerRunning ? onPause : onPlay} disabled={disableControls}>
-        {renderIcon()}
-      </TouchableOpacity>
 
-      {/* Stop Button */}
-      {showStopButton && (
-        <TouchableOpacity
-          style={[styles.button, disableControls && styles.disabledButton]}
-          onPress={onStop}
-          disabled={disableControls}>
-          <FontAwesome name={'stop'} size={24} />
+  const renderWorkoutActionButton = () => {
+    if (isWorkoutSessionDetailScreenTimerPaused) {
+      return (
+        <>
+          {/* Workout Status */}
+          <View style={tailwind(' mb-2 flex-row items-center justify-center')}>
+            <View
+              style={tailwind('items-center justify-center rounded-full bg-gray-800 px-3 py-1')}>
+              <Text style={tailwind('text-center text-sm font-medium text-WORKOUT_PURPLE')}>
+                {workoutDetails?.status?.toUpperCase() || 'Unknown'}
+              </Text>
+            </View>
+          </View>
+
+          {/* Resume / Finished Continue Button */}
+          {workoutDetails?.status !== 'completed' && (
+            <TouchableOpacity
+              style={[
+                tailwind(
+                  'flex-row items-center justify-center rounded-lg bg-WORKOUT_PURPLE p-1 px-2',
+                ),
+              ]}
+              onPress={onResume} // Or add a callback for specific action
+            >
+              <AntDesign name="playcircleo" size={20} color={Colors.white} />
+              <Text style={tailwind('ml-2 text-base font-medium text-white')}>{'Resume'}</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      );
+    }
+    return (
+      <>
+        {/* Play / Pause Button */}
+        <TouchableOpacity onPress={isTimerRunning ? onPause : onPlay} disabled={disableControls}>
+          {renderIcon()}
         </TouchableOpacity>
-      )}
+
+        {/* Stop Button */}
+        {showStopButton && (
+          <TouchableOpacity
+            style={[styles.button, disableControls && styles.disabledButton]}
+            onPress={onStop}
+            disabled={disableControls}>
+            <FontAwesome name={'stop'} size={24} />
+          </TouchableOpacity>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <Container
+      style={Platform.select({
+        web: tailwind(
+          `${isLargeScreen ? '' : 'min-w-72 flex-col items-center justify-end gap-1 gap-3'} `,
+        ),
+      })}>
+      {renderWorkoutActionButton()}
     </Container>
   );
 };

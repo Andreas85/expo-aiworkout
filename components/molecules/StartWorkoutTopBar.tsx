@@ -112,37 +112,10 @@ const StartWorkoutTopBar = () => {
     }
   }, [hasUserInteracted]);
 
-  // Render short version toggle
-  const renderVersionTab = () => {
-    return (
-      <Container
-        style={Platform.select({
-          web: tailwind('flex flex-row items-center justify-end gap-2  '),
-        })}>
-        <TouchableOpacity
-          style={{
-            flex: 1,
-          }}>
-          <Text style={styles.muteIconText}>{isMuted ? '🔇' : '🔊'}</Text>
-        </TouchableOpacity>
-        <CustomSwitch
-          isEnabled={isEnabled}
-          toggleSwitch={toggleSwitch}
-          label={`Short Version  `}
-          containerStyle={[tailwind('my-0')]}
-        />
-      </Container>
-    );
-  };
-
   return (
     <Container
       style={Platform.select({
-        web: isLargeScreen
-          ? tailwind('flex flex-col  p-4')
-          : isWorkoutSessionDetailScreenTimerPaused
-            ? tailwind('hidden')
-            : styles.desktop.container,
+        web: isLargeScreen ? tailwind('flex flex-col  p-4') : styles.desktop.container,
         native: tailwind('flex flex-col gap-4 p-4'),
       })}>
       <Container
@@ -168,46 +141,43 @@ const StartWorkoutTopBar = () => {
               }),
             ]}
           />
-          {!isMediumScreen && renderVersionTab()}
-        </Container>
-
-        <Container
-          style={Platform.select({
-            web: isLargeScreen
-              ? tailwind('hidden')
-              : tailwind(`
+          <Container
+            style={Platform.select({
+              web: isLargeScreen
+                ? tailwind('hidden')
+                : tailwind(`
               mx-auto w-[50.5625rem] flex-row items-center justify-between
             `),
-            native: tailwind('hidden'),
-          })}>
-          <TextContainer
-            data={`Exercises`}
-            style={[
-              Platform.select({
-                web: isLargeScreen
-                  ? tailwind('self-left text-[1rem]')
-                  : styles.desktop.exercise_title,
-                native: tailwind(' self-left  text-[1rem] font-bold'),
-              }),
-            ]}
-          />
-          {/* Timer Display */}
-          <ExerciseDuration
-            remainingTime={remainingTime}
-            elapsedTime={elapsedTime}
-            totalWorkoutTime={totalWorkoutTime}
-          />
-          {/* Timer Controls */}
-          <ExerciseStartAndPause
-            isTimerRunning={isWorkoutTimerRunning}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onStop={handleStop}
-            disableControls={isWorkoutCompleted || isWorkoutSessionDetailScreenTimerPaused}
-          />
+              native: tailwind('hidden'),
+            })}>
+            <TextContainer
+              data={`Exercises`}
+              style={[
+                Platform.select({
+                  web: isLargeScreen
+                    ? tailwind('self-left text-[1rem]')
+                    : styles.desktop.exercise_title,
+                  native: tailwind(' self-left  text-[1rem] font-bold'),
+                }),
+              ]}
+            />
+            {/* Timer Display */}
+            <ExerciseDuration
+              remainingTime={remainingTime}
+              elapsedTime={elapsedTime}
+              totalWorkoutTime={totalWorkoutTime}
+            />
+            {/* Timer Controls */}
+            <ExerciseStartAndPause
+              isTimerRunning={isWorkoutTimerRunning}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onStop={handleStop}
+              disableControls={isWorkoutCompleted}
+            />
+          </Container>
         </Container>
       </Container>
-      {isMediumScreen && renderVersionTab()}
     </Container>
   );
 };

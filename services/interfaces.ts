@@ -113,7 +113,8 @@ export interface Workout {
   exercises: ExerciseElement[];
   createdAt: Date;
   updatedAt: Date;
-  slug: string;
+  slug?: string;
+  status?: string;
   __v: number;
 }
 

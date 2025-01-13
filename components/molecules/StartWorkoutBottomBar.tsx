@@ -105,7 +105,7 @@ const StartWorkoutBottomBar = () => {
           onPlay={handlePlay}
           onPause={handlePause}
           onStop={handleStop}
-          disableControls={isWorkoutCompleted || isWorkoutSessionDetailScreenTimerPaused}
+          disableControls={isWorkoutCompleted}
         />
       </Container>
     </Container>
