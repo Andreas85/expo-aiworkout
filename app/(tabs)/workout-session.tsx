@@ -3,6 +3,7 @@ import GradientBackground from '@/components/atoms/GradientBackground';
 import WorkoutSessions from '@/components/screens/WorkoutSessions';
 import NoDataSvg from '@/components/svgs/NoDataSvg';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { tailwind } from '@/utils/tailwind';
 import { getWorkoutSessions } from '@/utils/workoutSessionHelper';
 import { useFocusEffect } from 'expo-router';
@@ -12,10 +13,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WorkoutSessionScreen() {
   const { isLargeScreen } = useWebBreakPoints();
+  const { setWorkoutDetail } = useWorkoutDetailStore();
   const [productData, setProductData] = useState<any[]>([]);
   const fetchInitials = async () => {
     const result: any = await getWorkoutSessions();
     setProductData(result);
+    setWorkoutDetail(result);
   };
 
   useFocusEffect(

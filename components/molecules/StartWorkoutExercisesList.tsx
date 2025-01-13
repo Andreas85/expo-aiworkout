@@ -56,6 +56,7 @@ const StartWorkoutExercisesList = (props: any) => {
 
   const processDataBasedOnSession = async (workoutExercises: ExerciseElement[]) => {
     const workoutSessionOfExercises = await getWorkoutSessionById(slug ?? '');
+    const isCompleted = workoutSessionOfExercises?.status === 'completed';
 
     if (workoutSessionOfExercises) {
       const unfinishedExerciseData = findFirstIncompleteExercise(
@@ -67,6 +68,10 @@ const StartWorkoutExercisesList = (props: any) => {
       //   unfinishedExerciseData,
       // });
       updateRemainingTime(remainingTime);
+      if (isCompleted) {
+        setSelectedIndex(workoutExercises?.length);
+        return;
+      }
       if (unfinishedExerciseData) {
         const reqIndex = workoutExercises.findIndex(
           (item: any) => item?._id === unfinishedExerciseData?.exerciseId,
@@ -156,16 +161,8 @@ const StartWorkoutExercisesList = (props: any) => {
     }, 500);
   };
 
-  const updateWorkoutStatus = async () => {
-    await updateWorkoutSessionStatus(slug ?? '', 'completed');
-    updateWorkoutStatusInZustandStore('completed');
-    console.log('Workout status updated');
-  };
-
   const workoutCycleCompleted = () => {
     console.log('Workout cycle completed');
-    updateWorkoutStatus();
-    // update workout status
 
     updateWorkoutTimer(false);
     updateWorkoutCompleted(true);
@@ -208,6 +205,11 @@ const StartWorkoutExercisesList = (props: any) => {
       payload.durationTaken,
       payload.repsTaken,
     );
+
+    const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
+    if (isLastExerciseCard) {
+      await updateWorkoutSessionStatus(slug, 'completed');
+    }
   };
 
   const startNextExercise = () => {

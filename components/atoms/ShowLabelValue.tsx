@@ -11,8 +11,18 @@ const ShowLabelValue = (props: {
   container?: { web?: string; native?: string };
   labelContainer?: { web?: string; native?: string };
   valueContainer?: { web?: string; native?: string };
+  noOfLinesLabel?: number;
+  noOfLinesValue?: number;
 }) => {
-  const { label, value, container, labelContainer, valueContainer } = props;
+  const {
+    label,
+    value,
+    container,
+    labelContainer,
+    valueContainer,
+    noOfLinesLabel,
+    noOfLinesValue,
+  } = props;
   const { isLargeScreen } = useWebBreakPoints();
   return (
     <Container
@@ -36,6 +46,7 @@ const ShowLabelValue = (props: {
             native: tailwind(`flex-1  ${labelContainer?.native ? labelContainer.native : ''}`),
           }),
         ]}
+        numberOfLines={noOfLinesLabel}
       />
       <TextContainer
         data={value}
@@ -47,6 +58,7 @@ const ShowLabelValue = (props: {
             native: tailwind(`flex-1   ${valueContainer?.native ? valueContainer.native : ''}`),
           }),
         ]}
+        numberOfLines={noOfLinesValue}
       />
     </Container>
   );

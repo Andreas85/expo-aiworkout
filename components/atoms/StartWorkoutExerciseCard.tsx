@@ -75,6 +75,8 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           }}
           label={hasReps ? 'No. of Reps ' : 'Duration'}
           value={hasReps ? repsValue : durationValue}
+          noOfLinesLabel={hasReps ? undefined : 1}
+          noOfLinesValue={hasReps ? undefined : 1}
           labelContainer={{ web: isLargeScreen ? 'flex-none' : '', native: 'flex-none' }}
           valueContainer={{ web: isLargeScreen ? '' : 'flex-none', native: 'flex-1 text-right' }}
         />

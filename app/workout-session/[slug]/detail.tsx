@@ -13,8 +13,11 @@ import { getWorkoutSessionById } from '@/utils/workoutSessionHelper';
 const WorkoutSessionDetail = () => {
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();
-  const { setWorkoutDetail, updateIsWorkoutSessionDetailScreenTimerPaused } =
-    useWorkoutDetailStore();
+  const {
+    setWorkoutDetail,
+    updateIsWorkoutSessionDetailScreenTimerPaused,
+    updateWorkoutSessionDetailScreen,
+  } = useWorkoutDetailStore();
 
   const getWorkoutSessionFromStorage = async () => {
     const result: any = await getWorkoutSessionById(slug ?? '');
@@ -32,11 +35,12 @@ const WorkoutSessionDetail = () => {
     useCallback(() => {
       getWorkoutSessionFromStorage();
       updateIsWorkoutSessionDetailScreenTimerPaused(true);
-
+      updateWorkoutSessionDetailScreen(true);
       // fetchInitials();
       // Cleanup function or additional logic when screen is unfocused
       return async () => {
         updateIsWorkoutSessionDetailScreenTimerPaused(false);
+        updateWorkoutSessionDetailScreen(false);
       };
     }, []),
   );
