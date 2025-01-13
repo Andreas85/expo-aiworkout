@@ -20,8 +20,6 @@ const BaseTimer = (props: IBaseTimerProps) => {
   const { isVisible, currentExercise, onComplete } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const [countdown, setCountdown] = useState<number>(5);
-  const [isMuted, setIsMuted] = useState<boolean>(Platform.OS === 'web'); // Default mute state based on platform
-  const [hasInteracted, setHasInteracted] = useState<boolean>(false); // Tracks user interaction
   const soundRef = useRef<Audio.Sound | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -36,7 +34,7 @@ const BaseTimer = (props: IBaseTimerProps) => {
 
   const playSound = async () => {
     try {
-      if (!isMuted && soundRef.current) {
+      if (soundRef.current) {
         await soundRef.current.replayAsync(); // Replay the loaded sound
       }
     } catch (error) {
@@ -49,13 +47,6 @@ const BaseTimer = (props: IBaseTimerProps) => {
       await soundRef.current.stopAsync();
       await soundRef.current.unloadAsync();
       soundRef.current = null;
-    }
-  };
-
-  const handleUserInteraction = () => {
-    // Mark interaction as completed and allow unmuting on web
-    if (!hasInteracted) {
-      setHasInteracted(true);
     }
   };
 
@@ -89,42 +80,27 @@ const BaseTimer = (props: IBaseTimerProps) => {
     };
   }, [isVisible]);
 
-  const handleMuteToggle = () => {
-    if (!hasInteracted && Platform.OS === 'web') {
-      // On web, ensure interaction is registered
-      setHasInteracted(true);
-    }
-    setIsMuted(prevState => !prevState);
-  };
-
   return (
-    <TouchableOpacity activeOpacity={1} onPress={handleUserInteraction} style={{ flex: 1 }}>
-      <Modal isVisible={isVisible} backdropOpacity={0.5}>
-        <View
-          style={Platform.select({
-            web: tailwind(
-              `items-center rounded-lg bg-NAVBAR_BACKGROUND p-4 ${isLargeScreen ? '' : 'mx-auto w-[55rem]'}`,
-            ),
-            native: tailwind(`items-center rounded-lg bg-NAVBAR_BACKGROUND p-4`),
-          })}>
-          {/* Mute Icon */}
-          <TouchableOpacity onPress={handleMuteToggle} style={styles.muteIconContainer}>
-            <Text style={styles.muteIconText}>{isMuted ? '🔇' : '🔊'}</Text>
-          </TouchableOpacity>
+    <Modal isVisible={isVisible} backdropOpacity={0.5}>
+      <View
+        style={Platform.select({
+          web: tailwind(
+            `items-center rounded-lg bg-NAVBAR_BACKGROUND p-4 ${isLargeScreen ? '' : 'mx-auto w-[55rem]'}`,
+          ),
+          native: tailwind(`items-center rounded-lg bg-NAVBAR_BACKGROUND p-4`),
+        })}>
+        {/* Circular Progress Indicator */}
+        <PercentageCircle totalDurationTime={5} remainingTime={countdown} />
 
-          {/* Circular Progress Indicator */}
-          <PercentageCircle totalDurationTime={5} remainingTime={countdown} />
+        <Text style={styles.nextText}>NEXT</Text>
 
-          <Text style={styles.nextText}>NEXT</Text>
-
-          <StartWorkoutExerciseCard
-            item={currentExercise}
-            onDecrementHandler={() => {}}
-            onIncrementHandler={() => {}}
-          />
-        </View>
-      </Modal>
-    </TouchableOpacity>
+        <StartWorkoutExerciseCard
+          item={currentExercise}
+          onDecrementHandler={() => {}}
+          onIncrementHandler={() => {}}
+        />
+      </View>
+    </Modal>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { LayoutAnimation, Platform } from 'react-native';
+import { LayoutAnimation, Platform, Text } from 'react-native';
 import Container from '../atoms/Container';
 import { tailwind } from '@/utils/tailwind';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
@@ -12,9 +12,13 @@ import ExerciseStartAndPause from './ExerciseStartAndPause';
 import pauseable from 'pauseable';
 import { debounce } from 'lodash';
 import TextContainer from '../atoms/TextContainer';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { interactionStore } from '@/store/interactionStore';
 
 const StartWorkoutTopBar = () => {
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
+  const hasUserInteracted = interactionStore(state => state.hasInteracted);
+
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
   const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
@@ -27,7 +31,7 @@ const StartWorkoutTopBar = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [remainingTime, setRemainingTime] = useState(0); // Total 5 minutes
-
+  const [isMuted, setIsMuted] = useState<boolean>(Platform.OS === 'web'); // Default mute state based on platform
   const timerRef = useRef<any>(null);
 
   const handleTimer = () => {
@@ -95,15 +99,36 @@ const StartWorkoutTopBar = () => {
     [],
   );
 
+  const handleMuteToggle = () => {
+    setIsMuted(prevState => !prevState);
+  };
+
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      setIsMuted(!hasUserInteracted);
+    }
+  }, [hasUserInteracted]);
+
   // Render short version toggle
   const renderVersionTab = () => {
     return (
-      <CustomSwitch
-        isEnabled={isEnabled}
-        toggleSwitch={toggleSwitch}
-        label="Short Version"
-        containerStyle={[tailwind('my-0')]}
-      />
+      <Container
+        style={Platform.select({
+          web: tailwind('flex flex-row items-center justify-end gap-2  p-4'),
+        })}>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+          }}>
+          <Text style={styles.muteIconText}>{isMuted ? '🔇' : '🔊'}</Text>
+        </TouchableOpacity>
+        <CustomSwitch
+          isEnabled={isEnabled}
+          toggleSwitch={toggleSwitch}
+          label="Short Version"
+          containerStyle={[tailwind('my-0')]}
+        />
+      </Container>
     );
   };
 
@@ -183,6 +208,10 @@ const StartWorkoutTopBar = () => {
 export default StartWorkoutTopBar;
 
 const styles = {
+  muteIconText: {
+    fontSize: 24,
+    color: '#fff',
+  },
   desktop: {
     container: {
       borderTopLeftRadius: '0rem',
