@@ -32,10 +32,10 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
           <View
             style={Platform.select({
               web: tailwind(
-                `${' h-15 w-15 p-2'} z-20 items-center justify-center rounded-full bg-WORKOUT_PURPLE`,
+                `${' h-15 w-15 p-2'} z-20 items-center justify-center rounded-full bg-WORKOUT_PURPLE ${disableControls ? 'opacity-50' : ''}`,
               ),
               native: tailwind(
-                `h-15 w-15 items-center justify-center rounded-full  bg-WORKOUT_PURPLE p-2`,
+                `h-15 w-15 items-center justify-center rounded-full  bg-WORKOUT_PURPLE p-2  ${disableControls ? 'opacity-50' : ''}`,
               ),
             })}>
             <AntDesign name="pause" size={40} color={Colors.white} />
@@ -48,10 +48,10 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
         <View
           style={Platform.select({
             web: tailwind(
-              `${' h-15 w-15 py-1 py-2 pl-2'} z-20 items-center justify-center rounded-full bg-WORKOUT_PURPLE`,
+              `${' h-15 w-15 py-1 py-2 pl-2'} z-20 items-center justify-center rounded-full bg-WORKOUT_PURPLE  ${disableControls ? 'opacity-50' : ''}`,
             ),
             native: tailwind(
-              `h-15 w-15 items-center justify-center rounded-full  bg-WORKOUT_PURPLE py-1 py-2 pl-2`,
+              `h-15 w-15 items-center justify-center rounded-full  bg-WORKOUT_PURPLE py-1 py-2 pl-2  ${disableControls ? 'opacity-50' : ''}`,
             ),
           })}>
           <Feather name="play" size={40} color={Colors.white} />

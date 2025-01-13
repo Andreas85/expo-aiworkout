@@ -26,6 +26,9 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
   const timerRef = useRef<any>(null);
   const [totalElapsedTime, setTotalElapsedTime] = useState<number>(1);
   const elapsedTimeRef = useRef<number>(1); // Track the current value with a ref
+  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
+    state => state.isWorkoutSessionDetailScreenTimerPaused,
+  );
   const isWorkoutTimerRunning =
     useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
 
@@ -75,7 +78,7 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
     // console.log('Initializing timer for item:', item);
 
     timerRef.current = pauseable.setInterval(() => {
-      if (isWorkoutTimerRunning) {
+      if (isWorkoutTimerRunning && !isWorkoutSessionDetailScreenTimerPaused) {
         updateTimer();
       }
     }, 1000);
@@ -84,7 +87,7 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
       // console.log('Clearing timer');
       timerRef.current?.clear();
     };
-  }, [item, isWorkoutTimerRunning]);
+  }, [item, isWorkoutTimerRunning, isWorkoutSessionDetailScreenTimerPaused]);
 
   if (isRestCard) {
     return <ActiveRestCard item={item} index={index} />;

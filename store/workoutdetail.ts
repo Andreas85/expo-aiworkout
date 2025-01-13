@@ -12,6 +12,7 @@ type State = {
   isWorkoutTimerRunning?: boolean;
   isWorkoutCompleted?: boolean;
   remainingTime?: number;
+  isWorkoutSessionDetailScreenTimerPaused?: boolean;
 };
 
 type Action = {
@@ -28,6 +29,8 @@ type Action = {
     property: keyof ExerciseElement,
     value: any,
   ) => void;
+  updateIsWorkoutSessionDetailScreenTimerPaused: (payload: boolean) => void;
+  updateWorkoutStatusInZustandStore: (payload: 'pending' | 'completed') => void;
 };
 
 export interface IWorkoutDetailStore extends State, Action {}
@@ -41,6 +44,7 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
     isWorkoutTimerRunning: false,
     isWorkoutCompleted: false,
     remainingTime: 0,
+    isWorkoutSessionDetailScreenTimerPaused: false,
     setWorkoutDetail: async payload => {
       if (payload) {
         const sortedExercisesList = _.sortBy(payload.exercises, ['order']); // Sort exercises
@@ -99,5 +103,17 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
           workoutDetail: { ...state.workoutDetail, exercises: updatedExercises },
         };
       }),
+
+    updateIsWorkoutSessionDetailScreenTimerPaused: async (payload: any) => {
+      set({ isWorkoutSessionDetailScreenTimerPaused: payload });
+    },
+
+    updateWorkoutStatusInZustandStore: async (payload: 'pending' | 'completed') => {
+      if (payload) {
+        set((state: any) => ({
+          workoutDetail: { ...state?.workoutDetail, status: payload },
+        }));
+      }
+    },
   })),
 );

@@ -224,14 +224,15 @@ export const getWorkoutSessionById = async (sessionId: string): Promise<WorkoutS
  */
 export const updateWorkoutSessionStatus = async (
   sessionId: string,
-  newStatus: 'PENDING' | 'COMPLETED',
+  newStatus: 'pending' | 'completed',
 ): Promise<boolean> => {
   try {
     // Get all workout sessions from AsyncStorage
     const storedWorkoutSessions = await AsyncStorage.getItem(STORAGES_KEYS.WORKOUT_SESSION_LIST);
-
+    console.log('Stored workout sessions:1');
     // If no sessions are stored, return false
     if (!storedWorkoutSessions) {
+      console.log('Stored workout sessions:2');
       console.error('No workout sessions found');
       return false;
     }
@@ -241,9 +242,10 @@ export const updateWorkoutSessionStatus = async (
 
     // Find the workout session by its ID
     const workoutSessionIndex = workoutSessions.findIndex(session => session._id === sessionId);
-
+    console.log('Workout session index:n check ', workoutSessionIndex, sessionId);
     // If session not found, return false
     if (workoutSessionIndex === -1) {
+      console.log('Stored workout sessions:3');
       console.error('Workout session not found');
       return false;
     }
@@ -257,7 +259,7 @@ export const updateWorkoutSessionStatus = async (
     // Save the updated workout sessions back to AsyncStorage
     await updateWorkoutSession(workoutSessions[workoutSessionIndex]);
 
-    console.log('Workout session status updated successfully', workoutSessions);
+    console.log('Workout session status updated successfully 4', workoutSessions);
     return true; // Successfully updated the status
   } catch (error) {
     console.error('Error updating workout session status:', error);

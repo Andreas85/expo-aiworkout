@@ -4,11 +4,10 @@ import { FlatList, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import StartWorkoutExerciseCardWrapper from './StartWorkoutExerciseCardWrapper';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { STRING_DATA, WORKOUT_STATUS } from '@/utils/appConstants';
+import { STRING_DATA } from '@/utils/appConstants';
 import {
   expandRestAsExercisesInExistingExercises,
   findFirstIncompleteExercise,
-  getTotalDurationTaken,
 } from '@/utils/helper';
 import { ExerciseElement } from '@/services/interfaces';
 import { Audio } from 'expo-av';
@@ -24,12 +23,16 @@ import {
 } from '@/utils/workoutSessionHelper';
 
 const StartWorkoutExercisesList = (props: any) => {
-  const { data } = props;
   const hasRunInitially = useRef(false);
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
+
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
-  const { updateRemainingTime, updateWorkoutTimer, updateWorkoutCompleted } =
-    useWorkoutDetailStore();
+  const {
+    updateRemainingTime,
+    updateWorkoutTimer,
+    updateWorkoutCompleted,
+    updateWorkoutStatusInZustandStore,
+  } = useWorkoutDetailStore();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
@@ -154,7 +157,8 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   const updateWorkoutStatus = async () => {
-    const result = await updateWorkoutSessionStatus(slug ?? '', 'COMPLETED');
+    await updateWorkoutSessionStatus(slug ?? '', 'completed');
+    updateWorkoutStatusInZustandStore('completed');
     console.log('Workout status updated');
   };
 

@@ -13,6 +13,7 @@ const Navbar = () => {
       <Stack.Screen name="start-workout/[slug]" options={{ headerShown: false }} />
       <Stack.Screen name="workout-session/[slug]" options={{ headerShown: false }} />
       <Stack.Screen name="workout-session" options={{ headerShown: false }} />
+      <Stack.Screen name="workout-session/[slug]/detail" options={{ headerShown: false }} />
     </Stack>
   );
 };

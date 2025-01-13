@@ -19,6 +19,9 @@ const StartWorkoutTopBar = () => {
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   const hasUserInteracted = interactionStore(state => state.hasInteracted);
 
+  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
+    state => state.isWorkoutSessionDetailScreenTimerPaused,
+  );
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
   const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
@@ -50,7 +53,7 @@ const StartWorkoutTopBar = () => {
   // Initialize the pauseable timer
   useEffect(() => {
     timerRef.current = pauseable.setInterval(() => {
-      if (isWorkoutTimerRunning) {
+      if (isWorkoutTimerRunning && !isWorkoutSessionDetailScreenTimerPaused) {
         handleTimer();
         return;
       }
@@ -59,7 +62,7 @@ const StartWorkoutTopBar = () => {
     return () => {
       timerRef.current?.clear();
     };
-  }, [isWorkoutTimerRunning]);
+  }, [isWorkoutTimerRunning, isWorkoutSessionDetailScreenTimerPaused]);
 
   useEffect(() => {
     updateWorkoutTimer(true);
@@ -114,7 +117,7 @@ const StartWorkoutTopBar = () => {
     return (
       <Container
         style={Platform.select({
-          web: tailwind('flex flex-row items-center justify-end gap-2  p-4'),
+          web: tailwind('flex flex-row items-center justify-end gap-2  '),
         })}>
         <TouchableOpacity
           style={{
@@ -125,7 +128,7 @@ const StartWorkoutTopBar = () => {
         <CustomSwitch
           isEnabled={isEnabled}
           toggleSwitch={toggleSwitch}
-          label="Short Version"
+          label={`Short Version  `}
           containerStyle={[tailwind('my-0')]}
         />
       </Container>
@@ -135,7 +138,11 @@ const StartWorkoutTopBar = () => {
   return (
     <Container
       style={Platform.select({
-        web: isLargeScreen ? tailwind('flex flex-col  p-4') : styles.desktop.container,
+        web: isLargeScreen
+          ? tailwind('flex flex-col  p-4')
+          : isWorkoutSessionDetailScreenTimerPaused
+            ? tailwind('hidden')
+            : styles.desktop.container,
         native: tailwind('flex flex-col gap-4 p-4'),
       })}>
       <Container
@@ -196,7 +203,7 @@ const StartWorkoutTopBar = () => {
             onPlay={handlePlay}
             onPause={handlePause}
             onStop={handleStop}
-            disableControls={isWorkoutCompleted}
+            disableControls={isWorkoutCompleted || isWorkoutSessionDetailScreenTimerPaused}
           />
         </Container>
       </Container>

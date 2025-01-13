@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useNavigation } from 'expo-router';
 
 import { Platform, View } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
@@ -10,29 +10,14 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import NoDataSvg from '../svgs/NoDataSvg';
 
 import StartWorkoutExercisesList from '../molecules/StartWorkoutExercisesList';
-import { getWorkoutSessionById, WorkoutSession } from '@/utils/workoutSessionHelper';
-import { ExerciseElement } from '@/services/interfaces';
 
 const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
-  const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const navigation = useNavigation();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled] = useState<boolean>(false);
   const { isLargeScreen } = useWebBreakPoints();
-  const [workoutSessionExercises, setWorkoutSessionExercise] = useState<ExerciseElement[]>([]);
-  const getWorkoutSessionFromStorage = async () => {
-    const result: any = await getWorkoutSessionById(slug ?? '');
-    if (result) {
-      setWorkoutSessionExercise(result?.exercises);
-      return;
-    }
-  };
-
-  useEffect(() => {
-    getWorkoutSessionFromStorage();
-  }, []);
 
   useEffect(() => {
     if (workoutDetail) {

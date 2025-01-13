@@ -9,6 +9,8 @@ import { debounce } from 'lodash';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import React from 'react';
 import WorkoutSessionList from '../molecules/WorkoutSessionList';
+import { WorkoutSession } from '@/utils/workoutSessionHelper';
+import { router } from 'expo-router';
 
 export default function WorkoutSessions(props: { workoutSessionData: any }) {
   const { workoutSessionData } = props;
@@ -26,9 +28,8 @@ export default function WorkoutSessions(props: { workoutSessionData: any }) {
     [],
   );
 
-  const handleCardClick = () => {
-    // prefetchWorkouts(item?._id);
-    // router.push(`/workout/public/${item?._id}`);
+  const handleCardClick = (item: WorkoutSession) => {
+    router.push(`/workout-session/${item?._id}/detail` as any);
   };
 
   const renderWorkingListing = () => {

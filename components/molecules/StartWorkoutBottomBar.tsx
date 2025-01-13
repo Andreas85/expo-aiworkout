@@ -9,8 +9,12 @@ import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
 const StartWorkoutBottomBar = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
+  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
+    state => state.isWorkoutSessionDetailScreenTimerPaused,
+  );
   const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
   const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
+
   const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
   const isWorkoutTimerRunning =
     useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
@@ -59,7 +63,7 @@ const StartWorkoutBottomBar = () => {
   // Initialize the pauseable timer
   useEffect(() => {
     timerRef.current = pauseable.setInterval(() => {
-      if (isWorkoutTimerRunning) {
+      if (isWorkoutTimerRunning && !isWorkoutSessionDetailScreenTimerPaused) {
         handleTimer();
         return;
       }
@@ -68,7 +72,7 @@ const StartWorkoutBottomBar = () => {
     return () => {
       timerRef.current?.clear();
     };
-  }, [isWorkoutTimerRunning]);
+  }, [isWorkoutTimerRunning, isWorkoutSessionDetailScreenTimerPaused]);
 
   useEffect(() => {
     updateWorkoutTimer(true);
@@ -101,7 +105,7 @@ const StartWorkoutBottomBar = () => {
           onPlay={handlePlay}
           onPause={handlePause}
           onStop={handleStop}
-          disableControls={isWorkoutCompleted}
+          disableControls={isWorkoutCompleted || isWorkoutSessionDetailScreenTimerPaused}
         />
       </Container>
     </Container>
