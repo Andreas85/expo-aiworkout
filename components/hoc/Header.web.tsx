@@ -18,20 +18,32 @@ const Header = () => {
 
   const renderActionButtonAndLinks = () => {
     if (!isAuthenticated) {
-      console.log('activeTab', activeTab);
-      let isActive = activeTab === '/workout-sessions';
+      const unauthenticatedLinks: any[] = [
+        { key: 'workouts', path: '/workouts', value: 'Workouts' },
+        { key: 'workout-sessions', path: '/workout-sessions', value: 'Workout Session' },
+      ];
+
       return (
         <div className="flex flex-row items-center justify-between gap-12">
-          <Link href={'/workout-sessions'} style={tailwind('text-white')}>
-            <div
-              className={`relative text-center  font-normal leading-[30px] tracking-[0] text-white [font-family:'Inter-Regular',Helvetica] ${isActive ? activeClass : ''}`}>
-              {'Workout Session'}
-            </div>
-          </Link>
+          {unauthenticatedLinks.map(item => {
+            const isActive = activeTab === item.path;
+
+            return (
+              <Link key={item.key} href={item.path} style={tailwind('text-white')}>
+                <div
+                  className={`relative text-center font-normal leading-[30px] tracking-[0] text-white [font-family:'Inter-Regular',Helvetica] ${
+                    isActive ? activeClass : ''
+                  }`}>
+                  {item.value}
+                </div>
+              </Link>
+            );
+          })}
           <ActionButton label={'Sign in'} onPress={() => router.push('/signin')} />
         </div>
       );
     }
+
     return (
       <div className="flex items-center justify-between gap-24">
         {navItems.map((item: ITabItem, index) => {
