@@ -57,6 +57,8 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
           hasExercise: sortedExercisesList.length > 0,
           totalWorkoutTime,
           remainingTime: totalWorkoutTime,
+          isWorkoutCompleted: false,
+          isWorkoutTimerRunning: false,
         });
       }
     },
