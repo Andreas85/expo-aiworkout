@@ -34,6 +34,10 @@ const StartWorkoutBottomBar = () => {
     }
   }, [workoutRemainingTime]);
 
+  useEffect(() => {
+    updateWorkoutTimer(true);
+  }, []);
+
   // Timer controls
   const handlePlay = () => {
     console.log('Play', { isWorkoutTimerRunning, reftime: timerRef.current });

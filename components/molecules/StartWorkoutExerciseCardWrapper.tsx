@@ -14,8 +14,14 @@ interface StartWorkoutExerciseCardWrapperProps {
   isSelectedWorkout?: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
-  handleNextExercise?: () => void;
-  handleNextRestExercise?: () => void;
+  handleNextExercise?: (props: {
+    durationTaken: number;
+    currentExerciseCompleted: boolean;
+  }) => void;
+  handleNextRestExercise?: (props: {
+    durationTaken: number;
+    currentExerciseCompleted: boolean;
+  }) => void;
   isRestCard?: boolean;
   isFirst?: boolean;
   isCompleted?: boolean;
@@ -50,17 +56,14 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
     onDecrement?.();
   };
 
-  const handleExerciseTimeFinished = (
-    exerciseDurationTaken: number,
-    currentExerciseCompleted: boolean,
-  ) => {
-    console.log('Exercise Time Finished', { exerciseDurationTaken, currentExerciseCompleted });
-    handleNextExercise?.();
+  const handleExerciseTimeFinished = (durationTaken: number, currentExerciseCompleted: boolean) => {
+    console.log('Exercise Time Finished', { durationTaken, currentExerciseCompleted });
+    handleNextExercise?.({ durationTaken, currentExerciseCompleted });
   };
 
   const handleRepsWorkoutFinished = (totalElapsedTime: number) => {
     console.log('Reps Workout Finished', { totalElapsedTime });
-    handleNextRestExercise?.();
+    handleNextRestExercise?.({ durationTaken: totalElapsedTime, currentExerciseCompleted: true });
   };
 
   const renderExerciseCard = () => {

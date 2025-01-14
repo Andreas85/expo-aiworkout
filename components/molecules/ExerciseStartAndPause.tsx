@@ -8,6 +8,7 @@ import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import SoundIcon from '../atoms/SoundIcon';
 import WorkoutStatus from '../atoms/WorkoutStatus';
+import usePlatform from '@/hooks/usePlatform';
 
 interface IExerciseStartAndPause {
   isTimerRunning: boolean;
@@ -29,6 +30,7 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
   } = props;
 
   const { isLargeScreen } = useWebBreakPoints();
+  const { isWeb } = usePlatform();
 
   const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
     state => state.isWorkoutSessionDetailScreenTimerPaused,
@@ -117,7 +119,7 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
             {renderIcon()}
           </TouchableOpacity>
           {/* Sound Icon render */}
-          <SoundIcon />
+          {isWeb && <SoundIcon />}
         </Container>
 
         {/* Stop Button */}
@@ -137,8 +139,9 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
     <Container
       style={Platform.select({
         web: tailwind(
-          `${isLargeScreen ? '' : `min-w-72 flex-col items-center justify-end gap-1 gap-3`} `,
+          `${isLargeScreen ? 'gap-2' : `min-w-72 flex-col items-center justify-end gap-3`} `,
         ),
+        native: tailwind('flex-col items-center justify-end gap-2'),
       })}>
       {renderWorkoutActionButton()}
     </Container>
