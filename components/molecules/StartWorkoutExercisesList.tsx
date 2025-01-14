@@ -74,6 +74,7 @@ const StartWorkoutExercisesList = (props: any) => {
         const reqIndex = workoutExercises.findIndex(
           (item: any) => item?._id === unfinishedExerciseData?.exerciseId,
         );
+        console.log('hasRunInitially.current1', hasRunInitially.current);
         if (hasRunInitially.current) return;
         hasRunInitially.current = true;
         setSelectedIndex(reqIndex);
@@ -86,6 +87,7 @@ const StartWorkoutExercisesList = (props: any) => {
                 animated: true,
                 viewPosition: 0.5,
               });
+              console.log('hasRunInitially.current2', hasRunInitially.current);
             }
           } catch (error) {
             console.warn('Error scrolling to index:', error);
@@ -134,12 +136,17 @@ const StartWorkoutExercisesList = (props: any) => {
   // Stop and unload the sound
   const stopSound = useCallback(async () => {
     if (sound) {
-      try {
-        await sound.stopAsync();
-        await sound.unloadAsync();
-        setSound(null); // Clear sound after unloading
-      } catch (error) {
-        console.error('Error stopping sound:', error);
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded) {
+        try {
+          await sound.stopAsync();
+          await sound.unloadAsync();
+          setSound(null); // Clear sound after unloading
+        } catch (error) {
+          console.error('Error stopping sound:', error);
+        }
+      } else {
+        console.warn('Sound is not loaded, cannot stop it.');
       }
     }
   }, [sound]);
@@ -185,28 +192,19 @@ const StartWorkoutExercisesList = (props: any) => {
     router.back();
   };
 
-  const saveWorkoutSessionExerciseRecord = async () => {
+  const saveWorkoutSessionExerciseRecord = async (props: {
+    durationTaken: number;
+    currentExerciseCompleted: boolean;
+  }) => {
+    const { durationTaken, currentExerciseCompleted } = props;
     const currentExercise = getCurrentExerciseData();
-    const hasRest = currentExercise?.type === STRING_DATA.REST;
 
-    if (hasRest && currentExercise?.preExerciseOrder?.toString() === '0') {
-      // console.log('Rest exercise', { currentExercise, selectedIndex });
-      // updateExercisePropertyZustand(currentExercise?.preExerciseOrder, 'isCompleted', true);
-    } else {
-      // console.log('Normal exercise', { currentExercise });
-      // updateExercisePropertyZustand(currentExercise.order, 'isCompleted', true);
-    }
-    // const updateExercise: any = await getWorkoutSessionExerciseById(
-    //   slug ?? '',
-    //   currentExercise?._id ?? '',
-    // );
-    // updateExercisePropertyZustand(selectedIndex, 'isCompleted', true);
-    // console.log('Current Exercise:', { currentExercise, selectedIndex });
+    console.log('Current Exercise:', { durationTaken, currentExerciseCompleted });
     // if (!currentExercise) return;
     const payload = {
       sessionId: slug ?? '',
       exerciseId: currentExercise?._id ?? '',
-      durationTaken: currentExercise?.duration,
+      durationTaken: durationTaken,
       repsTaken: currentExercise?.reps,
     };
 
@@ -241,14 +239,18 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   // Scroll to a specific item by index
-  const scrollToItem = () => {
+  const scrollToItem = (props: { durationTaken: number; currentExerciseCompleted: boolean }) => {
+    const { durationTaken, currentExerciseCompleted } = props;
     const hasReps = getCurrentExerciseData()?.reps;
-    const isRest = getNextExerciseData()?.type === STRING_DATA.REST;
+    const isCurrentRest = getCurrentExerciseData()?.type === STRING_DATA.REST;
 
     const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
     // console.log('exerciseDataexerciseData', { exerciseData });
     // Save the current exercise record
-    saveWorkoutSessionExerciseRecord();
+    saveWorkoutSessionExerciseRecord({
+      durationTaken,
+      currentExerciseCompleted,
+    });
 
     if (isLastExerciseCard && exerciseData?.length > 0) {
       startNextExercise();
@@ -261,29 +263,20 @@ const StartWorkoutExercisesList = (props: any) => {
       }
       return;
     }
-    // startNextExercise();
-    // console.log(hasReps, isRest, 'isRest');
 
-    if (!hasReps && isRest) {
-      startNextExercise();
-      updateWorkoutTimer(true);
-    } else if (!hasReps) {
-      // preStartNextExercise.value = true;
+    if (isCurrentRest) {
+      console.log('Rest card, starting next exercise');
       updateWorkoutTimer(false);
       openModal();
-    } else {
-      if (!isRest) {
-        playSound();
-        setTimeout(() => {
-          stopSound();
-          updateWorkoutTimer(true);
-          startNextExercise();
-        }, 500);
-      } else {
-        updateWorkoutTimer(true);
-        startNextExercise();
-      }
+      return;
     }
+
+    playSound();
+    setTimeout(() => {
+      stopSound();
+      updateWorkoutTimer(true);
+      startNextExercise();
+    }, 300);
   };
 
   // Memoize the renderItem to avoid re-renders

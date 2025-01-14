@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Platform } from 'react-native';
 import Container from './Container';
 import ShowLabelValue from './ShowLabelValue';
@@ -13,7 +13,6 @@ import ActiveWorkoutIcon from './ActiveWorkoutIcon';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { debounce } from 'lodash';
 
 interface ActiveRestCardProps {
   item: ExerciseElement;
@@ -23,14 +22,9 @@ interface ActiveRestCardProps {
 const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
   const { updateExercisePropertyZustand } = useWorkoutDetailStore();
-  const [durationValue, setDurationValue] = useState<number>(0);
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
-
-  useEffect(() => {
-    setDurationValue(item?.duration ?? 0);
-  }, [item]);
-
-  const updateExercisePropertyZustandDebounced = debounce(updateExercisePropertyZustand, 300);
+  // Use the item.duration as the single source of truth
+  const durationValue = item?.duration ?? 0;
 
   const handlePress = async (newDuration: number) => {
     const hasRest = item?.type === 'rest';
@@ -38,29 +32,20 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
       // console.log('Rest exercise-Active-card', { item, hasRest });
       await updateExerciseProperty(slug ?? '', item?.preExerciseId ?? '', 'rest', newDuration);
 
-      updateExercisePropertyZustandDebounced(item?.preExerciseOrder, 'rest', newDuration);
+      updateExercisePropertyZustand(item?.preExerciseOrder, 'rest', newDuration);
     }
   };
 
-  const onPressMinusHandler = async () => {
-    setDurationValue((prev: number) => {
-      if (prev > 0) {
-        const newDuration = prev - 1;
-        // Call the async function before updating the state
-        handlePress(newDuration);
-        return newDuration; // Update the state with the new value
-      }
-      return prev;
-    });
+  const onPressMinusHandler = () => {
+    if (durationValue > 0) {
+      const newDuration = durationValue - 1;
+      handlePress(newDuration);
+    }
   };
 
   const onPressPlusHandler = () => {
-    setDurationValue((prev: number) => {
-      const newDuration = prev + 1;
-      // Call the async function before updating the state
-      handlePress(newDuration);
-      return newDuration; // Update the state with the new value
-    });
+    const newDuration = durationValue + 1;
+    handlePress(newDuration);
   };
 
   const renderActionButtons = () => {

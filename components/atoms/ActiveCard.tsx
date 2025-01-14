@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react';
+import React from 'react';
 import { Platform } from 'react-native';
 import Container from './Container';
 import ImageContainer from './ImageContainer';
@@ -16,7 +16,6 @@ import { pluralise } from '@/utils/helper';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { debounce } from 'lodash';
 
 interface ActiveCardProps {
   item: ExerciseElement;
@@ -28,36 +27,23 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { updateExercisePropertyZustand } = useWorkoutDetailStore();
-  const [hasReps, setHasReps] = useState<boolean>(false);
-  const [repsValue, setRepsValue] = useState<number>(0);
-  const [durationValue, setDurationValue] = useState<number>(0);
 
-  useEffect(() => {
-    setHasReps(!!item?.reps);
-
-    setRepsValue(item?.reps ?? 0);
-    setDurationValue(item?.duration ?? 0);
-  }, [item]);
-
-  const updateExercisePropertyZustandDebounced = debounce(updateExercisePropertyZustand, 300);
+  const hasReps = !!item?.reps;
+  const repsValue = item?.reps ?? 0;
+  const durationValue = item?.duration ?? 0;
 
   const handlePress = async (newDuration: number) => {
     // console.log('Normal exercise-Active-card', { item });
     await updateExerciseProperty(slug ?? '', item?._id ?? '', 'reps', newDuration);
-    updateExercisePropertyZustandDebounced(item.order, 'reps', newDuration);
+    updateExercisePropertyZustand(item.order, 'reps', newDuration);
   };
 
   const onPressMinusHandler = async () => {
     if (item.reps && item.reps > 0) {
-      setRepsValue((prev: number) => {
-        if (prev > 0) {
-          const newDuration = prev - 1;
-          console.log('item?.exerciseId', item);
-          newDuration && handlePress(newDuration);
-          return newDuration;
-        }
-        return prev;
-      });
+      if (repsValue > 0) {
+        const newDuration = repsValue - 1;
+        handlePress(newDuration);
+      }
     } else {
       console.log(`Cannot decrement: No reps or reps already at 0 for ${item.name ?? 'exercise'}`);
     }
@@ -65,11 +51,8 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
 
   const onPressPlusHandler = () => {
     if (item.reps !== undefined) {
-      setRepsValue((prev: number) => {
-        const newDuration = prev + 1;
-        newDuration && handlePress(newDuration);
-        return newDuration; // Update the state with the new value
-      });
+      const newDuration = repsValue + 1;
+      handlePress(newDuration);
     } else {
       console.log(`Cannot increment: No reps defined for ${item.name ?? 'exercise'}`);
     }
@@ -275,7 +258,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   );
 };
 
-export default memo(ActiveCard);
+export default ActiveCard;
 
 const webStyles = {
   container: {
