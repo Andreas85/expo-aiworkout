@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { ERROR_MESSAGE, STRING_DATA } from './appConstants';
+import { ERROR_MESSAGE, STATUS_COLORS, STRING_DATA } from './appConstants';
 import { ExerciseElement } from '@/services/interfaces';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
@@ -186,4 +186,10 @@ export const getTotalDurationTaken = (workoutSessionExercises: ExerciseElement[]
     }
   }
   return totalDurationTaken;
+};
+
+type WorkoutSessionStatus = 'COMPLETED' | 'PENDING';
+export const getStatusColor = (status: WorkoutSessionStatus) => {
+  // Check if the status has a corresponding color, otherwise return default text color
+  return STATUS_COLORS[status] || 'text-gray-800';
 };

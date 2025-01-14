@@ -18,10 +18,11 @@ const Header = () => {
 
   const renderActionButtonAndLinks = () => {
     if (!isAuthenticated) {
-      let isActive = activeTab === '/workout-session';
+      console.log('activeTab', activeTab);
+      let isActive = activeTab === '/workout-sessions';
       return (
         <div className="flex flex-row items-center justify-between gap-12">
-          <Link href={'/workout-session'} style={tailwind('text-white')}>
+          <Link href={'/workout-sessions'} style={tailwind('text-white')}>
             <div
               className={`relative text-center  font-normal leading-[30px] tracking-[0] text-white [font-family:'Inter-Regular',Helvetica] ${isActive ? activeClass : ''}`}>
               {'Workout Session'}

@@ -46,7 +46,7 @@ export const WORKOUT_TABS: ITabItem[] = [
 export const headerOptions: ITabItem[] = [
   { key: 'workout', value: 'Workout', path: '/(tabs)/(workout)/workouts' },
   { key: 'my-exercise', value: 'My Exercise', path: '/(tabs)/my-exercise' },
-  { key: 'workout-session', value: 'Workout Session', path: '/(tabs)/workout-session' },
+  { key: 'workout-sessions', value: 'Workout Session', path: '/(tabs)/workout-sessions' },
   { key: 'profile', value: 'Profile', path: '/(tabs)/profile' },
 ];
 
@@ -78,4 +78,9 @@ export const WORKOUT_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
   NOT_STARTED: 'NOT_STARTED',
   PENDING: 'PENDING',
+};
+
+export const STATUS_COLORS = {
+  PENDING: { background: 'text-yellow-900', text: 'bg-yellow-500' },
+  COMPLETED: { background: 'text-green-900', text: 'bg-green-500' },
 };

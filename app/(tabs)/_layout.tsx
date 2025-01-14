@@ -113,10 +113,11 @@ export default function TabLayout() {
             ),
           }}
         />
+
         <Tabs.Screen
-          name="workout-session"
+          name="workout-sessions"
           options={{
-            title: 'Workout Session',
+            title: 'Workout Sessions',
             headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Svg width={size} height={size} viewBox="0 0 27 23" fill={color}>

@@ -7,6 +7,7 @@ import { tailwind } from '@/utils/tailwind';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import SoundIcon from '../atoms/SoundIcon';
+import WorkoutStatus from '../atoms/WorkoutStatus';
 
 interface IExerciseStartAndPause {
   isTimerRunning: boolean;
@@ -83,14 +84,10 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
       return (
         <>
           {/* Workout Status */}
-          <View style={tailwind(' mb-2 flex-row items-center justify-center')}>
-            <View
-              style={tailwind('items-center justify-center rounded-full bg-gray-800 px-3 py-1')}>
-              <Text style={tailwind('text-center text-sm font-medium text-WORKOUT_PURPLE')}>
-                {workoutDetails?.status?.toUpperCase() || 'Unknown'}
-              </Text>
-            </View>
-          </View>
+
+          <WorkoutStatus
+            itemStatus={workoutDetails?.status?.toUpperCase() as 'COMPLETED' | 'PENDING'}
+          />
 
           {/* Resume / Finished Continue Button */}
           {workoutDetails?.status !== 'completed' && (
@@ -115,12 +112,12 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
           style={Platform.select({
             web: tailwind('flex flex-row items-center justify-end gap-2  '),
           })}>
-          {/* Sound Icon render */}
-          <SoundIcon />
           {/* Play / Pause Button */}
           <TouchableOpacity onPress={isTimerRunning ? onPause : onPlay} disabled={disableControls}>
             {renderIcon()}
           </TouchableOpacity>
+          {/* Sound Icon render */}
+          <SoundIcon />
         </Container>
 
         {/* Stop Button */}
@@ -140,7 +137,7 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
     <Container
       style={Platform.select({
         web: tailwind(
-          `${isLargeScreen ? '' : 'min-w-72 flex-col items-center justify-end gap-1 gap-3'} `,
+          `${isLargeScreen ? '' : `min-w-72 flex-col items-center justify-end gap-1 gap-3`} `,
         ),
       })}>
       {renderWorkoutActionButton()}

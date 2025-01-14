@@ -6,6 +6,8 @@ import ImageContainer from '../atoms/ImageContainer';
 import TextContainer from '../atoms/TextContainer';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { IMAGES } from '@/utils/images';
+import { getStatusColor } from '@/utils/helper';
+import WorkoutStatus from '../atoms/WorkoutStatus';
 
 interface WorkoutListProps {
   data: any[];
@@ -70,15 +72,11 @@ const WorkoutSessionList = ({
             {/* Workout Status */}
             <View
               style={tailwind(
-                ' absolute right-2 top-2 z-40 mb-2 flex-row items-center justify-center',
+                'absolute right-2 top-2 z-40 mb-2 flex-row items-center justify-center',
               )}>
-              <View
-                style={tailwind('items-center justify-center rounded-full bg-gray-800 px-3 py-1')}>
-                <Text style={tailwind('text-center text-sm font-medium text-WORKOUT_PURPLE')}>
-                  {item?.status?.toUpperCase() || 'Unknown'}
-                </Text>
-              </View>
+              <WorkoutStatus itemStatus={item?.status?.toUpperCase() as 'COMPLETED' | 'PENDING'} />
             </View>
+
             {!isEnabled && (
               <ImageContainer
                 source={IMAGES.fitness}
