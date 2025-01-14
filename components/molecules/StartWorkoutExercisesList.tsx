@@ -21,12 +21,14 @@ import {
   updateExerciseInSession,
   updateWorkoutSessionStatus,
 } from '@/utils/workoutSessionHelper';
+import { interactionStore } from '@/store/interactionStore';
 
 const StartWorkoutExercisesList = (props: any) => {
   const hasRunInitially = useRef(false);
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
 
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+  const muted = interactionStore(state => state.muted);
   const { updateRemainingTime, updateWorkoutTimer, updateWorkoutCompleted } =
     useWorkoutDetailStore();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
@@ -72,18 +74,23 @@ const StartWorkoutExercisesList = (props: any) => {
         const reqIndex = workoutExercises.findIndex(
           (item: any) => item?._id === unfinishedExerciseData?.exerciseId,
         );
-        // console.log('reqIndexreqIndex', reqIndex);
         if (hasRunInitially.current) return;
         hasRunInitially.current = true;
         setSelectedIndex(reqIndex);
 
-        if (flatListRef.current && reqIndex <= exerciseData.length - 1) {
-          flatListRef.current.scrollToIndex({
-            index: reqIndex,
-            animated: true,
-            viewPosition: reqIndex === 0 || reqIndex === exerciseData.length - 1 ? 0 : 0.5, // Keep center for non-edge indices
-          });
-        }
+        setTimeout(() => {
+          try {
+            if (flatListRef.current && reqIndex < workoutExercises.length) {
+              flatListRef.current.scrollToIndex({
+                index: reqIndex,
+                animated: true,
+                viewPosition: 0.5,
+              });
+            }
+          } catch (error) {
+            console.warn('Error scrolling to index:', error);
+          }
+        }, 100);
       }
     }
   };
@@ -112,6 +119,7 @@ const StartWorkoutExercisesList = (props: any) => {
 
   // Play a sound
   const playSound = useCallback(async () => {
+    if (muted) return;
     try {
       const { sound } = await Audio.Sound.createAsync(
         require('@/assets/sounds/buzzer-countdown.mp3'), // Replace with your sound file
@@ -121,7 +129,7 @@ const StartWorkoutExercisesList = (props: any) => {
     } catch (error) {
       console.error('Error playing sound:', error);
     }
-  }, []);
+  }, [muted]);
 
   // Stop and unload the sound
   const stopSound = useCallback(async () => {

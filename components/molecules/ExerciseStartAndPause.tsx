@@ -6,6 +6,7 @@ import Colors from '@/constants/Colors';
 import { tailwind } from '@/utils/tailwind';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import SoundIcon from '../atoms/SoundIcon';
 
 interface IExerciseStartAndPause {
   isTimerRunning: boolean;
@@ -110,10 +111,17 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
     }
     return (
       <>
-        {/* Play / Pause Button */}
-        <TouchableOpacity onPress={isTimerRunning ? onPause : onPlay} disabled={disableControls}>
-          {renderIcon()}
-        </TouchableOpacity>
+        <Container
+          style={Platform.select({
+            web: tailwind('flex flex-row items-center justify-end gap-2  '),
+          })}>
+          {/* Sound Icon render */}
+          <SoundIcon />
+          {/* Play / Pause Button */}
+          <TouchableOpacity onPress={isTimerRunning ? onPause : onPlay} disabled={disableControls}>
+            {renderIcon()}
+          </TouchableOpacity>
+        </Container>
 
         {/* Stop Button */}
         {showStopButton && (

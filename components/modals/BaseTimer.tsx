@@ -8,6 +8,7 @@ import { tailwind } from '@/utils/tailwind';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import countSound from '@/assets/sounds/film-countdown.mp3';
 import PercentageCircle from '../atoms/PercentageCircle';
+import { interactionStore } from '@/store/interactionStore';
 
 interface IBaseTimerProps {
   isVisible: boolean;
@@ -22,6 +23,7 @@ const BaseTimer = (props: IBaseTimerProps) => {
   const [countdown, setCountdown] = useState<number>(5);
   const soundRef = useRef<Audio.Sound | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const muted = interactionStore(state => state.muted);
 
   const loadSound = async () => {
     try {
@@ -33,6 +35,7 @@ const BaseTimer = (props: IBaseTimerProps) => {
   };
 
   const playSound = async () => {
+    if (muted) return;
     try {
       if (soundRef.current) {
         await soundRef.current.replayAsync(); // Replay the loaded sound
