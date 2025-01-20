@@ -40,6 +40,10 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
     isRepsWorkoutFinished?.(elapsedTimeRef.current);
   };
 
+  const handleFinish = () => {
+    console.log('Finish button clicked');
+    repsWorkoutFinishedEvent();
+  };
   const updateTimer = () => {
     const { duration, reps, rest } = item ?? {};
     // console.log('Timer running:', {
@@ -63,11 +67,6 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
       return;
     }
 
-    if (reps && elapsedTimeRef.current >= duration) {
-      console.log('Reps workout completed, triggering event');
-      repsWorkoutFinishedEvent();
-      return;
-    }
     elapsedTimeRef.current += 1; // Update the ref value
     setTotalElapsedTime(elapsedTimeRef.current); // Trigger a re-render
   };
@@ -93,7 +92,7 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
     return <ActiveRestCard item={item} index={index} />;
   }
 
-  return <ActiveCard item={item} index={index} handleFinish={exerciseDurationCompletedEvent} />;
+  return <ActiveCard item={item} index={index} handleFinish={handleFinish} />;
 };
 
 export default memo(StartWorkoutExerciseCardActive);

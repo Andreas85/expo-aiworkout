@@ -12,12 +12,13 @@ import { getWorkoutSessionById } from '@/utils/workoutSessionHelper';
 const WorkoutSessionDetail = () => {
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();
-  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const { setWorkoutDetail, updateWorkoutTimer } = useWorkoutDetailStore();
 
   const getWorkoutSessionFromStorage = async () => {
     const result: any = await getWorkoutSessionById(slug ?? '');
     if (result) {
       setWorkoutDetail(result);
+      updateWorkoutTimer(true);
       return;
     }
   };

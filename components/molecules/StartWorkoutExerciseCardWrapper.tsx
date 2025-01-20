@@ -22,6 +22,10 @@ interface StartWorkoutExerciseCardWrapperProps {
     durationTaken: number;
     currentExerciseCompleted: boolean;
   }) => void;
+  handleNextRepsExercise?: (props: {
+    durationTaken: number;
+    currentExerciseCompleted: boolean;
+  }) => void;
   isRestCard?: boolean;
   isFirst?: boolean;
   isCompleted?: boolean;
@@ -37,6 +41,7 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
     isSelectedWorkout,
     handleNextExercise,
     handleNextRestExercise,
+    handleNextRepsExercise,
     isRestCard = false,
     isFirst = false,
     isCompleted = false,
@@ -62,8 +67,13 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
   };
 
   const handleRepsWorkoutFinished = (totalElapsedTime: number) => {
+    if (isRestCard) {
+      console.log('Rest Workout Finished', { totalElapsedTime });
+      handleNextRestExercise?.({ durationTaken: totalElapsedTime, currentExerciseCompleted: true });
+      return;
+    }
     console.log('Reps Workout Finished', { totalElapsedTime });
-    handleNextRestExercise?.({ durationTaken: totalElapsedTime, currentExerciseCompleted: true });
+    handleNextRepsExercise?.({ durationTaken: totalElapsedTime, currentExerciseCompleted: true });
   };
 
   const renderExerciseCard = () => {

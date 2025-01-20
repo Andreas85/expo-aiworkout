@@ -263,6 +263,7 @@ const StartWorkoutExercisesList = (props: any) => {
       }
       return;
     }
+    if (hasReps) return;
 
     if (isCurrentRest) {
       console.log('Rest card, starting next exercise');
@@ -277,6 +278,20 @@ const StartWorkoutExercisesList = (props: any) => {
       updateWorkoutTimer(true);
       startNextExercise();
     }, 300);
+  };
+
+  const handleNextRepsExercise = (props: {
+    durationTaken: number;
+    currentExerciseCompleted: boolean;
+  }) => {
+    const { durationTaken, currentExerciseCompleted } = props;
+    console.log('Reps workout finished- Exercise-list', { props });
+    saveWorkoutSessionExerciseRecord({
+      durationTaken,
+      currentExerciseCompleted,
+    });
+
+    startNextExercise();
   };
 
   // Memoize the renderItem to avoid re-renders
@@ -295,6 +310,7 @@ const StartWorkoutExercisesList = (props: any) => {
           isSelectedWorkout={selectedIndex === index}
           handleNextExercise={scrollToItem}
           handleNextRestExercise={scrollToItem}
+          handleNextRepsExercise={handleNextRepsExercise}
           isRestCard={item?.type === STRING_DATA.REST}
         />
       );

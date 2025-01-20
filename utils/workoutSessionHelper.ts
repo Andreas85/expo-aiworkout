@@ -145,7 +145,7 @@ export const updateExerciseInSession = async (
   try {
     const sessions = await getWorkoutSessions();
     const session = sessions.find(s => s._id === sessionId);
-    console.log('Session-update-workout-session', session, sessions);
+    // console.log('Session-update-workout-session', session, sessions);
     if (session) {
       const updatedExercises = session.exercises.map(exercise => {
         if (exercise._id === exerciseId) {

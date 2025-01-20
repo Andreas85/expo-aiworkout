@@ -58,7 +58,6 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
           totalWorkoutTime,
           remainingTime: totalWorkoutTime,
           isWorkoutCompleted: false,
-          isWorkoutTimerRunning: false,
         });
       }
     },
