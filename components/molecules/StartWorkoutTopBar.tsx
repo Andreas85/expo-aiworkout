@@ -1,110 +1,30 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { LayoutAnimation, Platform, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import Container from '../atoms/Container';
 import { tailwind } from '@/utils/tailwind';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import CustomSwitch from '../atoms/CustomSwitch';
 import ExerciseDuration from './ExerciseDuration';
 import ExerciseStartAndPause from './ExerciseStartAndPause';
-import pauseable from 'pauseable';
-import { debounce } from 'lodash';
 import TextContainer from '../atoms/TextContainer';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { interactionStore } from '@/store/interactionStore';
+import useTimer from '@/hooks/useTimer';
 
 const StartWorkoutTopBar = () => {
-  const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
+  const { isLargeScreen } = useWebBreakPoints();
   const hasUserInteracted = interactionStore(state => state.hasInteracted);
-
-  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
-    state => state.isWorkoutSessionDetailScreenTimerPaused,
-  );
+  const { elapsedTime, remainingTime, handlePlay, handlePause, handleStop } = useTimer();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
-  const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
   const isWorkoutTimerRunning =
     useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
   const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
 
-  const { updateWorkoutTimer } = useWorkoutDetailStore();
-  // Timer states
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(0); // Total 5 minutes
   const [isMuted, setIsMuted] = useState<boolean>(Platform.OS === 'web'); // Default mute state based on platform
-  const timerRef = useRef<any>(null);
-
-  const handleTimer = () => {
-    setElapsedTime(prev => prev + 1);
-    setRemainingTime(prev => {
-      return prev - 1 > 0 ? prev - 1 : 0;
-    });
-  };
-
-  useEffect(() => {
-    if (workoutRemainingTime) {
-      setRemainingTime(workoutRemainingTime);
-    }
-  }, [workoutRemainingTime]);
-
-  // Initialize the pauseable timer
-  useEffect(() => {
-    timerRef.current = pauseable.setInterval(() => {
-      if (isWorkoutTimerRunning && !isWorkoutSessionDetailScreenTimerPaused) {
-        handleTimer();
-        return;
-      }
-      handlePause();
-    }, 1000);
-    return () => {
-      timerRef.current?.clear();
-    };
-  }, [isWorkoutTimerRunning, isWorkoutSessionDetailScreenTimerPaused]);
-
-  useEffect(() => {
-    updateWorkoutTimer(true);
-  }, []);
-
-  // Timer controls
-  const handlePlay = () => {
-    console.log('Play', { isWorkoutTimerRunning, reftime: timerRef.current });
-    updateWorkoutTimer(true);
-    if (timerRef.current) {
-      timerRef.current.resume(); // Ensure `start` is called on a valid instance
-    }
-  };
-
-  const handlePause = () => {
-    updateWorkoutTimer(false);
-    if (timerRef.current) {
-      timerRef.current.pause(); // Ensure `pause` is called on a valid instance
-    }
-  };
-
-  const handleStop = () => {
-    updateWorkoutTimer(false);
-    if (timerRef.current) {
-      timerRef.current.clear(); // Clear the timer and reset values
-    }
-    setElapsedTime(0);
-    setRemainingTime(totalWorkoutTime); // Reset to total time
-  };
 
   // Debounced toggle for custom switch
-  const toggleSwitch = useCallback(
-    debounce(() => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setIsEnabled(prevState => !prevState);
-    }, 500), // 500ms delay
-    [],
-  );
-
-  const handleMuteToggle = () => {
-    setIsMuted(prevState => !prevState);
-  };
 
   useEffect(() => {
     if (Platform.OS === 'web') {

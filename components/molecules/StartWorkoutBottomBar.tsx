@@ -1,86 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Platform } from 'react-native';
 import Container from '../atoms/Container';
 import { tailwind } from '@/utils/tailwind';
 import ExerciseDuration from './ExerciseDuration';
 import ExerciseStartAndPause from './ExerciseStartAndPause';
-import pauseable from 'pauseable';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import useTimer from '@/hooks/useTimer';
 
 const StartWorkoutBottomBar = () => {
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
-    state => state.isWorkoutSessionDetailScreenTimerPaused,
-  );
+  const { elapsedTime, remainingTime, handlePlay, handlePause, handleStop } = useTimer();
+
   const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
   const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
 
-  const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
   const isWorkoutTimerRunning =
     useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
-  const { updateWorkoutTimer } = useWorkoutDetailStore();
-  const [remainingTime, setRemainingTime] = useState(0); // Total 5 minutes
-
-  const timerRef = useRef<any>(null);
-
-  const handleTimer = () => {
-    setElapsedTime(prev => prev + 1);
-    setRemainingTime(prev => prev - 1);
-  };
-
-  useEffect(() => {
-    if (workoutRemainingTime) {
-      setRemainingTime(workoutRemainingTime);
-    }
-  }, [workoutRemainingTime]);
-
-  useEffect(() => {
-    updateWorkoutTimer(true);
-  }, []);
-
-  // Timer controls
-  const handlePlay = () => {
-    console.log('Play', { isWorkoutTimerRunning, reftime: timerRef.current });
-    updateWorkoutTimer(true);
-    if (timerRef.current) {
-      timerRef.current.resume(); // Ensure `start` is called on a valid instance
-    }
-  };
-
-  const handlePause = () => {
-    updateWorkoutTimer(false);
-    if (timerRef.current) {
-      timerRef.current.pause(); // Ensure `pause` is called on a valid instance
-    }
-  };
-
-  const handleStop = () => {
-    updateWorkoutTimer(false);
-    if (timerRef.current) {
-      timerRef.current.clear(); // Clear the timer and reset values
-    }
-
-    setElapsedTime(0);
-    setRemainingTime(totalWorkoutTime); // Reset to total time
-  };
-
-  // Initialize the pauseable timer
-  useEffect(() => {
-    timerRef.current = pauseable.setInterval(() => {
-      if (isWorkoutTimerRunning && !isWorkoutSessionDetailScreenTimerPaused) {
-        handleTimer();
-        return;
-      }
-      handlePause();
-    }, 1000);
-    return () => {
-      timerRef.current?.clear();
-    };
-  }, [isWorkoutTimerRunning, isWorkoutSessionDetailScreenTimerPaused]);
-
-  useEffect(() => {
-    updateWorkoutTimer(true);
-  }, []);
 
   return (
     <Container

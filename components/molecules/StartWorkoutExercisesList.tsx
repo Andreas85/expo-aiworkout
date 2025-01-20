@@ -291,7 +291,20 @@ const StartWorkoutExercisesList = (props: any) => {
       currentExerciseCompleted,
     });
 
-    startNextExercise();
+    const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
+    if (isLastExerciseCard && exerciseData?.length > 0) {
+      console.log('(handleNextRepsExercise) Workout finished 1', isLastExerciseCard);
+      startNextExercise();
+      workoutCycleCompleted();
+      updateWorkoutTimer(false);
+      updateWorkoutCompleted(true);
+
+      return;
+    }
+
+    updateWorkoutTimer(false);
+    openModal();
+    // startNextExercise();
   };
 
   // Memoize the renderItem to avoid re-renders
