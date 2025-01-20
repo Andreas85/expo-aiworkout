@@ -36,6 +36,8 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
     state => state.isWorkoutSessionDetailScreenTimerPaused,
   );
 
+  const isActiveRepExerciseCard = useWorkoutDetailStore(state => state.isActiveRepExerciseCard);
+
   const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail);
   const { updateIsWorkoutSessionDetailScreenTimerPaused, updateWorkoutTimer } =
     useWorkoutDetailStore();
@@ -115,7 +117,9 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
             web: tailwind('flex flex-row items-center justify-end gap-2  '),
           })}>
           {/* Play / Pause Button */}
-          <TouchableOpacity onPress={isTimerRunning ? onPause : onPlay} disabled={disableControls}>
+          <TouchableOpacity
+            onPress={isTimerRunning ? onPause : onPlay}
+            disabled={disableControls || isActiveRepExerciseCard}>
             {renderIcon()}
           </TouchableOpacity>
           {/* Sound Icon render */}

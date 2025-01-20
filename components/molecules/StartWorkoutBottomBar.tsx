@@ -51,31 +51,3 @@ const StartWorkoutBottomBar = () => {
 };
 
 export default StartWorkoutBottomBar;
-
-const styles = {
-  desktop: {
-    container: {
-      borderTopLeftRadius: '0rem',
-      borderTopRightRadius: '0rem',
-      borderBottomRightRadius: '12.5rem',
-      borderBottomLeftRadius: '12.5rem',
-      backgroundColor: '#252425',
-      // height: '100%',
-      boxShadow: '0px 12px 24px 4px rgba(95, 63, 102, 0.50)',
-    },
-    containerInfo: {
-      display: 'flex',
-      width: '50.5625rem',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    exercise_title: {
-      color: '#FFF',
-      textAlign: 'left',
-      fontSize: '32px',
-      fontStyle: 'normal',
-      fontWeight: '700',
-      lineHeight: '150%',
-    },
-  },
-};

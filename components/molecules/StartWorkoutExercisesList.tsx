@@ -29,8 +29,12 @@ const StartWorkoutExercisesList = (props: any) => {
 
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const muted = interactionStore(state => state.muted);
-  const { updateRemainingTime, updateWorkoutTimer, updateWorkoutCompleted } =
-    useWorkoutDetailStore();
+  const {
+    updateRemainingTime,
+    updateWorkoutTimer,
+    updateWorkoutCompleted,
+    updateIsActiveRepExerciseCard,
+  } = useWorkoutDetailStore();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
@@ -42,6 +46,14 @@ const StartWorkoutExercisesList = (props: any) => {
     hideModal: hideModalWorkoutComplete,
   } = useModal();
   const { isWeb } = usePlatform();
+
+  const disableWorkoutTimer = (hasReps: number) => {
+    if (hasReps) {
+      updateIsActiveRepExerciseCard?.(true);
+    } else {
+      updateIsActiveRepExerciseCard?.(false);
+    }
+  };
   // open modal
   const openModal = () => {
     setShowModel(true);
@@ -78,7 +90,8 @@ const StartWorkoutExercisesList = (props: any) => {
         if (hasRunInitially.current) return;
         hasRunInitially.current = true;
         setSelectedIndex(reqIndex);
-
+        const hasReps = workoutExercises[reqIndex]?.reps;
+        disableWorkoutTimer(hasReps);
         setTimeout(() => {
           try {
             if (flatListRef.current && reqIndex < workoutExercises.length) {
@@ -168,11 +181,13 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   const handleModalClose = () => {
+    const nexthasReps = getNextExerciseData()?.reps;
     // hideModal();
 
     // Schedule state updates to avoid conflicts
     setTimeout(() => {
       updateWorkoutTimer(true);
+      disableWorkoutTimer(nexthasReps);
       hideModal();
       startNextExercise(); // Proceed to the next exercise
       // scrollToItem();
