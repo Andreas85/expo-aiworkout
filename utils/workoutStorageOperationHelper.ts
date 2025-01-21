@@ -1,0 +1,173 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_EMITTER_KEYS, STORAGES_KEYS } from './appConstants';
+import { ExerciseElement, Workout } from '@/services/interfaces';
+import { generateBigNumberId } from './helper';
+import { DeviceEventEmitter } from 'react-native';
+
+const STORAGE_KEY = STORAGES_KEYS.WORKOUTS_LIST;
+
+// Fetch the array of workouts from AsyncStorage
+export const getWorkouts = async (): Promise<any[]> => {
+  const data = await AsyncStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+};
+
+// Save the array of workouts to AsyncStorage
+export const saveWorkouts = async (workouts: any[]): Promise<void> => {
+  const results = JSON.stringify(workouts);
+  await AsyncStorage.setItem(STORAGE_KEY, results);
+  // Emit an event whenever the value is updated
+  DeviceEventEmitter.emit(STORAGE_EMITTER_KEYS.REFRESH_WORKOUT_LIST, results);
+};
+
+// Add a new workout to the array of workouts in AsyncStorage
+export const addWorkout = async (workout: Pick<Workout, 'name'>): Promise<void> => {
+  const workouts = await getWorkouts();
+  const workoutId = generateBigNumberId();
+  // Create a new workout object
+  const newWorkout = {
+    ...workout,
+    _id: workoutId, // Unique ID for the workout
+    isPublic: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    exercises: [],
+  };
+
+  workouts.push(newWorkout); // Add the new workout to the array
+  await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+};
+
+// Edit an existing workout in the array of workouts in AsyncStorage
+export const editWorkout = async (
+  workoutId: string,
+  updatedData: Partial<{
+    name: string;
+  }>,
+): Promise<void> => {
+  const workouts = await getWorkouts();
+
+  // Find the workout by ID
+  const index = workouts.findIndex(workout => workout._id === workoutId);
+  if (index === -1) throw new Error('Workout not found');
+
+  // Update the workout
+  workouts[index] = {
+    ...workouts[index],
+    ...updatedData,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+};
+
+// Duplicate workout to the array of workouts in AsyncStorage
+export const duplicateWorkout = async (workout: Pick<Workout, 'name'>): Promise<any> => {
+  const workouts = await getWorkouts();
+  const workoutId = generateBigNumberId();
+  // Create a new workout object
+  const newWorkout = {
+    name: workout.name + ' Copy',
+    _id: workoutId, // Unique ID for the workout
+    isPublic: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  workouts.push(newWorkout); // Add the new workout to the array
+  await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+  return newWorkout || null; // Return the workout if found, otherwise null
+};
+
+// Delete a workout from the array of workouts in AsyncStorage
+
+export const deleteWorkout = async (workoutId: string): Promise<void> => {
+  const workouts = await getWorkouts();
+
+  // Remove the workout with the specified ID
+  const updatedWorkouts = workouts.filter(workout => workout._id !== workoutId);
+
+  await saveWorkouts(updatedWorkouts); // Save the updated array to AsyncStorage
+};
+
+export const getWorkoutDetail = async (workoutId: string): Promise<any | null> => {
+  const workouts = await getWorkouts();
+
+  // Find the workout by ID
+  const workout = workouts.find(workout => workout._id === workoutId);
+
+  return workout || null; // Return the workout if found, otherwise null
+};
+
+// Add an exercise to a workout in the array of workouts in AsyncStorage
+export const addExerciseToWorkout = async (
+  workoutId: string,
+  exercise: Partial<ExerciseElement>,
+): Promise<void> => {
+  const workouts = await getWorkouts();
+
+  // Find the workout by ID
+  const workout = workouts.find(workout => workout._id === workoutId);
+  if (!workout) throw new Error('Workout not found');
+
+  // Create a new exercise object
+  const newExercise = {
+    ...exercise,
+    _id: Date.now().toString(), // Unique ID for the exercise
+  };
+
+  workout.exercises.push(newExercise); // Add the exercise to the workout
+  workout.updatedAt = new Date().toISOString();
+
+  await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+  // Emit event after successful operation
+  DeviceEventEmitter.emit(STORAGE_EMITTER_KEYS.REFRESH_WORKOUT_DETAILS, {
+    action: 'add',
+    workoutId,
+  });
+};
+
+export const editExerciseInWorkout = async (
+  workoutId: string,
+  exerciseId: string,
+  updatedData: Partial<{
+    reps: number;
+    rest: number;
+    weight: number;
+    duration: number;
+    order: number;
+  }>,
+): Promise<void> => {
+  const workouts = await getWorkouts();
+
+  // Find the workout by ID
+  const workout = workouts.find(workout => workout._id === workoutId);
+  if (!workout) throw new Error('Workout not found');
+
+  // Find the exercise by ID
+  const exercise = workout.exercises.find((ex: ExerciseElement) => ex._id === exerciseId);
+  if (!exercise) throw new Error('Exercise not found');
+
+  // Update the exercise
+  Object.assign(exercise, updatedData);
+  workout.updatedAt = new Date().toISOString();
+
+  await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+};
+
+export const deleteExerciseFromWorkout = async (
+  workoutId: string,
+  exerciseId: string,
+): Promise<void> => {
+  const workouts = await getWorkouts();
+
+  // Find the workout by ID
+  const workout = workouts.find(workout => workout._id === workoutId);
+  if (!workout) throw new Error('Workout not found');
+
+  // Remove the exercise with the specified ID
+  workout.exercises = workout.exercises.filter((ex: ExerciseElement) => ex._id !== exerciseId);
+  workout.updatedAt = new Date().toISOString();
+
+  await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+};

@@ -259,7 +259,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                 }),
               ]}>
               <TextContainer
-                data={`${data.exercise?.name}`}
+                data={`${data.exercise?.name || data?.name}`}
                 style={[
                   Platform.select({
                     web: tailwind(
@@ -586,7 +586,10 @@ const ExerciseCard = (props: IExerciseCard) => {
             )}>
             <Container style={tailwind(' ')}>{children}</Container>
             {/* :${data.order} */}
-            <TextContainer data={`${data?.exercise?.name} `} style={tailwind('flex-1')} />
+            <TextContainer
+              data={`${data?.exercise?.name || data?.name || ''} `}
+              style={tailwind('flex-1')}
+            />
           </Container>
           <Container style={tailwind('')}>
             <CustomSwitch

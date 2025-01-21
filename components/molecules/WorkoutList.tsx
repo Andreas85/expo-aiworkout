@@ -9,11 +9,11 @@ import { IMAGES } from '@/utils/images';
 
 interface WorkoutListProps {
   data: any[];
-  isPending: boolean;
+  isPending?: boolean;
   numColumns: number;
   onItemPress: (item: any) => void;
   isEnabled: boolean;
-  onRefresh: () => void;
+  onRefresh?: () => void;
   isMyWorkout?: boolean;
   keyName?: string;
 }

@@ -9,9 +9,7 @@ import { AppTextInput } from '../atoms/AppTextInput';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   addExerciseToWorkoutRequest,
-  exerciseAutoSuggest,
   fetchExerciseService,
-  fetchPublicExerciseService,
   sortExercisesRequest,
 } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
@@ -19,15 +17,16 @@ import * as yup from 'yup';
 import { useLocalSearchParams } from 'expo-router';
 import CustomSwitch from '../atoms/CustomSwitch';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import CustomAutoComplete from '../atoms/CustomAutoComplete';
 
 import { ExerciseElement } from '@/services/interfaces';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { Text, View } from '../Themed';
+import { View } from '../Themed';
 import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 import { useToast } from 'react-native-toast-notifications';
 import CustomDropdown from '../atoms/CustomDropdown';
 import { useFetchData } from '@/hooks/useFetchData';
+import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
+import { useAuthStore } from '@/store/authStore';
 
 const ERROR_MESSAGE = {
   EXERCISE_REQ: 'Exercise name is required if less than 3 characters.',
@@ -72,12 +71,13 @@ function AddExercise(props: {
   newCardOrder?: number;
 }) {
   const { isModalVisible, closeModal, isExerciseCard, newCardOrder } = props;
+  const { handleAddExerciseForNonLoggedInUser } = useWorkoutNonLoggedInUser();
   const { slug } = useLocalSearchParams() as any;
   const toast = useToast();
   const { updateWorkoutExercises } = useWorkoutDetailStore();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const [responseError, setResponseError] = useState<string>();
   const [filteredExercises, setFilteredExercises] = useState<any>([]);
-  const [isNewExercise, setIsNewExercise] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const cachedPublicExerciseData: any =
     queryClient.getQueryData([REACT_QUERY_API_KEYS.PUBLIC_EXERCISES]) ?? [];
@@ -137,27 +137,32 @@ function AddExercise(props: {
 
   const handleAddWorkout = async (values: IFormValues) => {
     const { duration, reps, weight, rest, exercise } = values;
-
+    const exerciseData = {
+      exerciseId: exercise?._id,
+      name: !exercise?._id ? exercise : `${exercise?.name || ''} `,
+      duration: parseInt(duration),
+      reps: reps ? parseInt(reps) : 0,
+      weight: weight ? parseFloat(weight) : 0,
+      rest: rest ? parseInt(rest) : 0,
+    };
     const payload = {
       queryParams: { id: slug },
-      formData: {
-        exerciseId: exercise?._id,
-        name: !exercise?._id ? exercise : '',
-        duration: parseInt(duration),
-        reps: reps ? parseInt(reps) : 0,
-        weight: weight ? parseFloat(weight) : 0,
-        rest: rest ? parseInt(rest) : 0,
-      },
+      formData: exerciseData,
     };
     console.log({ values }, { payload });
-
-    mutateAddExerciseToWorkout(payload);
+    if (isAuthenticated) {
+      mutateAddExerciseToWorkout(payload);
+      return;
+    }
+    handleAddExerciseForNonLoggedInUser(exerciseData);
+    closeModal();
   };
 
-  const { data, refetch, isSuccess } = useFetchData({
+  const { data, isSuccess } = useFetchData({
     queryFn: fetchExerciseService,
     queryKey: [REACT_QUERY_API_KEYS.MY_EXERCISES],
     staleTime: REACT_QUERY_STALE_TIME.MY_EXERCISES,
+    enabled: isAuthenticated,
   });
 
   useEffect(() => {
@@ -177,16 +182,6 @@ function AddExercise(props: {
     input && typeof input === 'object' && 'label' in input && 'value' in input;
 
   // Fetch exercises based on the query input
-  const handleExercisesOptionsFetch = async (input: string) => {
-    if (!input) return [];
-    try {
-      const response = await exerciseAutoSuggest(input);
-      return response || [];
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-      return [];
-    }
-  };
 
   // const findExercise = async (input: string) => {
   //   setQuery(input);
@@ -219,7 +214,7 @@ function AddExercise(props: {
             validateOnChange={false} // Disable validation on field change
             validateOnBlur={true} // Enable validation on blur
             onSubmit={handleAddWorkout}>
-            {({ handleChange, handleSubmit, values, errors, isSubmitting, setFieldValue }: any) => (
+            {({ handleChange, handleSubmit, values, errors, setFieldValue }: any) => (
               <Container style={tailwind('gap-y-4')}>
                 <ScrollView>
                   <KeyboardAvoidingView
@@ -227,7 +222,7 @@ function AddExercise(props: {
                     style={{ flex: 1 }}>
                     {/* <Text>{JSON.stringify(values?.exercise)}</Text> */}
                     <FieldArray name="exercise">
-                      {({ field, form }: any) => (
+                      {() => (
                         <CustomDropdown
                           open={true}
                           search={true}

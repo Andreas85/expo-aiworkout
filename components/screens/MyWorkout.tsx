@@ -14,22 +14,23 @@ import CustomSwitch from '../atoms/CustomSwitch';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import { LayoutAnimation, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
+import NoDataFallbackContainer from '../atoms/NoDataFallbackContainer';
+import { useAuthStore } from '@/store/authStore';
+import MyWorkoutNotLoggedInList from '../molecules/MyWorkoutNotLoggedInList';
+import { Workout } from '@/services/interfaces';
 
 export default function MyWorkout() {
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
   const queryClient = useQueryClient();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  const { setWorkoutDetail } = useWorkoutDetailStore();
-  // const toggleSwitch = () => setIsEnabled(!isEnabled);
-
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   // Using LayoutAnimation for smooth transitions
   const toggleSwitch = useCallback(
     debounce(() => {
@@ -47,15 +48,8 @@ export default function MyWorkout() {
     queryFn: getFetchFunction,
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
     staleTime: REACT_QUERY_STALE_TIME.MY_WORKOUT,
+    enabled: isAuthenticated,
   });
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     // if (!isStale) {
-  //     refetch();
-  //     // }
-  //   }, []),
-  // );
 
   const prefetchWorkouts = (id: string) => {
     // The results of this query will be cached like a normal query
@@ -66,17 +60,6 @@ export default function MyWorkout() {
       // gcTime: 1000,
     });
   };
-
-  // const { data, refetch:refetchDetails, isLoading } = useFetchData({
-  //   queryFn: async () => {
-  //     const response = await getWorkoutDetailById({ id: slug });
-  //     console.log({ response });
-  //     setWorkoutDetail(response);
-  //     return response;
-  //   },
-  //   queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-  //   enabled: false,
-  // });
 
   const handleAddWorkout = () => {
     showModal();
@@ -90,7 +73,7 @@ export default function MyWorkout() {
     }
   }, [data, isSuccess]);
 
-  const handleCardClick = (item: any) => {
+  const handleCardClick = (item: Workout) => {
     // setWorkoutDetail(item);
     router.push(`/workout/${item?._id}`);
   };
@@ -103,6 +86,9 @@ export default function MyWorkout() {
     // Ensure bracketPrediction is iterable
     const iterableProductData = Array.isArray(data?.data) ? data?.data : [];
 
+    if (iterableProductData.length === 0) {
+      return <NoDataFallbackContainer />;
+    }
     // Calculate how many placeholders are needed to make length a multiple of 4
     const placeholdersNeeded =
       iterableProductData.length % 4 === 0 ? 0 : 4 - (iterableProductData.length % 4);
@@ -185,7 +171,11 @@ export default function MyWorkout() {
         style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
         {renderVersionTab()}
         {renderTopHeader()}
-        {renderWorkingListing()}
+        {isAuthenticated ? (
+          renderWorkingListing()
+        ) : (
+          <MyWorkoutNotLoggedInList isEnabled={isEnabled} handleCardClick={handleCardClick} />
+        )}
       </Container>
       {openModal && (
         <AddAndEditWorkoutModal

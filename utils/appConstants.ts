@@ -71,6 +71,12 @@ export const REACT_QUERY_STALE_TIME = {
 export const STORAGES_KEYS = {
   WORKOUT_SESSION_LIST: 'workout-session-list',
   WORKOUT_SESSION: 'workout-session',
+  WORKOUTS_LIST: 'workouts-list',
+};
+
+export const STORAGE_EMITTER_KEYS = {
+  REFRESH_WORKOUT_LIST: 'refresh-workout-list',
+  REFRESH_WORKOUT_DETAILS: 'refresh-workout-details',
 };
 
 export const WORKOUT_STATUS = {

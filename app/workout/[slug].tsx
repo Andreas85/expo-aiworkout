@@ -2,26 +2,33 @@ import React, { useEffect } from 'react';
 import GradientBackground from '@/components/atoms/GradientBackground';
 import WorkoutDetail from '@/components/screens/WorkoutDetail';
 import { useLocalSearchParams } from 'expo-router';
-import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
+import {
+  REACT_QUERY_API_KEYS,
+  REACT_QUERY_STALE_TIME,
+  STORAGE_EMITTER_KEYS,
+} from '@/utils/appConstants';
 import { fetchPublicExerciseService, getWorkoutDetailById } from '@/services/workouts';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Loading from '@/components/atoms/Loading';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { tailwind } from '@/utils/tailwind';
-import { Platform } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFetchData } from '@/hooks/useFetchData';
+import { useAuthStore } from '@/store/authStore';
+import { getWorkoutDetail } from '@/utils/workoutStorageOperationHelper';
 
 const WorkoutDetailIndex = () => {
   const queryClient = useQueryClient();
-  const { slug } = useLocalSearchParams();
+  const { slug } = useLocalSearchParams() as { slug: string };
   const { isLargeScreen } = useWebBreakPoints();
   const { setWorkoutDetail } = useWorkoutDetailStore();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
 
   // const cachedData: any = queryClient.getQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug]);
-  const { data: exerciseDAta } = useFetchData({
+  useFetchData({
     queryFn: fetchPublicExerciseService,
     queryKey: [REACT_QUERY_API_KEYS.PUBLIC_EXERCISES],
     staleTime: REACT_QUERY_STALE_TIME.PUBLIC_EXERCISES,
@@ -39,37 +46,52 @@ const WorkoutDetailIndex = () => {
     queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
   });
 
-  // Uncomment this block of code if you want to use the fresh data
-  // useEffect(() => {
-  //   if (slug) {
-  //     refetch();
-  //   }
-  // }, [slug]);
-
-  // useEffect(() => {
-  //   if (data) {
-  //     setWorkoutDetail(data); // Update store with the latest data
-  //   }
-  // }, [data]);
-
   // Uncomment this block of code if you want to use the cached data
 
+  const refetchWorkoutData = async (workoutId: string) => {
+    const updatedData = await getWorkoutDetail(workoutId);
+    setWorkoutDetail(updatedData);
+  };
+
   useEffect(() => {
-    const cachedData: any = queryClient.getQueryData([
-      REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS,
-      slug,
-    ]);
-    const requiredData = data || cachedData;
-    console.log('Refetch: ', { isStale }, { data });
-    console.log({ requiredData });
-    if (requiredData) {
-      setWorkoutDetail(requiredData);
-    } else {
-      queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
-        refetchType: 'all',
-      });
-      refetch();
+    // Event listener for workout updates
+    if (isAuthenticated) return;
+    refetchWorkoutData(slug);
+    const workoutUpdatedListener = DeviceEventEmitter.addListener(
+      STORAGE_EMITTER_KEYS.REFRESH_WORKOUT_DETAILS,
+      event => {
+        console.log('Event:', event);
+        if (event.workoutId === slug) {
+          console.log('Workout updated:', event);
+          refetchWorkoutData(slug); // Refetch workout details
+        }
+      },
+    );
+
+    // Cleanup the listener on unmount
+    return () => {
+      workoutUpdatedListener.remove();
+    };
+  }, [slug]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const cachedData: any = queryClient.getQueryData([
+        REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS,
+        slug,
+      ]);
+      const requiredData = data || cachedData;
+      console.log('Refetch: ', { isStale }, { data });
+      console.log({ requiredData });
+      if (requiredData) {
+        setWorkoutDetail(requiredData);
+      } else {
+        queryClient.invalidateQueries({
+          queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+          refetchType: 'all',
+        });
+        refetch();
+      }
     }
   }, [slug, refetch, data]);
 

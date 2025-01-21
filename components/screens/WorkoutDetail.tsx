@@ -29,12 +29,17 @@ import ConfirmationModal from '../modals/ConfirmationModal';
 import { useToast } from 'react-native-toast-notifications';
 
 import AddExercise from '../modals/AddExercise';
+import { useAuthStore } from '@/store/authStore';
+import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams() as any;
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const { handleDeleteWorkoutForNonLoggedInUser, handleDuplicateWorkoutForNonLoggedInUser } =
+    useWorkoutNonLoggedInUser();
   const { hideModal, showModal, openModal } = useModal();
   const {
     hideModal: hideModalAddExercise,
@@ -113,11 +118,22 @@ const WorkoutDetail = () => {
   });
 
   const handleDuplicateWorkout = () => {
-    mutateCreateWorkoutCopy({ id: slug });
+    if (isAuthenticated) {
+      mutateCreateWorkoutCopy({ id: slug });
+      return;
+    }
+    handleDuplicateWorkoutForNonLoggedInUser({
+      name: workoutDetail?.name ?? '',
+    });
+    hideModalCreateWorkoutCopy();
   };
 
   const handleDeleteWorkout = () => {
-    mutateDeleteWorkout({ id: slug });
+    if (isAuthenticated) {
+      mutateDeleteWorkout({ id: slug });
+      return;
+    }
+    handleDeleteWorkoutForNonLoggedInUser();
   };
 
   useEffect(() => {
