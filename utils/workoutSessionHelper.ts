@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGES_KEYS } from './appConstants';
 import { mapExerciseElementToExercise } from './helper';
 import { ExerciseElement } from '@/services/interfaces';
+import { FlatList } from 'react-native';
 
 export interface WorkoutSession {
   _id: string;
@@ -322,5 +323,41 @@ export const getWorkoutSessionExerciseById = async (
   } catch (error) {
     console.error('Error getting exercise:', error);
     return null;
+  }
+};
+
+export const scrollToIndex = (
+  flatListRef: React.RefObject<FlatList<any>>,
+  index: number,
+  itemHeight: number,
+  containerHeight: number,
+  totalItems: number,
+  options: { animated?: boolean; viewPosition?: number } = {},
+  isLargeScreen = false,
+) => {
+  if (flatListRef.current) {
+    const { animated = true } = options;
+    try {
+      // Ensure the index is within valid bounds
+      const validIndex = Math.max(0, Math.min(index, totalItems - 1));
+
+      // Calculate the offset to fully show the item
+      const offset = Math.max(0, validIndex * itemHeight - containerHeight / 2 + itemHeight / 2);
+      if (isLargeScreen) {
+        flatListRef.current.scrollToOffset({
+          offset,
+          animated,
+        });
+      } else {
+        flatListRef.current.scrollToIndex({
+          index: validIndex,
+          animated,
+          viewOffset: 20,
+          viewPosition: validIndex === 0 || validIndex === totalItems - 1 ? 0 : 0.5, // Keep center for non-edge indices
+        });
+      }
+    } catch (error) {
+      console.warn('Error scrolling to index:', error);
+    }
   }
 };

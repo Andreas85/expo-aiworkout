@@ -15,18 +15,23 @@ import BaseTimer from '../modals/BaseTimer';
 import usePlatform from '@/hooks/usePlatform';
 import WorkoutComplete from '../modals/WorkoutComplete';
 import useModal from '@/hooks/useModal';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import {
   getWorkoutSessionById,
+  scrollToIndex,
   updateExerciseInSession,
   updateWorkoutSessionStatus,
 } from '@/utils/workoutSessionHelper';
 import { interactionStore } from '@/store/interactionStore';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+
+const ITEM_HEIGHT = 100; // Replace with the actual height of your list items
+const CONTAINER_HEIGHT = 500; // Replace with the actual height of the FlatList container
 
 const StartWorkoutExercisesList = (props: any) => {
   const hasRunInitially = useRef(false);
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
-
+  const { isLargeScreen } = useWebBreakPoints();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const muted = interactionStore(state => state.muted);
   const {
@@ -72,10 +77,16 @@ const StartWorkoutExercisesList = (props: any) => {
       const unfinishedExerciseData = findFirstIncompleteExercise(
         workoutSessionOfExercises?.exercises,
       );
+      if (!unfinishedExerciseData) {
+        await updateWorkoutSessionStatus(slug, 'completed');
+        updateWorkoutTimer(false);
+        updateWorkoutCompleted(true);
+      }
       const remainingTime = workoutSessionOfExercises?.remainingTime ?? 0;
       // console.log('unfinishedExerciseDataunfinishedExerciseData', {
       //   remainingTime,
       //   unfinishedExerciseData,
+      //   workoutSessionOfExercises,
       // });
       updateRemainingTime(remainingTime);
       if (isCompleted) {
@@ -93,18 +104,18 @@ const StartWorkoutExercisesList = (props: any) => {
         const hasReps = workoutExercises[reqIndex]?.reps;
         disableWorkoutTimer(hasReps);
         setTimeout(() => {
-          try {
-            if (flatListRef.current && reqIndex < workoutExercises.length) {
-              flatListRef.current.scrollToIndex({
-                index: reqIndex,
-                animated: true,
-                viewPosition: 0.5,
-              });
-              console.log('hasRunInitially.current2', hasRunInitially.current);
-            }
-          } catch (error) {
-            console.warn('Error scrolling to index:', error);
-          }
+          scrollToIndex(
+            flatListRef,
+            reqIndex,
+            ITEM_HEIGHT,
+            CONTAINER_HEIGHT,
+            workoutExercises.length,
+            {
+              animated: true,
+              viewPosition: 0.5,
+            },
+            isLargeScreen,
+          );
         }, 100);
       }
     }
@@ -128,9 +139,13 @@ const StartWorkoutExercisesList = (props: any) => {
     };
   }, [workoutDetail]);
 
-  useEffect(() => {
-    hasRunInitially.current = false;
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      // if (!isStale) {
+      hasRunInitially.current = false;
+      // }
+    }, []),
+  );
 
   // Play a sound
   const playSound = useCallback(async () => {
@@ -196,7 +211,8 @@ const StartWorkoutExercisesList = (props: any) => {
 
   const workoutCycleCompleted = () => {
     console.log('Workout cycle completed');
-
+    const nextIndex = selectedIndex + 1;
+    setSelectedIndex(nextIndex);
     updateWorkoutTimer(false);
     updateWorkoutCompleted(true);
     showModelWorkoutComplete();
@@ -210,11 +226,15 @@ const StartWorkoutExercisesList = (props: any) => {
   const saveWorkoutSessionExerciseRecord = async (props: {
     durationTaken: number;
     currentExerciseCompleted: boolean;
+    isLastExerciseCard?: boolean;
   }) => {
-    const { durationTaken, currentExerciseCompleted } = props;
+    const { durationTaken, currentExerciseCompleted, isLastExerciseCard } = props;
     const currentExercise = getCurrentExerciseData();
-
-    console.log('Current Exercise:', { durationTaken, currentExerciseCompleted });
+    // console.log('Current Exercise:', {
+    //   durationTaken,
+    //   currentExerciseCompleted,
+    //   isLastExerciseCard,
+    // });
     // if (!currentExercise) return;
     const payload = {
       sessionId: slug ?? '',
@@ -230,7 +250,6 @@ const StartWorkoutExercisesList = (props: any) => {
       payload.repsTaken,
     );
 
-    const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
     if (isLastExerciseCard) {
       await updateWorkoutSessionStatus(slug, 'completed');
     }
@@ -240,17 +259,21 @@ const StartWorkoutExercisesList = (props: any) => {
     console.log('Start Next Exercise');
 
     const nextIndex = selectedIndex + 1;
-    console.log('Scrolling to index:', { nextIndex, exerciseData });
-    if (nextIndex > exerciseData.length) return;
-    setSelectedIndex(nextIndex);
 
-    if (flatListRef.current && nextIndex <= exerciseData.length - 1) {
-      flatListRef.current.scrollToIndex({
-        index: nextIndex,
+    if (nextIndex >= exerciseData.length) return; // No further scrolling if at the end
+    setSelectedIndex(nextIndex);
+    scrollToIndex(
+      flatListRef,
+      nextIndex,
+      ITEM_HEIGHT,
+      CONTAINER_HEIGHT,
+      exerciseData.length,
+      {
         animated: true,
-        viewPosition: nextIndex === 0 || nextIndex === exerciseData.length - 1 ? 0 : 0.5, // Keep center for non-edge indices
-      });
-    }
+        viewPosition: 0.5,
+      },
+      isLargeScreen,
+    );
   };
 
   // Scroll to a specific item by index
@@ -265,6 +288,7 @@ const StartWorkoutExercisesList = (props: any) => {
     saveWorkoutSessionExerciseRecord({
       durationTaken,
       currentExerciseCompleted,
+      isLastExerciseCard,
     });
 
     if (isLastExerciseCard && exerciseData?.length > 0) {
@@ -301,12 +325,13 @@ const StartWorkoutExercisesList = (props: any) => {
   }) => {
     const { durationTaken, currentExerciseCompleted } = props;
     console.log('Reps workout finished- Exercise-list', { props });
+    const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
     saveWorkoutSessionExerciseRecord({
       durationTaken,
       currentExerciseCompleted,
+      isLastExerciseCard,
     });
 
-    const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
     if (isLastExerciseCard && exerciseData?.length > 0) {
       console.log('(handleNextRepsExercise) Workout finished 1', isLastExerciseCard);
       startNextExercise();

@@ -71,7 +71,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
         <ShowLabelValue
           container={{
             web: `${isLargeScreen ? 'gap-[0.75rem] justify-center' : ''}`,
-            native: 'gap-[0.75rem] justify-center',
+            native: 'gap-[0.75rem] justify-center items-center ',
           }}
           label={hasReps ? 'No. of Reps ' : 'Duration'}
           value={hasReps ? repsValue : durationValue}
@@ -121,7 +121,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           style={[
             Platform.select({
               web: tailwind(`flex-row items-center ${isLargeScreen ? '' : ''}`),
-              native: tailwind('flex-1 flex-row items-center'),
+              native: tailwind(`${isRestCard ? 'flex-1' : ''} flex-row items-center`),
             }),
           ]}>
           <Text
@@ -132,7 +132,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
                     ' ' +
                     `${isLargeScreen ? 'line-clamp-1 text-[1rem]' : 'text-[1.625rem] font-bold not-italic'} font-inter`,
                 ),
-                native: tailwind('text-[1rem] font-extrabold'),
+                native: tailwind(`text-[1rem] font-extrabold `),
               }),
               {
                 fontWeight: '700',
