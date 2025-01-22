@@ -1,8 +1,8 @@
-import { string } from 'yup';
-
 export interface ICreateWorkoutFormData {
   name?: string;
   isPublic?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IAddExerciseToWorkout {
@@ -12,6 +12,9 @@ export interface IAddExerciseToWorkout {
   reps?: any;
   rest?: any;
   weight?: any;
+  order?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IUpdateExerciseToWorkout {
