@@ -8,15 +8,12 @@ import { Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { ActionButton } from '../atoms/ActionButton';
 import { SkypeIndicator } from 'react-native-indicators';
-import CustomSwitch from '../atoms/CustomSwitch';
 
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import NoDataSvg from '../svgs/NoDataSvg';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
-import { AntDesign, Feather, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
-import DraggableExercises from '../molecules/DraggableExercises';
 import useModal from '@/hooks/useModal';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -31,6 +28,9 @@ import { useToast } from 'react-native-toast-notifications';
 import AddExercise from '../modals/AddExercise';
 import { useAuthStore } from '@/store/authStore';
 import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
+import RenderWorkoutDetailController from '../atoms/RenderWorkoutDetailController';
+import RenderWorkoutDetailExercises from '../atoms/RenderWorkoutDetailExercises';
+import RenderWorkoutDetailStartWorkoutContainer from '../atoms/RenderWorkoutDetailStartWorkoutContainer';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
@@ -57,7 +57,7 @@ const WorkoutDetail = () => {
     openModal: openModalCreateWorkoutCopy,
   } = useModal();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
-  const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
+
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const [isCurrentWorkoutPublic, setIsCurrentWorkoutPublic] = useState<boolean>(false);
   const { isLargeScreen, isExtraSmallScreenOnly } = useWebBreakPoints();
@@ -142,160 +142,6 @@ const WorkoutDetail = () => {
       navigation.setOptions({ title: `Workout: ${workoutDetail.name ?? ''}`, unmountOnBlur: true });
     }
   }, [workoutDetail]);
-
-  const renderWorkoutExercises = () => {
-    if (!hasExercise) {
-      return (
-        <Container style={tailwind('flex-1')}>
-          <NoDataSvg label="No exercises" message={'Start building your workout'} />
-        </Container>
-      );
-    }
-    return (
-      <>
-        <DraggableExercises setIsPendingExerciseCardAction={setIsPendingExerciseCardAction} />
-      </>
-    );
-  };
-
-  const renderStartWorkoutButton = () => {
-    if (hasExercise) {
-      return (
-        <Container
-          style={[
-            Platform.select({
-              web: tailwind(
-                `${isLargeScreen ? ' p-4' : 'absolute bottom-3   items-center justify-center self-center px-4'}`,
-              ),
-
-              native: tailwind(
-                'absolute bottom-0 left-0 right-0  flex-1 bg-NAVBAR_BACKGROUND p-4 ',
-              ),
-            }),
-          ]}>
-          <ActionButton
-            label="Start workout"
-            uppercase
-            disabled
-            style={[
-              Platform.select({
-                web: tailwind(
-                  `${isLargeScreen ? 'w-full' : 'h-[3.6875rem] w-[23.0625rem]'} flex  shrink-0 items-center justify-center gap-2.5 rounded-lg px-2.5 py-3`,
-                ),
-                native: tailwind('rounded-lg '),
-              }),
-            ]}
-          />
-        </Container>
-      );
-    }
-  };
-
-  const renderWorkoutController = () => {
-    return (
-      <Container
-        style={[
-          Platform.select({
-            web: tailwind('w-full flex-row flex-wrap items-center justify-between gap-4 '),
-            native: tailwind('w-full flex-row flex-wrap  items-center justify-between gap-1 '),
-          }),
-        ]}>
-        <Container
-          style={[
-            Platform.select({
-              web: tailwind(` gap-4 ${isLargeScreen ? 'hidden ' : 'flex-row'} flex-1.5`),
-              native: tailwind('hidden'),
-            }),
-          ]}>
-          <BackActionButton />
-          <LabelContainer
-            label={workoutDetail?.name ?? ''}
-            labelStyle={[
-              Platform.select({
-                web: tailwind(
-                  `${isLargeScreen ? 'text-[1.0625rem]' : 'text-[1.5rem]'}   font-bold not-italic leading-[150%] text-white `,
-                ),
-                native: tailwind('text-xl font-bold'),
-              }),
-            ]}
-            containerStyle={[
-              Platform.select({
-                web: tailwind(`
-                ${isLargeScreen ? 'hidden' : 'flex-1 justify-start text-xl font-bold'}  
-              `),
-                native: tailwind('hidden'),
-              }),
-            ]}
-            onPress={showModal}
-            left={<FontAwesome5 name="edit" color="#A27DE1" size={ICON_SIZE} />}
-          />
-        </Container>
-        <CustomSwitch
-          isEnabled={isCurrentWorkoutPublic}
-          toggleSwitch={toggleIsCurrentWorkoutPublic}
-          labelStyle={[
-            Platform.select({
-              web: tailwind(
-                ' text-center text-xl font-normal not-italic leading-[150%] text-white',
-              ),
-              native: tailwind('text-sm font-bold'),
-            }),
-          ]}
-          label={'Public'}
-        />
-        <LabelContainer
-          label={'Duplicate'}
-          labelStyle={[
-            Platform.select({
-              web: tailwind(
-                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center  font-normal not-italic leading-[150%] text-white`,
-              ),
-              native: tailwind('text-sm font-bold'),
-            }),
-          ]}
-          onPress={showModalCreateWorkoutCopy}
-          containerStyle={[
-            Platform.select({
-              web: tailwind('flex-1 justify-end'),
-              // native: tailwind('flex-1'),
-            }),
-          ]}
-          left={
-            <Ionicons
-              name="duplicate-sharp"
-              color="#A27DE1"
-              size={Platform.OS === 'web' ? ICON_SIZE : 16}
-            />
-          }
-        />
-        <LabelContainer
-          label={'Delete'}
-          labelStyle={[
-            Platform.select({
-              web: tailwind(
-                ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'}  text-center font-normal  not-italic leading-[150%] text-white`,
-              ),
-              native: tailwind('text-sm font-bold'),
-            }),
-          ]}
-          containerStyle={[
-            Platform.select({
-              web: tailwind('flex-1 justify-end'),
-              // native: tailwind('flex-1'),
-            }),
-          ]}
-          onPress={showModalDeleteModal}
-          left={
-            <FontAwesome6
-              name="trash-can"
-              color="#A27DE1"
-              size={Platform.OS === 'web' ? ICON_SIZE : 16}
-            />
-          }
-        />
-      </Container>
-    );
-  };
 
   const renderExcerciseLabel = () => {
     return (
@@ -392,33 +238,7 @@ const WorkoutDetail = () => {
                 <BackActionButton />
               </Container>
             )}
-            {/* {(isPending || isPendingExerciseCardAction) &&
-              Platform.OS === 'web' &&
-              !isLargeScreen && (
-                <Container
-                  style={[tailwind(` relative flex-1 items-start justify-center self-center`)]}>
-                  <LabelContainer
-                    label={'Saving Changes'}
-                    containerStyle={[
-                      Platform.select({
-                        web: tailwind(`
-                    ${isLargeScreen ? 'hidden' : 'absolute top-[5px] self-center'}
-                  `),
-                      }),
-                    ]}
-                    right={
-                      <SkypeIndicator
-                        color="#A27DE1"
-                        animating
-                        size={Platform.OS === 'web' ? 20 : 16}
-                        style={{
-                          marginRight: 10,
-                        }}
-                      />
-                    }
-                  />
-                </Container>
-              )} */}
+
             <LabelContainer
               label={workoutDetail?.name ?? ''}
               labelStyle={[
@@ -443,7 +263,13 @@ const WorkoutDetail = () => {
           </Container>
         </Container>
 
-        {renderWorkoutController()}
+        <RenderWorkoutDetailController
+          showModal={showModal}
+          isCurrentWorkoutPublic={isCurrentWorkoutPublic}
+          toggleIsCurrentWorkoutPublic={toggleIsCurrentWorkoutPublic}
+          showModalCreateWorkoutCopy={showModalCreateWorkoutCopy}
+          showModalDeleteModal={showModalDeleteModal}
+        />
 
         {renderExcerciseLabel()}
         <Container
@@ -462,11 +288,13 @@ const WorkoutDetail = () => {
                 native: tailwind('mb-1 flex-1 '),
               }),
             ]}>
-            {renderWorkoutExercises()}
+            <RenderWorkoutDetailExercises
+              setIsPendingExerciseCardAction={() => setIsPendingExerciseCardAction}
+            />
           </Container>
         </Container>
       </Container>
-      {renderStartWorkoutButton()}
+      <RenderWorkoutDetailStartWorkoutContainer />
       {openModal && (
         <AddAndEditWorkoutModal
           isEditWorkout={true}
