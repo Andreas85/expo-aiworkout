@@ -34,7 +34,7 @@ export const addWorkout = async (workout: Pick<Workout, 'name'>): Promise<void> 
     exercises: [],
   };
 
-  workouts.push(newWorkout); // Add the new workout to the array
+  workouts?.push?.(newWorkout); // Add the new workout to the array
   await saveWorkouts(workouts); // Save the updated array to AsyncStorage
 };
 
@@ -74,7 +74,7 @@ export const duplicateWorkout = async (workout: Pick<Workout, 'name'>): Promise<
     updatedAt: new Date().toISOString(),
   };
 
-  workouts.push(newWorkout); // Add the new workout to the array
+  workouts?.push?.(newWorkout); // Add the new workout to the array
   await saveWorkouts(workouts); // Save the updated array to AsyncStorage
   return newWorkout || null; // Return the workout if found, otherwise null
 };
@@ -85,7 +85,7 @@ export const deleteWorkout = async (workoutId: string): Promise<void> => {
   const workouts = await getWorkouts();
 
   // Remove the workout with the specified ID
-  const updatedWorkouts = workouts.filter(workout => workout._id !== workoutId);
+  const updatedWorkouts = workouts?.filter(workout => workout._id !== workoutId);
 
   await saveWorkouts(updatedWorkouts); // Save the updated array to AsyncStorage
 };
@@ -94,7 +94,7 @@ export const getWorkoutDetail = async (workoutId: string): Promise<any | null> =
   const workouts = await getWorkouts();
 
   // Find the workout by ID
-  const workout = workouts.find(workout => workout._id === workoutId);
+  const workout = workouts?.find(workout => workout._id === workoutId);
 
   return workout || null; // Return the workout if found, otherwise null
 };
@@ -107,7 +107,7 @@ export const addExerciseToWorkout = async (
   const workouts = await getWorkouts();
 
   // Find the workout by ID
-  const workout = workouts.find(workout => workout._id === workoutId);
+  const workout = workouts?.find(workout => workout._id === workoutId);
   if (!workout) throw new Error('Workout not found');
 
   // Create a new exercise object
@@ -116,7 +116,7 @@ export const addExerciseToWorkout = async (
     _id: Date.now().toString(), // Unique ID for the exercise
   };
 
-  workout.exercises.push(newExercise); // Add the exercise to the workout
+  workout?.exercises?.push(newExercise); // Add the exercise to the workout
   workout.updatedAt = new Date().toISOString();
 
   await saveWorkouts(workouts); // Save the updated array to AsyncStorage
@@ -145,7 +145,7 @@ export const editExerciseInWorkout = async (
   if (!workout) throw new Error('Workout not found');
 
   // Find the exercise by ID
-  const exercise = workout.exercises.find((ex: ExerciseElement) => ex._id === exerciseId);
+  const exercise = workout?.exercises?.find((ex: ExerciseElement) => ex._id === exerciseId);
   if (!exercise) throw new Error('Exercise not found');
 
   // Update the exercise
@@ -162,7 +162,7 @@ export const deleteExerciseFromWorkout = async (
   const workouts = await getWorkouts();
 
   // Find the workout by ID
-  const workout = workouts.find(workout => workout._id === workoutId);
+  const workout = workouts?.find(workout => workout._id === workoutId);
   if (!workout) throw new Error('Workout not found');
 
   // Remove the exercise with the specified ID

@@ -16,7 +16,8 @@ const Tab = createMaterialTopTabNavigator();
 export default function Layout() {
   const insets = useSafeAreaInsets();
   const { isLargeScreen } = useBreakPoints();
-  const { isAuthenticated } = useAuthStore();
+  // const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = true;
   return (
     <SafeAreaView style={[tailwind('flex-1')]}>
       <GradientBackground
