@@ -259,6 +259,18 @@ export const getWorkoutSessionsAdmin = async () => {
   }
 };
 
+export const getUserWorkoutSessionsService = async () => {
+  try {
+    const URL = API_ENPOINTS.WORKOUT_SESSION + '/user';
+    const { data } = await getRequest({
+      API: URL,
+    });
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const createWorkoutCopy = async (payload: ICreateWorkoutCopy) => {
   try {
     const { id } = payload;
