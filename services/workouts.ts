@@ -204,7 +204,7 @@ export const createWorkoutSession = async (payload: IPayloadWorkoutSessions) => 
   }
 };
 
-export const updateWorkoutSession = async (payload: IPayloadWorkoutSessionsUpdate) => {
+export const updateWorkoutSessionService = async (payload: IPayloadWorkoutSessionsUpdate) => {
   try {
     const { formData, id } = payload;
     const URL = API_ENPOINTS.WORKOUT_SESSION + '/' + id;

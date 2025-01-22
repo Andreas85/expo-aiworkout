@@ -10,6 +10,8 @@ import { useAuthStore } from '@/store/authStore';
 import WorkoutIndexRoute from './workouts';
 import PublicScreenRoute from './workouts/public';
 import GradientBackground from '@/components/atoms/GradientBackground';
+import { useEffect } from 'react';
+import { syncWorkoutData } from '@/utils/SyncDataHelper';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -17,14 +19,20 @@ export default function Layout() {
   const insets = useSafeAreaInsets();
   const { isLargeScreen } = useBreakPoints();
   // const { isAuthenticated } = useAuthStore();
-  const isAuthenticated = true;
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  useEffect(() => {
+    console.log('isAuthenticated', isAuthenticated);
+    if (isAuthenticated) {
+      syncWorkoutData();
+    }
+  }, [isAuthenticated]);
   return (
     <SafeAreaView style={[tailwind('flex-1')]}>
       <GradientBackground
         styleWeb="!mt-0"
         styleNative={[
           Platform.select({
-            web: tailwind(`${!isLargeScreen && !isAuthenticated ? 'mt-24' : ''} flex-1`),
+            web: tailwind(`${isLargeScreen ? '' : ''} flex-1`),
             native: tailwind('flex-1'),
           }),
         ]}>
@@ -44,7 +52,7 @@ export default function Layout() {
                     `rounded-t-4 mx-auto 
                   ${isLargeScreen ? 'mt-4' : 'mt-32'} w-80
                     capitalize 
-                  ${!isAuthenticated && 'hidden'}
+               
                   `,
                   ),
                   native: {
@@ -71,20 +79,18 @@ export default function Layout() {
             {/* {isAuthenticated && ( */}
             <Tab.Screen
               name="workouts/index"
-              component={isAuthenticated ? WorkoutIndexRoute : PublicScreenRoute}
+              component={WorkoutIndexRoute}
               options={({ route }) => ({
                 title: 'My workouts',
               })}
             />
-            {isAuthenticated && (
-              <Tab.Screen
-                name="workouts/public"
-                component={PublicScreenRoute}
-                options={({ route }) => ({
-                  title: 'Public workouts',
-                })}
-              />
-            )}
+            <Tab.Screen
+              name="workouts/public"
+              component={PublicScreenRoute}
+              options={({ route }) => ({
+                title: 'Public workouts',
+              })}
+            />
           </Tab.Navigator>
         </Container>
       </GradientBackground>

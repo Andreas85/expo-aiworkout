@@ -64,7 +64,7 @@ export interface IPayloadSortExercises {
 }
 
 export interface IPayloadWorkoutSessions {
-  formData: { id: string };
+  formData: { id: string; createdAt?: Date; updatedAt?: Date };
 }
 
 export interface IPayloadWorkoutSessionsUpdate {

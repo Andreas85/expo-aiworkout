@@ -90,6 +90,17 @@ export const getWorkoutSessions = async (): Promise<WorkoutSession[]> => {
   }
 };
 
+// remove workout session by id
+export const removeWorkoutSessionById = async (sessionId: string): Promise<void> => {
+  try {
+    const sessions = await getWorkoutSessions();
+    const updatedSessions = sessions.filter(session => session._id !== sessionId);
+    await setWorkoutSessions(updatedSessions);
+  } catch (error) {
+    console.error('Error removing workout session:', error);
+  }
+};
+
 // 2. Set workout sessions to AsyncStorage (overwrites existing data)
 export const setWorkoutSessions = async (sessions: WorkoutSession[]): Promise<void> => {
   try {
