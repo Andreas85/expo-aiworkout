@@ -25,6 +25,8 @@ import AddExercise from '../modals/AddExercise';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { debounce } from 'lodash';
 import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
+import { useAuthStore } from '@/store/authStore';
+import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 
 interface IExerciseCard {
   data: ExerciseElement;
@@ -38,6 +40,12 @@ const ExerciseCard = (props: IExerciseCard) => {
   const { data, children, handleSubmit, setIsPendingExerciseCardAction, index } = props;
   const queryClient = useQueryClient();
   const { setWorkoutDetail, updateWorkoutExercises } = useWorkoutDetailStore() as any;
+  const {
+    handleEditExerciseForNonLoggedInUser,
+    handleAddExerciseForNonLoggedInUser,
+    handleDeleteExerciseForNonLoggedInUser,
+  } = useWorkoutNonLoggedInUser();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail) ?? [];
   const workoutDetailExercises =
     useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
@@ -111,10 +119,14 @@ const ExerciseCard = (props: IExerciseCard) => {
     };
 
     workoutDetailExercises[data?.order] = updatedValues;
-    setWorkoutDetail({ ...workoutDetails, exercises: workoutDetailExercises });
-
-    // Call mutation function
-    mutateUpdateExerciseToWorkoutRequest(payload);
+    console.log('(update-exercise) INFO::PAYLOAD');
+    if (isAuthenticated) {
+      // Call mutation function
+      // setWorkoutDetail({ ...workoutDetails, exercises: workoutDetailExercises });
+      mutateUpdateExerciseToWorkoutRequest(payload);
+    } else {
+      handleEditExerciseForNonLoggedInUser(data._id, payload.formData.exercise);
+    }
 
     return send; // Return the send object if needed for further usage
   };
@@ -153,8 +165,8 @@ const ExerciseCard = (props: IExerciseCard) => {
   const handleDuplicateExerciseCard = () => {
     const payload = {
       formData: {
-        name: data?.exercise?.name,
-        exerciseId: data?.exercise?._id,
+        name: data?.exercise?.name || data?.name,
+        exerciseId: data?.exercise?._id ?? data?.exerciseId,
         duration: data?.duration,
         reps: data?.reps,
         rest: data?.rest,
@@ -164,7 +176,11 @@ const ExerciseCard = (props: IExerciseCard) => {
       isDuplicated: true,
     };
 
-    mutateDuplicateExercise(payload);
+    if (isAuthenticated) {
+      mutateDuplicateExercise(payload);
+    } else {
+      handleAddExerciseForNonLoggedInUser(payload.formData);
+    }
   };
 
   const {
@@ -219,10 +235,15 @@ const ExerciseCard = (props: IExerciseCard) => {
 
   const handleDeleteWorkoutExercise = () => {
     // console.log('Api called to delete workout exercise', data?.order);
-    mutateRemoveExerciseToWorkoutRequest({
-      formData: { index: index },
-      queryParams: { id: slug },
-    });
+    if (isAuthenticated) {
+      mutateRemoveExerciseToWorkoutRequest({
+        formData: { index: index },
+        queryParams: { id: slug },
+      });
+    } else {
+      handleDeleteExerciseForNonLoggedInUser(data._id);
+      hideModalDeleteWorkoutExercise();
+    }
   };
 
   const renderCard = () => {

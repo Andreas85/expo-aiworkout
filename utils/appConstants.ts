@@ -77,6 +77,7 @@ export const STORAGES_KEYS = {
 export const STORAGE_EMITTER_KEYS = {
   REFRESH_WORKOUT_LIST: 'refresh-workout-list',
   REFRESH_WORKOUT_DETAILS: 'refresh-workout-details',
+  REFRESH_WORKOUT_DETAILS_EXERCISES: 'refresh-workout-details-exercises',
 };
 
 export const WORKOUT_STATUS = {

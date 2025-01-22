@@ -16,15 +16,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { sortExercisesRequest } from '@/services/workouts';
 import { useLocalSearchParams } from 'expo-router';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
+import { useAuthStore } from '@/store/authStore';
 
 const DraggableExercises = (props: {
   setIsPendingExerciseCardAction: (loading: boolean) => void;
 }) => {
   const queryClient = useQueryClient();
   const { setIsPendingExerciseCardAction } = props;
-  const { setWorkoutDetail, updateWorkoutExercises } = useWorkoutDetailStore();
+  const { updateWorkoutExercises } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
   const exercisesList: any[] = useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
+  const { handleSortExerciseForNonLoggedInUser } = useWorkoutNonLoggedInUser();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const [data, setData] = useState<ExerciseElement[]>(
     [...exercisesList].sort((a, b) => a.order - b.order),
@@ -57,7 +61,7 @@ const DraggableExercises = (props: {
       <ScaleDecorator>
         <ExerciseCard
           data={item}
-          index={index}
+          index={index ?? 0}
           handleSubmit={() => {}}
           setIsPendingExerciseCardAction={setIsPendingExerciseCardAction}>
           <TouchableOpacity onPressIn={drag} onLongPress={drag} onPress={drag} disabled={isActive}>
@@ -75,7 +79,12 @@ const DraggableExercises = (props: {
       queryParams: { id: slug },
       formData: { ...modifiedData },
     };
-    mutateSortExercise(payload);
+    if (isAuthenticated) {
+      mutateSortExercise(payload);
+    } else {
+      handleSortExerciseForNonLoggedInUser(modifiedData);
+      console.log('Not authenticated');
+    }
     setData(data);
   };
 

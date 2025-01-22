@@ -152,10 +152,11 @@ function AddExercise(props: {
     console.log({ values }, { payload });
     if (isAuthenticated) {
       mutateAddExerciseToWorkout(payload);
-      return;
+    } else {
+      // console.log('Not add exercise', { isExerciseCard, newCardOrder });
+      handleAddExerciseForNonLoggedInUser(exerciseData, isExerciseCard, newCardOrder);
+      closeModal();
     }
-    handleAddExerciseForNonLoggedInUser(exerciseData);
-    closeModal();
   };
 
   const { data, isSuccess } = useFetchData({
@@ -230,7 +231,7 @@ function AddExercise(props: {
                           selectedItem={values?.exercise}
                           items={filteredExercises}
                           onchange={(value: ExerciseElement) => {
-                            console.log({ value }, isLabelValueObject(value));
+                            // console.log("INFO:: isLabelValueObject", { value }, isLabelValueObject(value));
                             setFieldValue('exercise', value, false);
                           }}
                           placeholder="Select"

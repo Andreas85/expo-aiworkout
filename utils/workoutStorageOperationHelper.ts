@@ -110,10 +110,11 @@ export const addExerciseToWorkout = async (
   const workout = workouts?.find(workout => workout._id === workoutId);
   if (!workout) throw new Error('Workout not found');
 
-  // Create a new exercise object
+  // Create a new exercise object with sequential order
   const newExercise = {
     ...exercise,
-    _id: Date.now().toString(), // Unique ID for the exercise
+    _id: generateBigNumberId(), // Unique ID for the exercise
+    order: workout.exercises?.length || 0, // Start from 0
   };
 
   workout?.exercises?.push(newExercise); // Add the exercise to the workout
@@ -130,13 +131,7 @@ export const addExerciseToWorkout = async (
 export const editExerciseInWorkout = async (
   workoutId: string,
   exerciseId: string,
-  updatedData: Partial<{
-    reps: number;
-    rest: number;
-    weight: number;
-    duration: number;
-    order: number;
-  }>,
+  updatedData: Partial<ExerciseElement>,
 ): Promise<void> => {
   const workouts = await getWorkouts();
 
@@ -167,7 +162,48 @@ export const deleteExerciseFromWorkout = async (
 
   // Remove the exercise with the specified ID
   workout.exercises = workout.exercises.filter((ex: ExerciseElement) => ex._id !== exerciseId);
+  // Recalculate the order of remaining exercises
+  workout.exercises.forEach((ex: ExerciseElement, index: number) => {
+    ex.order = index + 1;
+  });
+
   workout.updatedAt = new Date().toISOString();
 
   await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+  // Emit event after successful operation
+  DeviceEventEmitter.emit(STORAGE_EMITTER_KEYS.REFRESH_WORKOUT_DETAILS, {
+    action: 'delete',
+    workoutId,
+  });
+};
+
+export const sortExercisesInWorkout = async (
+  workoutId: string,
+  updatedOrder: Record<string, number>, // Object with exerciseId as key and order as value
+): Promise<void> => {
+  const workouts = await getWorkouts();
+
+  // Find the workout by ID
+  const workout = workouts?.find(workout => workout._id === workoutId);
+  if (!workout) throw new Error('Workout not found');
+
+  // Map exercise IDs to their updated orders
+  workout.exercises?.forEach((exercise: ExerciseElement) => {
+    if (updatedOrder[exercise._id] !== undefined) {
+      exercise.order = updatedOrder[exercise._id];
+    }
+  });
+
+  // Sort exercises based on the updated order
+  workout.exercises?.sort((a: ExerciseElement, b: ExerciseElement) => a.order - b.order);
+
+  workout.updatedAt = new Date().toISOString();
+
+  await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+
+  // Emit event after successful operation
+  DeviceEventEmitter.emit(STORAGE_EMITTER_KEYS.REFRESH_WORKOUT_DETAILS, {
+    action: 'sort',
+    workoutId,
+  });
 };

@@ -60,9 +60,8 @@ const WorkoutDetailIndex = () => {
     const workoutUpdatedListener = DeviceEventEmitter.addListener(
       STORAGE_EMITTER_KEYS.REFRESH_WORKOUT_DETAILS,
       event => {
-        console.log('Event:', event);
+        console.log('(REFERSH):: Event:', event);
         if (event.workoutId === slug) {
-          console.log('Workout updated:', event);
           refetchWorkoutData(slug); // Refetch workout details
         }
       },

@@ -13,6 +13,8 @@ import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useToast } from 'react-native-toast-notifications';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { useAuthStore } from '@/store/authStore';
+import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 
 // Sortable item component
 const SortableItem: React.FC<{
@@ -50,6 +52,8 @@ const DraggableExercises = (props: {
   const { updateWorkoutExercises } = useWorkoutDetailStore();
   const { slug } = useLocalSearchParams() as any;
   const exercisesList: any[] = useWorkoutDetailStore(state => state.workoutDetail?.exercises) ?? [];
+  const { handleSortExerciseForNonLoggedInUser } = useWorkoutNonLoggedInUser();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   // Sort exercises by the 'order' key
 
@@ -89,7 +93,13 @@ const DraggableExercises = (props: {
       queryParams: { id: slug },
       formData: { ...modifiedData },
     };
-    mutateSortExercise(payload);
+
+    if (isAuthenticated) {
+      mutateSortExercise(payload);
+    } else {
+      handleSortExerciseForNonLoggedInUser(modifiedData);
+      console.log('Not authenticated');
+    }
     console.log(oldIndex, newIndex, 'ORDER CHANGE', reorderedItems);
   };
 

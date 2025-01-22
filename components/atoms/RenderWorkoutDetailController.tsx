@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import React from 'react';
 import Container from './Container';
 import BackActionButton from './BackActionButton';
@@ -28,6 +28,34 @@ export default function RenderWorkoutDetailController(props: {
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const { isLargeScreen } = useWebBreakPoints();
+
+  const renderIsPublicToggle = () => {
+    if (isAuthenticated) {
+      return (
+        <CustomSwitch
+          isEnabled={isCurrentWorkoutPublic}
+          toggleSwitch={toggleIsCurrentWorkoutPublic}
+          labelStyle={[
+            Platform.select({
+              web: tailwind(
+                ' text-center text-xl font-normal not-italic leading-[150%] text-white',
+              ),
+              native: tailwind('text-sm font-bold'),
+            }),
+          ]}
+          label={'Public'}
+        />
+      );
+    }
+    return (
+      <View
+        style={{
+          width: 100,
+          height: 50,
+        }}
+      />
+    );
+  };
 
   return (
     <Container
@@ -67,19 +95,7 @@ export default function RenderWorkoutDetailController(props: {
           left={<FontAwesome5 name="edit" color="#A27DE1" size={ICON_SIZE} />}
         />
       </Container>
-      {/* {isAuthenticated && ( */}
-      <CustomSwitch
-        isEnabled={isCurrentWorkoutPublic}
-        toggleSwitch={toggleIsCurrentWorkoutPublic}
-        labelStyle={[
-          Platform.select({
-            web: tailwind(' text-center text-xl font-normal not-italic leading-[150%] text-white'),
-            native: tailwind('text-sm font-bold'),
-          }),
-        ]}
-        label={'Public'}
-      />
-      {/* )} */}
+      {renderIsPublicToggle()}
       <LabelContainer
         label={'Duplicate'}
         labelStyle={[
