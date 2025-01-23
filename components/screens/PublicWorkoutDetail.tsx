@@ -22,6 +22,7 @@ import { debounce } from 'lodash';
 import { addWorkoutSession } from '@/utils/workoutSessionHelper';
 import { expandRestAsExercisesInExistingExercises, generateBigNumberId } from '@/utils/helper';
 import { useAuthStore } from '@/store/authStore';
+import useWorkoutSessionDetailsTracking from '@/hooks/useWorkoutSessionDetails';
 
 const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
@@ -31,6 +32,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
+  const { handleAddWorkoutSession } = useWorkoutSessionDetailsTracking();
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   // const toggleSwitch = useCallback(() => {
   //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -104,26 +106,28 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
     );
   };
 
-  const handleStartWorkoutClick = async () => {
+  const handleStartWorkoutClick = () => {
     console.log('Start workout clicked');
-    const sessionId = generateBigNumberId();
-    const payload = {
-      _id: sessionId,
-      workoutId: workoutDetail?._id ?? '',
-      exercises: workoutDetail?.exercises ?? [],
-      status: 'pending',
-      totalDuration: 0,
-      totalExercisesCompleted: 0,
-      totalWeightTaken: 0,
-      totalRestTaken: 0,
-      duration: 0,
-      remainingTime: 0,
-      user: userData ? userData?._id : '',
-      name: workoutDetail?.name ?? '',
-      createdAt: new Date().toISOString(),
-    };
-    await addWorkoutSession(payload);
-    router.push(`/workout-session/${sessionId}` as any);
+    // const sessionId = generateBigNumberId();
+    // const payload = {
+    //   _id: sessionId,
+    //   workoutId: workoutDetail?._id ?? '',
+    //   exercises: workoutDetail?.exercises ?? [],
+    //   status: 'pending',
+    //   totalDuration: 0,
+    //   totalExercisesCompleted: 0,
+    //   totalWeightTaken: 0,
+    //   totalRestTaken: 0,
+    //   duration: 0,
+    //   remainingTime: 0,
+    //   user: userData ? userData?._id : '',
+    //   name: workoutDetail?.name ?? '',
+    //   createdAt: new Date().toISOString(),
+    // };
+    // await addWorkoutSession(payload);
+    // router.push(`/workout-session/${sessionId}` as any);
+
+    handleAddWorkoutSession();
   };
 
   const renderStartWorkoutButton = () => {

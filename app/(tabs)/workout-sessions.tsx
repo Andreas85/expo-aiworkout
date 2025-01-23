@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WorkoutSessionScreen() {
   const { isLargeScreen } = useWebBreakPoints();
-  const [productData, setProductData] = useState<any[]>([]);
+  const [workoutSessionData, setWorkoutSessionData] = useState<any[]>([]);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const { data: dataWorkoutSession, refetch } = useFetchData({
@@ -34,14 +34,14 @@ export default function WorkoutSessionScreen() {
       refetch();
     } else {
       const result: any = await getWorkoutSessions();
-      setProductData(result);
+      setWorkoutSessionData(result);
     }
   };
 
   useEffect(() => {
     if (isAuthenticated) {
       const results = dataWorkoutSession?.data;
-      setProductData(results);
+      setWorkoutSessionData(results);
     }
   }, [isAuthenticated, dataWorkoutSession]);
 
@@ -52,7 +52,7 @@ export default function WorkoutSessionScreen() {
   );
 
   const renderWorkingListing = () => {
-    if (productData?.length === 0) {
+    if (workoutSessionData?.length === 0) {
       return (
         <ScrollView
           contentContainerStyle={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -62,7 +62,7 @@ export default function WorkoutSessionScreen() {
         </ScrollView>
       );
     }
-    return <WorkoutSessions workoutSessionData={productData} />;
+    return <WorkoutSessions workoutSessionData={workoutSessionData} />;
   };
 
   return (

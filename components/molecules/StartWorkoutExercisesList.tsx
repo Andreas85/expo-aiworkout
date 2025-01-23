@@ -26,6 +26,7 @@ import { interactionStore } from '@/store/interactionStore';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { useAuthStore } from '@/store/authStore';
 import { updateWorkoutSessionFinishedStatus } from '@/services/workouts';
+import useWorkoutSessionDetailsTracking from '@/hooks/useWorkoutSessionDetails';
 
 const ITEM_HEIGHT = 100; // Replace with the actual height of your list items
 const CONTAINER_HEIGHT = 500; // Replace with the actual height of the FlatList container
@@ -43,6 +44,7 @@ const StartWorkoutExercisesList = (props: any) => {
     updateWorkoutCompleted,
     updateIsActiveRepExerciseCard,
   } = useWorkoutDetailStore();
+  const { handleUpdateExerciseInWorkoutSession } = useWorkoutSessionDetailsTracking();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
@@ -120,17 +122,17 @@ const StartWorkoutExercisesList = (props: any) => {
       }
       if (unfinishedExerciseData) {
         const reqIndex = workoutExercises.findIndex(
-          (item: any) => item?._id === unfinishedExerciseData?.exerciseId,
+          (item: any) => item?.exerciseId === unfinishedExerciseData?.exerciseId,
         );
         console.log('hasRunInitially.current1', {
           reqIndex,
           hasRunInitially: hasRunInitially.current,
         });
+        const hasReps = workoutExercises[reqIndex]?.reps;
+        disableWorkoutTimer(hasReps);
         if (hasRunInitially.current) return;
         hasRunInitially.current = true;
         setSelectedIndex(reqIndex);
-        const hasReps = workoutExercises[reqIndex]?.reps;
-        disableWorkoutTimer(hasReps);
         setTimeout(() => {
           scrollToIndex(
             flatListRef,
@@ -264,23 +266,31 @@ const StartWorkoutExercisesList = (props: any) => {
     //   isLastExerciseCard,
     // });
     // if (!currentExercise) return;
-    const payload = {
+    // const payload = {
+    //   sessionId: slug ?? '',
+    //   exerciseId: currentExercise?._id ?? '',
+    //   durationTaken: durationTaken,
+    //   repsTaken: currentExercise?.reps,
+    // };
+
+    // await updateExerciseInSession(
+    //   payload.sessionId,
+    //   payload.exerciseId,
+    //   payload.durationTaken,
+    //   payload.repsTaken,
+    // );
+
+    // if (isLastExerciseCard) {
+    //   await updateWorkoutSessionStatus(slug, 'FINISHED');
+    // }
+
+    handleUpdateExerciseInWorkoutSession({
       sessionId: slug ?? '',
       exerciseId: currentExercise?._id ?? '',
       durationTaken: durationTaken,
-      repsTaken: currentExercise?.reps,
-    };
-
-    await updateExerciseInSession(
-      payload.sessionId,
-      payload.exerciseId,
-      payload.durationTaken,
-      payload.repsTaken,
-    );
-
-    if (isLastExerciseCard) {
-      await updateWorkoutSessionStatus(slug, 'FINISHED');
-    }
+      repsTaken: currentExercise?.reps ?? 0,
+      isLastExerciseCard,
+    });
   };
 
   const startNextExercise = () => {
