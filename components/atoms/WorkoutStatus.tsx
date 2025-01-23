@@ -3,7 +3,7 @@ import { tailwind } from '@/utils/tailwind';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
-export default function WorkoutStatus(props: { itemStatus: 'COMPLETED' | 'PENDING' | 'FINISHED' }) {
+export default function WorkoutStatus(props: { itemStatus: 'PENDING' | 'FINISHED' }) {
   const { itemStatus } = props;
   const [colorObject, setColorObject] = useState<{
     background: string;
@@ -15,7 +15,7 @@ export default function WorkoutStatus(props: { itemStatus: 'COMPLETED' | 'PENDIN
 
   useEffect(() => {
     if (itemStatus) {
-      const status = itemStatus === 'FINISHED' ? 'COMPLETED' : itemStatus;
+      const status = itemStatus;
       const result = getStatusColor(status) as {
         background: string;
         text: string;

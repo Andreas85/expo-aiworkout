@@ -32,7 +32,7 @@ type Action = {
     value: any,
   ) => void;
   updateIsWorkoutSessionDetailScreenTimerPaused: (payload: boolean) => void;
-  updateWorkoutStatusInZustandStore: (payload: 'pending' | 'completed') => void;
+  updateWorkoutStatusInZustandStore: (payload: 'PENDING' | 'FINISHED') => void;
   updateWorkoutSessionDetailScreen: (payload: boolean) => void;
   updateIsActiveRepExerciseCard?: (payload: boolean) => void;
 };
@@ -115,7 +115,7 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
       set({ isWorkoutSessionDetailScreenTimerPaused: payload });
     },
 
-    updateWorkoutStatusInZustandStore: async (payload: 'pending' | 'completed') => {
+    updateWorkoutStatusInZustandStore: async (payload: 'PENDING' | 'FINISHED') => {
       if (payload) {
         set((state: any) => ({
           workoutDetail: { ...state?.workoutDetail, status: payload },

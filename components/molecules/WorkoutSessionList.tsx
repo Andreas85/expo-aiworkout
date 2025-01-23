@@ -74,7 +74,7 @@ const WorkoutSessionList = ({
               style={tailwind(
                 'absolute right-2 top-2 z-40 mb-2 flex-row items-center justify-center',
               )}>
-              <WorkoutStatus itemStatus={item?.status?.toUpperCase() as 'COMPLETED' | 'PENDING'} />
+              <WorkoutStatus itemStatus={item?.status?.toUpperCase() as 'FINISHED' | 'PENDING'} />
             </View>
 
             {!isEnabled && (
@@ -87,7 +87,7 @@ const WorkoutSessionList = ({
             {/* Workout Details */}
             <Container style={tailwind('mt-2')}>
               <TextContainer
-                data={item?.name || 'Workout Name'}
+                data={item?.name || item?.workout?.name || 'Workout Name'}
                 style={[
                   tailwind('text-center text-base font-semibold'),
                   Platform.select({

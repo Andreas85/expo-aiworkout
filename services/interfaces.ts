@@ -118,6 +118,7 @@ export interface Workout {
   updatedAt: Date;
   slug?: string;
   status?: string;
+  remainingTime?: number;
   __v: number;
 }
 

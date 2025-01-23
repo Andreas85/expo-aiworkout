@@ -90,11 +90,11 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
           {/* Workout Status */}
 
           <WorkoutStatus
-            itemStatus={workoutDetails?.status?.toUpperCase() as 'COMPLETED' | 'PENDING'}
+            itemStatus={workoutDetails?.status?.toUpperCase() as 'FINISHED' | 'PENDING'}
           />
 
           {/* Resume / Finished Continue Button */}
-          {workoutDetails?.status !== 'completed' && (
+          {workoutDetails?.status !== 'FINISHED' && (
             <TouchableOpacity
               style={[
                 tailwind(

@@ -6,7 +6,6 @@ import { useFetchData } from '@/hooks/useFetchData';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { getUserWorkoutSessionsService } from '@/services/workouts';
 import { useAuthStore } from '@/store/authStore';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { tailwind } from '@/utils/tailwind';
 import { getWorkoutSessions } from '@/utils/workoutSessionHelper';
@@ -17,7 +16,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WorkoutSessionScreen() {
   const { isLargeScreen } = useWebBreakPoints();
-  const { setWorkoutDetail } = useWorkoutDetailStore();
   const [productData, setProductData] = useState<any[]>([]);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
@@ -25,7 +23,6 @@ export default function WorkoutSessionScreen() {
     queryFn: async () => {
       const response = await getUserWorkoutSessionsService();
       console.log({ response });
-      setWorkoutDetail(response);
       return response;
     },
     enabled: false,
@@ -38,13 +35,11 @@ export default function WorkoutSessionScreen() {
     } else {
       const result: any = await getWorkoutSessions();
       setProductData(result);
-      setWorkoutDetail(result);
     }
   };
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('data', dataWorkoutSession);
       const results = dataWorkoutSession?.data;
       setProductData(results);
     }
@@ -53,10 +48,6 @@ export default function WorkoutSessionScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchInitials();
-      // Cleanup function or additional logic when screen is unfocused
-      return async () => {
-        // console.log("Preference Screen is unfocused");
-      };
     }, []),
   );
 

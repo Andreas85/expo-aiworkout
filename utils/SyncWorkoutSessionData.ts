@@ -95,7 +95,7 @@ export const syncAllDataWithSessions = async (
       }
     }
 
-    if (session?.status === 'completed') {
+    if (session?.status === 'FINISHED') {
       try {
         // Update the workout session status
         await updateWorkoutSessionFinishedStatus({

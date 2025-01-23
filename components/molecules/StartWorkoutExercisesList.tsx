@@ -4,12 +4,12 @@ import { FlatList, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import StartWorkoutExerciseCardWrapper from './StartWorkoutExerciseCardWrapper';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { STRING_DATA } from '@/utils/appConstants';
+import { STRING_DATA, WORKOUT_STATUS } from '@/utils/appConstants';
 import {
   expandRestAsExercisesInExistingExercises,
   findFirstIncompleteExercise,
 } from '@/utils/helper';
-import { ExerciseElement } from '@/services/interfaces';
+import { ExerciseElement, Workout } from '@/services/interfaces';
 import { Audio } from 'expo-av';
 import BaseTimer from '../modals/BaseTimer';
 import usePlatform from '@/hooks/usePlatform';
@@ -24,6 +24,8 @@ import {
 } from '@/utils/workoutSessionHelper';
 import { interactionStore } from '@/store/interactionStore';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { useAuthStore } from '@/store/authStore';
+import { updateWorkoutSessionFinishedStatus } from '@/services/workouts';
 
 const ITEM_HEIGHT = 100; // Replace with the actual height of your list items
 const CONTAINER_HEIGHT = 500; // Replace with the actual height of the FlatList container
@@ -33,6 +35,7 @@ const StartWorkoutExercisesList = (props: any) => {
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useWebBreakPoints();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const muted = interactionStore(state => state.muted);
   const {
     updateRemainingTime,
@@ -69,16 +72,37 @@ const StartWorkoutExercisesList = (props: any) => {
     setShowModel(false);
   };
 
-  const processDataBasedOnSession = async (workoutExercises: ExerciseElement[]) => {
-    const workoutSessionOfExercises = await getWorkoutSessionById(slug ?? '');
-    const isCompleted = workoutSessionOfExercises?.status === 'completed';
+  const handleWorkoutStatusUpdate = async () => {
+    if (isAuthenticated) {
+      // Update the workout session status
+      await updateWorkoutSessionFinishedStatus({
+        id: slug,
+        formData: {
+          status: WORKOUT_STATUS.FINISHED,
+        },
+      });
+      // console.log('(API call here ) INFO:: Workout completed api calling done');
+      return;
+    }
+    await updateWorkoutSessionStatus(slug, 'FINISHED');
+  };
+
+  const processDataBasedOnSession = (
+    workoutExercises: ExerciseElement[],
+    workoutDetailData: Workout,
+  ) => {
+    // const workoutSessionOfExercises = await getWorkoutSessionById(slug ?? '');
+    const workoutSessionOfExercises = workoutDetailData;
+    // console.log('workoutSessionOfExercises', { workoutDetailData });
+    const isCompleted = workoutSessionOfExercises?.status === 'FINISHED';
 
     if (workoutSessionOfExercises) {
       const unfinishedExerciseData = findFirstIncompleteExercise(
         workoutSessionOfExercises?.exercises,
       );
       if (!unfinishedExerciseData) {
-        await updateWorkoutSessionStatus(slug, 'completed');
+        // await updateWorkoutSessionStatus(slug, 'completed');
+        handleWorkoutStatusUpdate();
         updateWorkoutTimer(false);
         updateWorkoutCompleted(true);
       }
@@ -87,6 +111,7 @@ const StartWorkoutExercisesList = (props: any) => {
       //   remainingTime,
       //   unfinishedExerciseData,
       //   workoutSessionOfExercises,
+      //   isCompleted,
       // });
       updateRemainingTime(remainingTime);
       if (isCompleted) {
@@ -97,7 +122,10 @@ const StartWorkoutExercisesList = (props: any) => {
         const reqIndex = workoutExercises.findIndex(
           (item: any) => item?._id === unfinishedExerciseData?.exerciseId,
         );
-        console.log('hasRunInitially.current1', hasRunInitially.current);
+        console.log('hasRunInitially.current1', {
+          reqIndex,
+          hasRunInitially: hasRunInitially.current,
+        });
         if (hasRunInitially.current) return;
         hasRunInitially.current = true;
         setSelectedIndex(reqIndex);
@@ -129,7 +157,7 @@ const StartWorkoutExercisesList = (props: any) => {
       ) as ExerciseElement[];
       // console.log('workoutExercisesworkoutExercises', workoutDetail?.exercises);
       setExerciseData(updateData);
-      processDataBasedOnSession(updateData);
+      processDataBasedOnSession(updateData, workoutDetail);
       // setExerciseData(workoutExercises);
     }
     return () => {
@@ -251,7 +279,7 @@ const StartWorkoutExercisesList = (props: any) => {
     );
 
     if (isLastExerciseCard) {
-      await updateWorkoutSessionStatus(slug, 'completed');
+      await updateWorkoutSessionStatus(slug, 'FINISHED');
     }
   };
 

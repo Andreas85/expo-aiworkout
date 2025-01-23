@@ -236,7 +236,7 @@ export const getWorkoutSessionById = async (sessionId: string): Promise<WorkoutS
  */
 export const updateWorkoutSessionStatus = async (
   sessionId: string,
-  newStatus: 'pending' | 'completed',
+  newStatus: 'PENDING' | 'FINISHED',
 ): Promise<boolean> => {
   try {
     // Get all workout sessions from AsyncStorage
