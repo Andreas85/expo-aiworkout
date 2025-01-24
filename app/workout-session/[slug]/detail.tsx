@@ -76,7 +76,7 @@ const WorkoutSessionDetail = () => {
         updateIsWorkoutSessionDetailScreenTimerPaused(false);
         updateWorkoutSessionDetailScreen(false);
       };
-    }, []),
+    }, [isAuthenticated]),
   );
 
   return (

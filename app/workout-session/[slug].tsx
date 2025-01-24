@@ -70,7 +70,7 @@ const WorkoutSessionDetail = () => {
   useFocusEffect(
     useCallback(() => {
       fetchInitials();
-    }, []),
+    }, [isAuthenticated]),
   );
 
   const renderScreenData = () => {

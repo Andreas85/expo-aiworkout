@@ -22,19 +22,23 @@ export default function WorkoutSessionScreen() {
   const { data: dataWorkoutSession, refetch } = useFetchData({
     queryFn: async () => {
       const response = await getUserWorkoutSessionsService();
-      console.log({ response });
       return response;
     },
     enabled: false,
     queryKey: [REACT_QUERY_API_KEYS.WORKOUT_SESSION_USER],
   });
 
-  const fetchInitials = async () => {
+  const getDataFromStorage = async () => {
+    const result: any = await getWorkoutSessions();
+    setWorkoutSessionData(result);
+  };
+
+  const fetchInitials = () => {
+    console.log('fetchInitials', isAuthenticated);
     if (isAuthenticated) {
       refetch();
     } else {
-      const result: any = await getWorkoutSessions();
-      setWorkoutSessionData(result);
+      getDataFromStorage();
     }
   };
 
@@ -48,7 +52,7 @@ export default function WorkoutSessionScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchInitials();
-    }, []),
+    }, [isAuthenticated]),
   );
 
   const renderWorkingListing = () => {
