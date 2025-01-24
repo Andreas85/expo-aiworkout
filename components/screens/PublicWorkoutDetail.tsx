@@ -34,6 +34,8 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const { handleAddWorkoutSession } = useWorkoutSessionDetailsTracking();
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
+  const [loading, setLoading] = useState(false);
+
   // const toggleSwitch = useCallback(() => {
   //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   //   setIsEnabled(prev => !prev);
@@ -107,27 +109,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   };
 
   const handleStartWorkoutClick = () => {
-    console.log('Start workout clicked');
-    // const sessionId = generateBigNumberId();
-    // const payload = {
-    //   _id: sessionId,
-    //   workoutId: workoutDetail?._id ?? '',
-    //   exercises: workoutDetail?.exercises ?? [],
-    //   status: 'pending',
-    //   totalDuration: 0,
-    //   totalExercisesCompleted: 0,
-    //   totalWeightTaken: 0,
-    //   totalRestTaken: 0,
-    //   duration: 0,
-    //   remainingTime: 0,
-    //   user: userData ? userData?._id : '',
-    //   name: workoutDetail?.name ?? '',
-    //   createdAt: new Date().toISOString(),
-    // };
-    // await addWorkoutSession(payload);
-    // router.push(`/workout-session/${sessionId}` as any);
-
-    handleAddWorkoutSession();
+    handleAddWorkoutSession({ setLoading });
   };
 
   const renderStartWorkoutButton = () => {
@@ -146,6 +128,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           <ActionButton
             label="Start workout"
             uppercase
+            isLoading={loading}
             // disabled
             onPress={handleStartWorkoutClick}
             style={[

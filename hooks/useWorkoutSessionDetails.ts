@@ -22,7 +22,9 @@ const useWorkoutSessionDetailsTracking = () => {
   const userData = useAuthStore(state => state.userData);
   const { setWorkoutDetail } = useWorkoutDetailStore();
 
-  const handleAddWorkoutSession = async () => {
+  const handleAddWorkoutSession = async (props: { setLoading: (loading: boolean) => void }) => {
+    const { setLoading } = props;
+    setLoading(true);
     if (isAuthenticated && workoutDetail) {
       console.log('(API_CALLING) INFO:: handleAddWorkoutSession');
       // Sync workout with the server
@@ -31,11 +33,12 @@ const useWorkoutSessionDetailsTracking = () => {
           id: workoutDetail?._id,
         },
       });
-      const results = dataWorkoutSessionDetails?.workout;
+      // const results = dataWorkoutSessionDetails?.workout;
       const sessionId = dataWorkoutSessionDetails?._id;
-      const updatedData = { ...results, status: dataWorkoutSessionDetails?.status };
-      console.log('(isAuthenticated-workout-session-details) INFO:: ');
-      setWorkoutDetail(updatedData);
+      setLoading(false);
+      // const updatedData = { ...results, status: dataWorkoutSessionDetails?.status };
+      // console.log('(isAuthenticated-workout-session-details) INFO:: ');
+      // setWorkoutDetail(updatedData);
       router.push(`/workout-session/${sessionId}` as any);
       return;
     }
@@ -56,6 +59,7 @@ const useWorkoutSessionDetailsTracking = () => {
       createdAt: new Date().toISOString(),
     };
     await addWorkoutSession(payload);
+    setLoading(false);
     router.push(`/workout-session/${sessionId}` as any);
   };
 

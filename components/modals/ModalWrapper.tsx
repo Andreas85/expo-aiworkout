@@ -52,7 +52,7 @@ function ModalWrapper(props: IAddAndEditWorkoutModalProps) {
                 </Container>
               )}
               <Container style={tailwind('flex-grow')}>{children}</Container>
-              <Container style={tailwind('mt-4')}>{footerChildren}</Container>
+              {footerChildren && <Container style={tailwind('mt-4')}>{footerChildren}</Container>}
             </Container>
           </ScrollView>
         </View>

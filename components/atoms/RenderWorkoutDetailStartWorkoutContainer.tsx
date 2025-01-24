@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Container from './Container';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { tailwind } from '@/utils/tailwind';
 import { ActionButton } from './ActionButton';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { Platform } from 'react-native';
+import useWorkoutSessionDetailsTracking from '@/hooks/useWorkoutSessionDetails';
 
 export default function RenderWorkoutDetailStartWorkoutContainer() {
   const { isLargeScreen } = useWebBreakPoints();
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
+  const { handleAddWorkoutSession } = useWorkoutSessionDetailsTracking();
+
+  const [loading, setLoading] = useState(false);
+
+  const handleStartWorkoutClick = () => {
+    handleAddWorkoutSession({ setLoading });
+  };
+
   if (hasExercise) {
     return (
       <Container
@@ -24,7 +33,8 @@ export default function RenderWorkoutDetailStartWorkoutContainer() {
         <ActionButton
           label="Start workout"
           uppercase
-          disabled
+          isLoading={loading}
+          onPress={handleStartWorkoutClick}
           style={[
             Platform.select({
               web: tailwind(
