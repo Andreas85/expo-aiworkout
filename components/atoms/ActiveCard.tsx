@@ -15,7 +15,7 @@ import PlusActionButton from './PlusActionButton';
 import { pluralise } from '@/utils/helper';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 interface ActiveCardProps {
   item: ExerciseElement;
@@ -26,8 +26,8 @@ interface ActiveCardProps {
 const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
-  const isWorkoutTimerRunning = useWorkoutDetailStore(state => state.isWorkoutTimerRunning);
-  const { updateExercisePropertyZustand } = useWorkoutDetailStore();
+  const isWorkoutTimerRunning = useWorkoutSessionStore(state => state.isWorkoutTimerRunning);
+  const { updateExercisePropertyZustand } = useWorkoutSessionStore();
 
   const hasReps = !!item?.reps;
   const repsValue = item?.reps ?? 0;

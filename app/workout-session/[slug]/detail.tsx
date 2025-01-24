@@ -7,22 +7,22 @@ import { tailwind } from '@/utils/tailwind';
 import StartWorkoutScreen from '@/components/screens/StartWorkoutScreen';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { getWorkoutSessionById } from '@/utils/workoutSessionHelper';
 import { useAuthStore } from '@/store/authStore';
 import { useFetchData } from '@/hooks/useFetchData';
 import { getWorkoutSessionDetail } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 const WorkoutSessionDetail = () => {
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const {
-    setWorkoutDetail,
+    setWorkoutSessionDetails,
     updateIsWorkoutSessionDetailScreenTimerPaused,
-    updateWorkoutSessionDetailScreen,
-  } = useWorkoutDetailStore();
+    updateWorkoutSessionDetailsScreen: updateWorkoutSessionDetailScreen,
+  } = useWorkoutSessionStore();
 
   const { data: dataWorkoutSessionDetails, refetch } = useFetchData({
     queryFn: async () => {
@@ -36,19 +36,18 @@ const WorkoutSessionDetail = () => {
   });
 
   useEffect(() => {
-    console.log('dataWorkoutSessionDetails', dataWorkoutSessionDetails);
     if (isAuthenticated && dataWorkoutSessionDetails?.data) {
       const results = dataWorkoutSessionDetails?.data?.workout;
       const updatedData = { ...results, status: dataWorkoutSessionDetails?.data?.status };
       // console.log('(isAuthenticated-workout-session-details) INFO:: ', updatedData);
-      setWorkoutDetail(updatedData);
+      setWorkoutSessionDetails(updatedData);
     }
   }, [isAuthenticated, dataWorkoutSessionDetails?.data]);
 
   const getWorkoutSessionFromStorage = async () => {
     const result: any = await getWorkoutSessionById(slug ?? '');
     if (result) {
-      setWorkoutDetail(result);
+      setWorkoutSessionDetails(result);
       return;
     }
   };

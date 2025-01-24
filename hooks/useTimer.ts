@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import pauseable from 'pauseable';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 const useTimer = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -8,13 +8,13 @@ const useTimer = () => {
   const timerRef = useRef<any>(null);
 
   const isWorkoutTimerRunning =
-    useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
-  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
+    useWorkoutSessionStore(state => state.isWorkoutTimerRunning) ?? false;
+  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutSessionStore(
     state => state.isWorkoutSessionDetailScreenTimerPaused,
   );
-  const workoutRemainingTime = useWorkoutDetailStore(state => state.remainingTime) ?? 0;
-  const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
-  const { updateWorkoutTimer } = useWorkoutDetailStore();
+  const workoutRemainingTime = useWorkoutSessionStore(state => state.remainingTime) ?? 0;
+  const totalWorkoutTime = useWorkoutSessionStore(state => state.totalWorkoutTime) ?? 0;
+  const { updateWorkoutTimer } = useWorkoutSessionStore();
 
   const handleTimer = () => {
     setElapsedTime(prev => prev + 1);

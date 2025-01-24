@@ -6,13 +6,14 @@ import {
   updateWorkoutSessionStatus,
 } from '@/utils/workoutSessionHelper';
 import { generateBigNumberId } from '@/utils/helper';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import {
   createWorkoutSession,
   updateWorkoutSessionFinishedStatus,
   updateWorkoutSessionService,
 } from '@/services/workouts';
 import { WORKOUT_STATUS } from '@/utils/appConstants';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
 const useWorkoutSessionDetailsTracking = () => {
   const { slug } = useLocalSearchParams() as { slug: string };
@@ -20,7 +21,7 @@ const useWorkoutSessionDetailsTracking = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const userData = useAuthStore(state => state.userData);
-  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const { setWorkoutSessionDetails } = useWorkoutSessionStore();
 
   const handleAddWorkoutSession = async (props: { setLoading: (loading: boolean) => void }) => {
     const { setLoading } = props;
@@ -37,8 +38,8 @@ const useWorkoutSessionDetailsTracking = () => {
       const sessionId = dataWorkoutSessionDetails?._id;
       setLoading(false);
       // const updatedData = { ...results, status: dataWorkoutSessionDetails?.status };
-      // console.log('(isAuthenticated-workout-session-details) INFO:: ');
-      // setWorkoutDetail(updatedData);
+      // // // console.log('(isAuthenticated-workout-session-details) INFO:: ');
+      // setWorkoutSessionDetails(updatedData);
       router.push(`/workout-session/${sessionId}` as any);
       return;
     }
@@ -59,6 +60,7 @@ const useWorkoutSessionDetailsTracking = () => {
       createdAt: new Date().toISOString(),
     };
     await addWorkoutSession(payload);
+    setWorkoutSessionDetails(workoutDetail);
     setLoading(false);
     router.push(`/workout-session/${sessionId}` as any);
   };

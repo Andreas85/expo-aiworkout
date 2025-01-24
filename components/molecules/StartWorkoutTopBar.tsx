@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import Container from '../atoms/Container';
 import { tailwind } from '@/utils/tailwind';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
@@ -11,16 +10,17 @@ import ExerciseStartAndPause from './ExerciseStartAndPause';
 import TextContainer from '../atoms/TextContainer';
 import { interactionStore } from '@/store/interactionStore';
 import useTimer from '@/hooks/useTimer';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 const StartWorkoutTopBar = () => {
   const { isLargeScreen } = useWebBreakPoints();
   const hasUserInteracted = interactionStore(state => state.hasInteracted);
   const { elapsedTime, remainingTime, handlePlay, handlePause, handleStop } = useTimer();
-  const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
-  const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
+  const workoutDetail = useWorkoutSessionStore(state => state.workoutSessionDetails);
+  const totalWorkoutTime = useWorkoutSessionStore(state => state.totalWorkoutTime) ?? 0;
   const isWorkoutTimerRunning =
-    useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
-  const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
+    useWorkoutSessionStore(state => state.isWorkoutTimerRunning) ?? false;
+  const isWorkoutCompleted = useWorkoutSessionStore(state => state.isWorkoutCompleted) ?? false;
 
   const [isMuted, setIsMuted] = useState<boolean>(Platform.OS === 'web'); // Default mute state based on platform
 

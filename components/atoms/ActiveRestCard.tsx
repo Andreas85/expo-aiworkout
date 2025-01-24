@@ -12,7 +12,7 @@ import PlusActionButton from './PlusActionButton';
 import ActiveWorkoutIcon from './ActiveWorkoutIcon';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 interface ActiveRestCardProps {
   item: ExerciseElement;
@@ -21,7 +21,7 @@ interface ActiveRestCardProps {
 
 const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
-  const { updateExercisePropertyZustand } = useWorkoutDetailStore();
+  const { updateExercisePropertyZustand } = useWorkoutSessionStore();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   // Use the item.duration as the single source of truth
   const durationValue = item?.duration ?? 0;

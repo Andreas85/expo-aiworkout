@@ -3,7 +3,6 @@ import { FlatList, Platform } from 'react-native';
 
 import { tailwind } from '@/utils/tailwind';
 import StartWorkoutExerciseCardWrapper from './StartWorkoutExerciseCardWrapper';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { STRING_DATA, WORKOUT_STATUS } from '@/utils/appConstants';
 import {
   expandRestAsExercisesInExistingExercises,
@@ -27,6 +26,7 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { useAuthStore } from '@/store/authStore';
 import { updateWorkoutSessionFinishedStatus } from '@/services/workouts';
 import useWorkoutSessionDetailsTracking from '@/hooks/useWorkoutSessionDetails';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 const ITEM_HEIGHT = 100; // Replace with the actual height of your list items
 const CONTAINER_HEIGHT = 500; // Replace with the actual height of the FlatList container
@@ -35,7 +35,7 @@ const StartWorkoutExercisesList = (props: any) => {
   const hasRunInitially = useRef(false);
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useWebBreakPoints();
-  const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+  const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const muted = interactionStore(state => state.muted);
   const {
@@ -43,7 +43,7 @@ const StartWorkoutExercisesList = (props: any) => {
     updateWorkoutTimer,
     updateWorkoutCompleted,
     updateIsActiveRepExerciseCard,
-  } = useWorkoutDetailStore();
+  } = useWorkoutSessionStore();
   const { handleUpdateExerciseInWorkoutSession } = useWorkoutSessionDetailsTracking();
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
@@ -152,14 +152,14 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   useEffect(() => {
-    if (workoutDetail && workoutDetail?.exercises.length > 0) {
-      const workoutExercises = workoutDetail?.exercises;
+    if (workoutSessionDetails && workoutSessionDetails?.exercises.length > 0) {
+      const workoutExercises = workoutSessionDetails?.exercises;
       const updateData = expandRestAsExercisesInExistingExercises(
         workoutExercises,
       ) as ExerciseElement[];
       // console.log('workoutExercisesworkoutExercises', workoutDetail?.exercises);
       setExerciseData(updateData);
-      processDataBasedOnSession(updateData, workoutDetail);
+      processDataBasedOnSession(updateData, workoutSessionDetails);
       // setExerciseData(workoutExercises);
     }
     return () => {
@@ -167,7 +167,7 @@ const StartWorkoutExercisesList = (props: any) => {
         sound.unloadAsync(); // Cleanup sound resource
       }
     };
-  }, [workoutDetail]);
+  }, [workoutSessionDetails]);
 
   useFocusEffect(
     useCallback(() => {

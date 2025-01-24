@@ -4,11 +4,11 @@ import Container from '../atoms/Container';
 import { AntDesign, Feather, FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { tailwind } from '@/utils/tailwind';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import SoundIcon from '../atoms/SoundIcon';
 import WorkoutStatus from '../atoms/WorkoutStatus';
 import usePlatform from '@/hooks/usePlatform';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 interface IExerciseStartAndPause {
   isTimerRunning: boolean;
@@ -32,15 +32,15 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
   const { isLargeScreen } = useWebBreakPoints();
   const { isWeb } = usePlatform();
 
-  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
+  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutSessionStore(
     state => state.isWorkoutSessionDetailScreenTimerPaused,
   );
 
-  const isActiveRepExerciseCard = useWorkoutDetailStore(state => state.isActiveRepExerciseCard);
+  const isActiveRepExerciseCard = useWorkoutSessionStore(state => state.isActiveRepExerciseCard);
 
-  const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail);
+  const workoutDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
   const { updateIsWorkoutSessionDetailScreenTimerPaused, updateWorkoutTimer } =
-    useWorkoutDetailStore();
+    useWorkoutSessionStore();
 
   const onResume = () => {
     updateIsWorkoutSessionDetailScreenTimerPaused(false);

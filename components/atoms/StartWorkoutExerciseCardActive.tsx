@@ -2,9 +2,9 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { ExerciseElement } from '@/services/interfaces';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import pauseable from 'pauseable';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import ActiveRestCard from './ActiveRestCard';
 import ActiveCard from './ActiveCard';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 interface StartWorkoutExerciseCardActiveProps {
   index: number;
@@ -26,11 +26,11 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
   const timerRef = useRef<any>(null);
   const [totalElapsedTime, setTotalElapsedTime] = useState<number>(1);
   const elapsedTimeRef = useRef<number>(1); // Track the current value with a ref
-  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutDetailStore(
+  const isWorkoutSessionDetailScreenTimerPaused = useWorkoutSessionStore(
     state => state.isWorkoutSessionDetailScreenTimerPaused,
   );
   const isWorkoutTimerRunning =
-    useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
+    useWorkoutSessionStore(state => state.isWorkoutTimerRunning) ?? false;
 
   const exerciseDurationCompletedEvent = () => {
     isExerciseTimeFinished?.(elapsedTimeRef.current, true);

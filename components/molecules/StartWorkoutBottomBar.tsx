@@ -4,17 +4,17 @@ import Container from '../atoms/Container';
 import { tailwind } from '@/utils/tailwind';
 import ExerciseDuration from './ExerciseDuration';
 import ExerciseStartAndPause from './ExerciseStartAndPause';
-import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import useTimer from '@/hooks/useTimer';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 const StartWorkoutBottomBar = () => {
   const { elapsedTime, remainingTime, handlePlay, handlePause, handleStop } = useTimer();
 
-  const totalWorkoutTime = useWorkoutDetailStore(state => state.totalWorkoutTime) ?? 0;
-  const isWorkoutCompleted = useWorkoutDetailStore(state => state.isWorkoutCompleted) ?? false;
+  const totalWorkoutTime = useWorkoutSessionStore(state => state.totalWorkoutTime) ?? 0;
+  const isWorkoutCompleted = useWorkoutSessionStore(state => state.isWorkoutCompleted) ?? false;
 
   const isWorkoutTimerRunning =
-    useWorkoutDetailStore(state => state.isWorkoutTimerRunning) ?? false;
+    useWorkoutSessionStore(state => state.isWorkoutTimerRunning) ?? false;
 
   return (
     <Container
