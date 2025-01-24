@@ -1,11 +1,7 @@
 import { addExerciseToWorkoutRequest, addWorkoutService } from '@/services/workouts';
+import { ISyncProgressTracker } from './SyncDataHelper';
+import { updateWorkoutIdInWorkoutSession } from './workoutSessionHelper';
 import { deleteWorkout } from './workoutStorageOperationHelper';
-
-interface ISyncProgressTracker {
-  total: number;
-  completed: number;
-  updateProgress: (message: string) => void; // Callback for updating progress in UI
-}
 
 // Utility to sync workouts
 export const syncWorkouts = async (
@@ -18,22 +14,33 @@ export const syncWorkouts = async (
   for (let i = 0; i < workouts.length; i++) {
     const workout = workouts[i];
     try {
-      // Sync workout with the server
-      const { data } = await addWorkoutService({
-        formData: {
-          name: workout.name,
-          createdAt: workout.createdAt,
-          updatedAt: workout.updatedAt,
-          // Add other required workout fields
-        },
-      });
+      const workoutId = workout.workoutId; // Handle existing workoutId
+      let data;
 
-      //   console.log('(Response)INFO:', data);
+      if (!workoutId) {
+        // If no workoutId, create a new workout in the DB
 
-      // Add the new workout ID from the response
+        const response = await addWorkoutService({
+          formData: {
+            name: workout.name,
+            createdAt: workout.createdAt,
+            updatedAt: workout.updatedAt,
+            // Add other required workout fields
+          },
+        });
+        data = response.data;
+        // console.log('Workout created with ID:', {
+        //   oldWorkoutId: workouts[i]?._id,
+        //   newWorkoutId: data?._id,
+        // });
+        await updateWorkoutIdInWorkoutSession(workouts[i]?._id, data?._id);
+      } else {
+        data = { _id: workoutId }; // Use the existing workoutId
+      }
+
       successfullySyncedWorkouts.push({
         ...workout,
-        workoutId: data?._id, // Assuming `workoutId` is part of the API response
+        workoutId: data?._id,
       });
 
       // Update progress tracker
@@ -59,7 +66,6 @@ export const syncExercisesForWorkout = async (
   for (let i = 0; i < exercises.length; i++) {
     const exercise = exercises[i];
     try {
-      // Sync exercise with the server
       await addExerciseToWorkoutRequest({
         queryParams: { id: workoutId },
         formData: {
@@ -76,10 +82,8 @@ export const syncExercisesForWorkout = async (
         },
       });
 
-      // Mark exercise as successfully synced
       successfullySyncedExercises.push(exercise);
 
-      // Update progress tracker
       tracker.completed++;
       updateProgress(`Syncing exercises ${tracker.completed}/${total}`);
     } catch (error) {
@@ -90,7 +94,7 @@ export const syncExercisesForWorkout = async (
   return successfullySyncedExercises;
 };
 
-// Utility to sync all workouts and their exercises
+// Utility to sync all data
 export const syncAllData = async (
   workouts: any[],
   updateProgress: (message: string) => void,
@@ -100,7 +104,8 @@ export const syncAllData = async (
     (acc, workout) => acc + (workout.exercises?.length || 0),
     0,
   );
-  const totalItems = totalWorkouts + totalExercises;
+  const totalSessions = workouts.length; // Assuming each workout has a session
+  const totalItems = totalWorkouts + totalExercises + totalSessions;
 
   const tracker: ISyncProgressTracker = {
     total: totalItems,
@@ -108,23 +113,27 @@ export const syncAllData = async (
     updateProgress,
   };
 
-  // Sync workouts and get the new IDs
+  // Step 1: Sync workouts and get the new IDs
   const successfullySyncedWorkouts = await syncWorkouts(workouts, tracker);
 
-  // Sync exercises for each successfully synced workout
+  // Step 2: Sync exercises for each successfully synced workout
   for (const workout of successfullySyncedWorkouts) {
     if (workout.exercises?.length) {
       await syncExercisesForWorkout(
-        workout.workoutId, // Use the new workoutId from the API response
+        workout.workoutId, // Use the workoutId from the API response
         workout.exercises,
         tracker,
       );
     }
   }
 
-  // Remove successfully synced workouts from local storage
+  // const workoutSessions = await getWorkoutSessions();
+
+  // // Step 3: Sync workout sessions for each workout
+  // await syncWorkoutSessions(workoutSessions, tracker);
+
+  // Step 4: Remove successfully synced workouts from local storage
   for (const workout of successfullySyncedWorkouts) {
-    // Sync exercises for each successfully synced workout
     await deleteWorkout(workout._id);
   }
 };

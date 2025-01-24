@@ -18,31 +18,29 @@ export const syncWorkoutSessions = async (
 ): Promise<any[]> => {
   const { total, updateProgress } = tracker;
   const successfullySyncedWorkoutSessions: any[] = [];
-
-  for (let i = 0; i < workoutSessions.length; i++) {
-    const sessionData = workoutSessions[i];
+  console.log('workoutSessions:', workoutSessions);
+  for (const sessionData of workoutSessions) {
     try {
-      // Sync workout with the server
-      const { data } = await createWorkoutSession({
+      // Step 1: Create workout if `workoutId` is undefined
+      console.log('Creating new workout for session:1', sessionData.workoutId);
+
+      // Step 3: Create the workout session
+      const { data: sessionDataResponse } = await createWorkoutSession({
         formData: {
           id: sessionData.workoutId,
-
-          createdAt: sessionData.createdAt,
-          updatedAt: sessionData.updatedAt,
-          // Add other required workout fields
         },
       });
 
       successfullySyncedWorkoutSessions.push({
         ...sessionData,
-        sessionId: data?._id,
+        sessionId: sessionDataResponse?._id,
       });
 
       // Update progress tracker
       tracker.completed++;
-      updateProgress(`Syncing workout sessions ${tracker.completed}/${total}`);
+      updateProgress(`Synced workout session ${tracker.completed}/${total}`);
     } catch (error) {
-      console.error(`Failed to sync workout session with ID ${sessionData?._id || 'new'}:`, error);
+      console.error('Error syncing workout session:', error, sessionData);
     }
   }
 
@@ -111,10 +109,10 @@ export const syncAllDataWithSessions = async (
         );
       }
     }
-  }
 
-  for (const workout of successfullySyncedWorkoutSessions) {
+    console.log('Successfully synced workout session:', { workoutId: session?._id });
+
     // Implement deletion or updating of local storage
-    await removeWorkoutSessionById(workout?._id);
+    await removeWorkoutSessionById(session?._id);
   }
 };

@@ -147,6 +147,57 @@ export const updateWorkoutSession = async (updatedSession: WorkoutSession): Prom
   }
 };
 
+export const updateWorkoutIdInWorkoutSession = async (
+  oldWorkoutId: string,
+  newWorkoutId: string,
+): Promise<void> => {
+  try {
+    const sessions = await getWorkoutSessions();
+    const updatedSessions = sessions.map(session => {
+      if (session.workoutId === oldWorkoutId) {
+        return {
+          ...session,
+          workoutId: newWorkoutId,
+        };
+      }
+      return session;
+    });
+    await setWorkoutSessions(updatedSessions);
+    console.log('Updated workout sessions:', updatedSessions);
+  } catch (error) {
+    console.error('Error updating workout session:', error);
+  }
+};
+
+export const updateExerciseIdOfWorkoutInWorkoutSession = async (
+  oldExerciseId: string,
+  newExerciseId: string,
+): Promise<void> => {
+  try {
+    const sessions = await getWorkoutSessions();
+    const updatedSessions = sessions.map(session => {
+      const updatedExercises = session.exercises.map(exercise => {
+        if (exercise.exerciseId === oldExerciseId) {
+          return {
+            ...exercise,
+            exerciseId: newExerciseId,
+          };
+        }
+        return exercise;
+      });
+
+      return {
+        ...session,
+        exercises: updatedExercises,
+      };
+    });
+    await setWorkoutSessions(updatedSessions);
+    console.log('Updated workout sessions:', updatedSessions);
+  } catch (error) {
+    console.error('Error updating workout session:', error);
+  }
+};
+
 // 5. Update exercise in a workout session
 export const updateExerciseInSession = async (
   sessionId: string,
