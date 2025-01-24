@@ -26,6 +26,7 @@ interface ActiveCardProps {
 const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  const isWorkoutTimerRunning = useWorkoutDetailStore(state => state.isWorkoutTimerRunning);
   const { updateExercisePropertyZustand } = useWorkoutDetailStore();
 
   const hasReps = !!item?.reps;
@@ -146,6 +147,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
           label="Finish"
           onPress={handleFinishClick}
           uppercase
+          disabled={!isWorkoutTimerRunning}
           style={[
             Platform.select({
               web: tailwind(

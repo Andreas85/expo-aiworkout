@@ -102,7 +102,7 @@ const StartWorkoutExercisesList = (props: any) => {
       const unfinishedExerciseData = findFirstIncompleteExercise(
         workoutSessionOfExercises?.exercises,
       );
-      if (!unfinishedExerciseData) {
+      if (!unfinishedExerciseData && !isCompleted) {
         // await updateWorkoutSessionStatus(slug, 'completed');
         handleWorkoutStatusUpdate();
         updateWorkoutTimer(false);
@@ -124,10 +124,10 @@ const StartWorkoutExercisesList = (props: any) => {
         const reqIndex = workoutExercises.findIndex(
           (item: any) => item?.exerciseId === unfinishedExerciseData?.exerciseId,
         );
-        console.log('hasRunInitially.current1', {
-          reqIndex,
-          hasRunInitially: hasRunInitially.current,
-        });
+        // console.log('hasRunInitially.current1', {
+        //   reqIndex,
+        //   hasRunInitially: hasRunInitially.current,
+        // });
         const hasReps = workoutExercises[reqIndex]?.reps;
         disableWorkoutTimer(hasReps);
         if (hasRunInitially.current) return;
@@ -260,12 +260,14 @@ const StartWorkoutExercisesList = (props: any) => {
   }) => {
     const { durationTaken, currentExerciseCompleted, isLastExerciseCard } = props;
     const currentExercise = getCurrentExerciseData();
+    const isRestTypeExercise = currentExercise?.type === STRING_DATA.REST;
     // console.log('Current Exercise:', {
     //   durationTaken,
     //   currentExerciseCompleted,
     //   isLastExerciseCard,
+    //   isRestTypeExercise,
     // });
-    // if (!currentExercise) return;
+    if (isRestTypeExercise) return;
     // const payload = {
     //   sessionId: slug ?? '',
     //   exerciseId: currentExercise?._id ?? '',
@@ -286,7 +288,7 @@ const StartWorkoutExercisesList = (props: any) => {
 
     handleUpdateExerciseInWorkoutSession({
       sessionId: slug ?? '',
-      exerciseId: currentExercise?._id ?? '',
+      exerciseId: currentExercise?.exerciseId ?? '',
       durationTaken: durationTaken,
       repsTaken: currentExercise?.reps ?? 0,
       isLastExerciseCard,

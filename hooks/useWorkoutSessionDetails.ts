@@ -1,5 +1,4 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useToast } from 'react-native-toast-notifications';
 import { useAuthStore } from '@/store/authStore';
 import {
   addWorkoutSession,
@@ -8,11 +7,15 @@ import {
 } from '@/utils/workoutSessionHelper';
 import { generateBigNumberId } from '@/utils/helper';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { createWorkoutSession } from '@/services/workouts';
+import {
+  createWorkoutSession,
+  updateWorkoutSessionFinishedStatus,
+  updateWorkoutSessionService,
+} from '@/services/workouts';
+import { WORKOUT_STATUS } from '@/utils/appConstants';
 
 const useWorkoutSessionDetailsTracking = () => {
   const { slug } = useLocalSearchParams() as { slug: string };
-  const toast = useToast();
 
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
@@ -31,9 +34,7 @@ const useWorkoutSessionDetailsTracking = () => {
       const results = dataWorkoutSessionDetails?.workout;
       const sessionId = dataWorkoutSessionDetails?._id;
       const updatedData = { ...results, status: dataWorkoutSessionDetails?.status };
-      console.log('(isAuthenticated-workout-session-details) INFO:: ', {
-        dataWorkoutSessionDetails,
-      });
+      console.log('(isAuthenticated-workout-session-details) INFO:: ');
       setWorkoutDetail(updatedData);
       router.push(`/workout-session/${sessionId}` as any);
       return;
@@ -67,7 +68,28 @@ const useWorkoutSessionDetailsTracking = () => {
   }) => {
     const { sessionId, exerciseId, durationTaken, repsTaken, isLastExerciseCard } = payload;
     if (isAuthenticated) {
+      // Sync exercise with the server
       console.log('(API_CALLING) INFO:: handleUpdateExerciseInWorkoutSession');
+      // Update each exercise for the workout session
+      await updateWorkoutSessionService({
+        id: sessionId, // Use the synced session ID
+        formData: {
+          exerciseId: exerciseId, // ID of the exercise
+          durationTaken: durationTaken,
+          isCompleted: true,
+          repsTaken: repsTaken,
+          // Add other necessary fields
+        },
+      });
+      if (isLastExerciseCard) {
+        // Update the workout session status
+        await updateWorkoutSessionFinishedStatus({
+          id: sessionId,
+          formData: {
+            status: WORKOUT_STATUS.FINISHED,
+          },
+        });
+      }
       return;
     }
 

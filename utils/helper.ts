@@ -67,8 +67,19 @@ export const formatTime = (seconds: number) => {
 export const calculateTotalDuration = (exercises: ExerciseElement[]) => {
   return (
     exercises?.length &&
-    exercises.reduce((totalDuration: any, exercise: { duration: any }) => {
-      return totalDuration + exercise.duration;
+    exercises.reduce((totalDuration: any, exercise: ExerciseElement) => {
+      return totalDuration + exercise.duration + exercise?.rest;
+    }, 0)
+  );
+};
+
+export const calculateDurationOFCompleteExercises = (exercises: ExerciseElement[]) => {
+  return (
+    exercises?.length &&
+    exercises.reduce((totalDuration: number, exercise: ExerciseElement) => {
+      return exercise?.isCompleted
+        ? totalDuration + exercise.duration + exercise?.rest
+        : totalDuration;
     }, 0)
   );
 };

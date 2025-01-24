@@ -1,5 +1,5 @@
 import { ExerciseElement, Workout } from '@/services/interfaces';
-import { calculateTotalDuration } from '@/utils/helper';
+import { calculateDurationOFCompleteExercises, calculateTotalDuration } from '@/utils/helper';
 import _ from 'lodash';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
@@ -55,11 +55,14 @@ export const useWorkoutDetailStore = create<IWorkoutDetailStore>()(
       if (payload) {
         const sortedExercisesList = _.sortBy(payload.exercises, ['order']); // Sort exercises
         const totalWorkoutTime = calculateTotalDuration(sortedExercisesList); // Calculate total workout time
+        const durationOFCompleteExercises =
+          calculateDurationOFCompleteExercises(sortedExercisesList); // Calculate remaining time
+        const remainingTime = totalWorkoutTime - durationOFCompleteExercises;
         set({
           workoutDetail: { ...payload, exercises: sortedExercisesList },
           hasExercise: sortedExercisesList.length > 0,
           totalWorkoutTime,
-          remainingTime: totalWorkoutTime,
+          remainingTime: remainingTime,
           isWorkoutCompleted: false,
         });
       }
