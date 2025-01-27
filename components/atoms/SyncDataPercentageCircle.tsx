@@ -60,7 +60,6 @@ const SyncDataPercentageCircle: React.FC<{ completed: number | null; total: numb
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

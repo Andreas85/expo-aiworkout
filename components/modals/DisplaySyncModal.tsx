@@ -84,24 +84,6 @@ const DisplaySyncModal = (props: IDisplaySyncModalProps) => {
     );
   };
 
-  // const confirmSync = () => {
-  //   Alert.alert(
-  //     'Sync Data',
-  //     'Are you sure you want to sync your workout data?',
-  //     [
-  //       { text: 'Cancel', style: 'cancel' },
-  //       { text: 'Yes', onPress: () => {} },
-  //     ],
-  //     { cancelable: true },
-  //   );
-  // };
-
-  // useEffect(() => {
-  //   if (isVisible) {
-  //     confirmSync();
-  //   }
-  // }, [isVisible]);
-
   return (
     <Modal isVisible={isVisible} backdropOpacity={0.5}>
       <View
