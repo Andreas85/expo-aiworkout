@@ -43,9 +43,9 @@ export const syncWorkouts = async (
         workoutId: data?._id,
       });
 
-      // Update progress tracker
+      // Update progress tracker after completing the workout and its exercises
       tracker.completed++;
-      updateProgress(`Syncing workouts ${tracker.completed}/${total}`);
+      updateProgress(`Syncing workouts ${tracker.completed}/${total}`, tracker.completed, total);
     } catch (error) {
       console.error(`Failed to sync workout with ID ${workout._id}:`, error);
     }
@@ -60,7 +60,7 @@ export const syncExercisesForWorkout = async (
   exercises: any[],
   tracker: ISyncProgressTracker,
 ): Promise<any[]> => {
-  const { total, updateProgress } = tracker;
+  // const { total, updateProgress } = tracker;
   const successfullySyncedExercises: any[] = [];
 
   for (let i = 0; i < exercises.length; i++) {
@@ -84,8 +84,8 @@ export const syncExercisesForWorkout = async (
 
       successfullySyncedExercises.push(exercise);
 
-      tracker.completed++;
-      updateProgress(`Syncing exercises ${tracker.completed}/${total}`);
+      // tracker.completed++;
+      // updateProgress(`Syncing exercises ${tracker.completed}/${total}`);
     } catch (error) {
       console.error(`Failed to sync exercise with ID ${exercise._id}:`, error);
     }
@@ -97,7 +97,7 @@ export const syncExercisesForWorkout = async (
 // Utility to sync all data
 export const syncAllData = async (
   workouts: any[],
-  updateProgress: (message: string) => void,
+  updateProgress: (message: string, completed: number, total: number) => void,
 ): Promise<void> => {
   const totalWorkouts = workouts.length;
   const totalExercises = workouts.reduce(
@@ -105,7 +105,7 @@ export const syncAllData = async (
     0,
   );
   const totalSessions = workouts.length; // Assuming each workout has a session
-  const totalItems = totalWorkouts + totalExercises + totalSessions;
+  const totalItems = totalWorkouts;
 
   const tracker: ISyncProgressTracker = {
     total: totalItems,

@@ -9,7 +9,7 @@ import { WORKOUT_STATUS } from './appConstants';
 interface ISyncProgressTracker {
   total: number;
   completed: number;
-  updateProgress: (message: string) => void; // Callback for updating progress in UI
+  updateProgress: (message: string, completed: number, total: number) => void; // Callback for updating progress in UI
 }
 
 export const syncWorkoutSessions = async (
@@ -38,7 +38,11 @@ export const syncWorkoutSessions = async (
 
       // Update progress tracker
       tracker.completed++;
-      updateProgress(`Synced workout session ${tracker.completed}/${total}`);
+      updateProgress(
+        `Synced workout session ${tracker.completed}/${total}`,
+        tracker.completed,
+        total,
+      );
     } catch (error) {
       console.error('Error syncing workout session:', error, sessionData);
     }
@@ -50,7 +54,7 @@ export const syncWorkoutSessions = async (
 // Utility to sync all data including workout sessions
 export const syncAllDataWithSessions = async (
   workoutSessions: any[],
-  updateProgress: (message: string) => void,
+  updateProgress: (message: string, completed: number, total: number) => void,
 ): Promise<void> => {
   const totalSessions = workoutSessions.length;
   const totalItems = totalSessions;
@@ -84,9 +88,9 @@ export const syncAllDataWithSessions = async (
             },
           });
 
-          // Update progress tracker for each exercise
-          tracker.completed++;
-          updateProgress(`Syncing exercises ${tracker.completed}/${tracker.total}`);
+          // // Update progress tracker for each exercise
+          // tracker.completed++;
+          // updateProgress(`Syncing exercises ${tracker.completed}/${tracker.total}`);
         } catch (error) {
           console.error(`Failed to sync exercise for session ID ${session.sessionId}:`, error);
         }

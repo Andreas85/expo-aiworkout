@@ -11,32 +11,28 @@ import WorkoutIndexRoute from './workouts';
 import PublicScreenRoute from './workouts/public';
 import GradientBackground from '@/components/atoms/GradientBackground';
 import { useEffect } from 'react';
-import { syncWorkoutData } from '@/utils/SyncDataHelper';
+import { checkHasDataInStorage } from '@/utils/SyncDataHelper';
 import DisplaySyncModal from '@/components/modals/DisplaySyncModal';
-import { useSyncDataStore } from '@/store/useSyncDataStore';
-import { getWorkouts } from '@/utils/workoutStorageOperationHelper';
-import { getWorkoutSessions } from '@/utils/workoutSessionHelper';
+import useModal from '@/hooks/useModal';
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Layout() {
   const insets = useSafeAreaInsets();
   const { isLargeScreen } = useBreakPoints();
-  const isSync = useSyncDataStore(state => state.isSyncing);
-  // const { isAuthenticated } = useAuthStore();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const { showModal, hideModal, openModal } = useModal();
 
-  const checkHasDataInStorage = async () => {
-    const workouts = await getWorkouts();
-    const workoutSessions = await getWorkoutSessions();
-    if (workouts.length > 0 || workoutSessions.length > 0) {
-      syncWorkoutData();
+  const handleShowSyncModal = async () => {
+    const hasData = await checkHasDataInStorage();
+    if (hasData) {
+      showModal();
     }
   };
 
   useEffect(() => {
     if (isAuthenticated) {
-      checkHasDataInStorage();
+      handleShowSyncModal();
     }
   }, [isAuthenticated]);
   return (
@@ -106,7 +102,7 @@ export default function Layout() {
           </Tab.Navigator>
         </Container>
       </GradientBackground>
-      <DisplaySyncModal isVisible={isSync} toggleModal={() => {}} onComplete={() => {}} />
+      <DisplaySyncModal isVisible={openModal} toggleModal={hideModal} onComplete={() => {}} />
     </SafeAreaView>
   );
 }

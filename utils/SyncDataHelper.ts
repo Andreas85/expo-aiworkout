@@ -2,13 +2,13 @@
 import { useSyncDataStore } from '@/store/useSyncDataStore';
 import { syncAllData } from './SyncWorkoutDataHelper';
 import { syncAllDataWithSessions } from './SyncWorkoutSessionData';
-import { getWorkoutSessions } from './workoutSessionHelper';
-import { getWorkouts } from './workoutStorageOperationHelper';
+import { getWorkoutSessions, setWorkoutSessions } from './workoutSessionHelper';
+import { getWorkouts, saveWorkouts } from './workoutStorageOperationHelper';
 
 export interface ISyncProgressTracker {
   total: number;
   completed: number;
-  updateProgress: (message: string) => void; // Callback for updating progress in UI
+  updateProgress: (message: string, completed: number, total: number) => void; // Callback for updating progress in UI
 }
 
 export const syncWorkoutData = async () => {
@@ -17,8 +17,8 @@ export const syncWorkoutData = async () => {
   console.log('(SYNC_START) INFO:: workouts:');
   const workouts = await getWorkouts(); // Retrieve workouts from local storage or state
   syncStore.startSync(workouts.length);
-  await syncAllData(workouts, (message: string) => {
-    syncStore.updateProgress(message, syncStore.completed + 1);
+  await syncAllData(workouts, (message: string, completed: number, total: number) => {
+    syncStore.updateProgress(message, completed);
     console.log('(WORKOUT-syncing...)', message); // Update UI with the sync progress message
   });
 
@@ -26,9 +26,22 @@ export const syncWorkoutData = async () => {
   syncStore.startSync(workoutSessions.length);
 
   console.log('(SYNC_START) INFO:: workoutsession:');
-  await syncAllDataWithSessions(workoutSessions, (message: string) => {
-    syncStore.updateProgress(message, syncStore.completed + 1);
-    console.log('(WORKOUT-session-syncing...)', message); // Update UI with the sync progress message
-  });
+  await syncAllDataWithSessions(
+    workoutSessions,
+    (message: string, completed: number, total: number) => {
+      syncStore.updateProgress(message, completed);
+      console.log('(WORKOUT-session-syncing...)', message); // Update UI with the sync progress message
+    },
+  );
   syncStore.finishSync();
+};
+
+export const checkHasDataInStorage = async () => {
+  const workouts = await getWorkouts();
+  const workoutSessions = await getWorkoutSessions();
+  return workouts.length > 0 || workoutSessions.length > 0;
+};
+
+export const clearStorageUnSyncData = async () => {
+  await Promise.all([setWorkoutSessions([]), saveWorkouts([])]);
 };

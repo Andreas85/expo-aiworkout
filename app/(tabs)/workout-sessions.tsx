@@ -1,5 +1,6 @@
 import Container from '@/components/atoms/Container';
 import GradientBackground from '@/components/atoms/GradientBackground';
+import Loading from '@/components/atoms/Loading';
 import WorkoutSessions from '@/components/screens/WorkoutSessions';
 import NoDataSvg from '@/components/svgs/NoDataSvg';
 import { useFetchData } from '@/hooks/useFetchData';
@@ -19,7 +20,11 @@ export default function WorkoutSessionScreen() {
   const [workoutSessionData, setWorkoutSessionData] = useState<any[]>([]);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
-  const { data: dataWorkoutSession, refetch } = useFetchData({
+  const {
+    data: dataWorkoutSession,
+    refetch,
+    isLoading,
+  } = useFetchData({
     queryFn: async () => {
       const response = await getUserWorkoutSessionsService();
       return response;
@@ -56,6 +61,13 @@ export default function WorkoutSessionScreen() {
   );
 
   const renderWorkingListing = () => {
+    if (isLoading) {
+      return (
+        <Container>
+          <Loading />
+        </Container>
+      );
+    }
     if (workoutSessionData?.length === 0) {
       return (
         <ScrollView

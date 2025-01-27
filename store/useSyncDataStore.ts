@@ -7,6 +7,7 @@ type State = {
   completed: number;
   total: number;
   error: string | null;
+  syncStatus: 'idle' | 'syncing' | 'error' | 'complete';
 };
 
 type Action = {
@@ -25,6 +26,7 @@ export const useSyncDataStore = create<ISyncDataStore>()(
     completed: 0,
     total: 0,
     error: null,
+    syncStatus: 'idle',
     startSync: total =>
       set({
         isSyncing: true,
@@ -32,6 +34,7 @@ export const useSyncDataStore = create<ISyncDataStore>()(
         completed: 0,
         total,
         error: null,
+        syncStatus: 'syncing',
       }),
     updateProgress: (message, completed) =>
       set(state => ({
@@ -41,6 +44,8 @@ export const useSyncDataStore = create<ISyncDataStore>()(
     setError: error =>
       set({
         isSyncing: false,
+        progressMessage: 'Sync failed!',
+        syncStatus: 'error',
         error,
       }),
     finishSync: () =>
@@ -50,6 +55,7 @@ export const useSyncDataStore = create<ISyncDataStore>()(
         completed: 0,
         total: 0,
         error: null,
+        syncStatus: 'complete',
       }),
   })),
 );
