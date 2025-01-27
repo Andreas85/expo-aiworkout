@@ -10,12 +10,14 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import NoDataSvg from '../svgs/NoDataSvg';
 
 import StartWorkoutExercisesList from '../molecules/StartWorkoutExercisesList';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
   const navigation = useNavigation();
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
+  const hasExerciseWorkoutSession = useWorkoutSessionStore(state => state.hasExercises);
   const [isEnabled] = useState<boolean>(false);
   const { isLargeScreen } = useWebBreakPoints();
 
@@ -26,7 +28,7 @@ const StartWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   }, [workoutDetail]);
 
   const renderWorkoutExercises = () => {
-    if (!hasExercise) {
+    if (!hasExercise && !hasExerciseWorkoutSession) {
       return (
         <Container style={tailwind('flex-1')}>
           <NoDataSvg
