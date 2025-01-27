@@ -1,23 +1,24 @@
 import { ISyncProgressTracker } from './SyncDataHelper';
 import {
+  IWorkoutExercisesHelper,
   removeworkoutExercisesHelperById,
   updateExerciseIdsInLocalStorage,
 } from './workoutExercisesHelper';
 import { addExerciseService } from '@/services/exercises';
 
 export const syncExerciseData = async (
-  exercises: any[],
+  exercises: IWorkoutExercisesHelper[],
   tracker: ISyncProgressTracker,
 ): Promise<any[]> => {
   const { total, updateProgress } = tracker;
   const successfullySyncedExercises: any[] = [];
 
   for (const exercise of exercises) {
-    const oldExerciseId = exercise.exerciseId;
+    const oldExerciseId = exercise._id;
     try {
       const response = await addExerciseService({
         formData: {
-          ...exercise,
+          name: exercise.name,
         },
       });
 

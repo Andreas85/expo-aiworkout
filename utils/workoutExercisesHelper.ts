@@ -9,7 +9,6 @@ export interface IWorkoutExercisesHelper {
   name: string;
   value: string;
   label: string;
-  exerciseId: string;
 }
 
 // 1. Get current workout session from AsyncStorage
@@ -65,7 +64,7 @@ export const updateWorkoutIdInWorkoutSession = async (
   try {
     const sessions = await getWorkoutExercisesList();
     const updatedSessions = sessions.map(session => {
-      if (session.exerciseId === oldExerciseId) {
+      if (session._id === oldExerciseId) {
         return {
           ...session,
           exerciseId: newExerciseId,
