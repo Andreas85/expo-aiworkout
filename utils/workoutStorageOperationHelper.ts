@@ -21,7 +21,7 @@ export const saveWorkouts = async (workouts: any[]): Promise<void> => {
 };
 
 // Add a new workout to the array of workouts in AsyncStorage
-export const addWorkout = async (workout: Pick<Workout, 'name'>): Promise<void> => {
+export const addWorkout = async (workout: Pick<Workout, 'name'>): Promise<any> => {
   const workouts = await getWorkouts();
   const workoutId = generateBigNumberId();
   // Create a new workout object
@@ -36,6 +36,7 @@ export const addWorkout = async (workout: Pick<Workout, 'name'>): Promise<void> 
 
   workouts?.push?.(newWorkout); // Add the new workout to the array
   await saveWorkouts(workouts); // Save the updated array to AsyncStorage
+  return workoutId; // Return the workout ID
 };
 
 // Edit an existing workout in the array of workouts in AsyncStorage

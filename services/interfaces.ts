@@ -144,3 +144,20 @@ export interface ExerciseExercise {
   name: string;
   slug: string;
 }
+
+export interface ICreateExerciseFormData {
+  name: string;
+}
+
+export interface IPayloadCreateExercise {
+  formData: ICreateExerciseFormData;
+}
+
+export interface IPayloadExerciseDetail {
+  id: any;
+}
+
+export interface IPayloadUpdateExerciseData {
+  formData: any;
+  queryParams: { id: any };
+}

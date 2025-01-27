@@ -1,9 +1,10 @@
-// import { syncAllData } from './SyncWorkoutDataHelper';
 import { useSyncDataStore } from '@/store/useSyncDataStore';
 import { syncAllData } from './SyncWorkoutDataHelper';
 import { syncAllDataWithSessions } from './SyncWorkoutSessionData';
 import { getWorkoutSessions, setWorkoutSessions } from './workoutSessionHelper';
 import { getWorkouts, saveWorkouts } from './workoutStorageOperationHelper';
+import { getWorkoutExercisesList } from './workoutExercisesHelper';
+import { syncExercises } from './SyncExercisesDataHelper';
 
 export interface ISyncProgressTracker {
   total: number;
@@ -13,6 +14,14 @@ export interface ISyncProgressTracker {
 
 export const syncWorkoutData = async () => {
   const syncStore = useSyncDataStore.getState();
+
+  console.log('(SYNC_START) INFO:: workouts exercises:');
+  const exercises = await getWorkoutExercisesList(); // Retrieve workouts from local storage or state
+  syncStore.startSync(exercises.length);
+  await syncExercises(exercises, (message: string, completed: number, total: number) => {
+    syncStore.updateProgress(message, completed);
+    console.log('(EXERCISES-syncing...)', message); // Update UI with the sync progress message
+  });
 
   console.log('(SYNC_START) INFO:: workouts:');
   const workouts = await getWorkouts(); // Retrieve workouts from local storage or state

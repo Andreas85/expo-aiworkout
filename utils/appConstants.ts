@@ -74,6 +74,7 @@ export const STORAGES_KEYS = {
   WORKOUT_SESSION_LIST: 'workout-session-list',
   WORKOUT_SESSION: 'workout-session',
   WORKOUTS_LIST: 'workouts-list',
+  WORKOUT_EXERCISES: 'workout-exercises',
 };
 
 export const STORAGE_EMITTER_KEYS = {

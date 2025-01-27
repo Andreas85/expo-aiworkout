@@ -12,7 +12,7 @@ import { addWorkoutService, updateWorkoutDataRequest } from '@/services/workouts
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import * as yup from 'yup';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { getWorkoutDetail } from '@/utils/workoutStorageOperationHelper';
 import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
@@ -39,10 +39,11 @@ function AddAndEditWorkoutModal(props: {
 
   const { mutate: mutateAddWorkout, isPending } = useMutation({
     mutationFn: addWorkoutService,
-    onSuccess: async () => {
+    onSuccess: async (data: any) => {
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
       });
+      router.push(`/workout/${data?.data?._id}`);
       closeModal();
       // refetch?.();
     },

@@ -175,7 +175,7 @@ export const mapExerciseElementToExercise = (exerciseElement: ExerciseElement): 
     _id: exerciseElement._id,
     exercise: exerciseElement.exercise,
     order: exerciseElement.order,
-    exerciseId: exerciseElement._id, // Map _id to exerciseId
+    exerciseId: exerciseElement.exerciseId, // Map _id to exerciseId
     name: exerciseElement.name || '', // Use name from ExerciseElement, default to empty string if not available
     reps: exerciseElement.reps,
     duration: exerciseElement.duration,

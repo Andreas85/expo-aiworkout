@@ -21,12 +21,17 @@ import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { ExerciseElement } from '@/services/interfaces';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { View } from '../Themed';
-import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
+import { getReorderItemsForSortingWorkoutExercises, isValidUUID } from '@/utils/helper';
 import { useToast } from 'react-native-toast-notifications';
 import CustomDropdown from '../atoms/CustomDropdown';
 import { useFetchData } from '@/hooks/useFetchData';
 import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 import { useAuthStore } from '@/store/authStore';
+import {
+  addWorkoutExercises,
+  getWorkoutExercisesList,
+  IWorkoutExercisesHelper,
+} from '@/utils/workoutExercisesHelper';
 
 const ERROR_MESSAGE = {
   EXERCISE_REQ: 'Exercise name is required if less than 3 characters.',
@@ -145,11 +150,17 @@ function AddExercise(props: {
       weight: weight ? parseFloat(weight) : 0,
       rest: rest ? parseInt(rest) : 0,
     };
+
+    // i want to add exerciseId conditionally in exerciseData object
+    if (isValidUUID(exercise?._id) && isAuthenticated) {
+      delete exerciseData.exerciseId;
+    }
+    console.log('(exerciseData)INFO:: ', { exerciseData });
+
     const payload = {
       queryParams: { id: slug },
       formData: exerciseData,
     };
-    console.log({ values }, { payload });
     if (isAuthenticated) {
       mutateAddExerciseToWorkout(payload);
     } else {
@@ -166,41 +177,32 @@ function AddExercise(props: {
     enabled: isAuthenticated,
   });
 
-  useEffect(() => {
-    if (cachedPublicExerciseData || cachedMyExerciseData) {
-      // console.log({ cachedMyExerciseData }, { data });
-      setFilteredExercises(
-        [...(cachedMyExerciseData ?? []), ...cachedPublicExerciseData].map((item: any) => ({
+  const updateFilteredExercises = async (
+    cachedPublicExerciseData: any,
+    cachedMyExerciseData: any,
+  ) => {
+    const localExercises = await getWorkoutExercisesList();
+    setFilteredExercises(
+      [...(cachedMyExerciseData ?? []), ...cachedPublicExerciseData, ...localExercises].map(
+        (item: any) => ({
           ...item,
           label: item?.name,
           value: item?._id,
-        })),
-      );
+        }),
+      ),
+    );
+  };
+
+  useEffect(() => {
+    if (cachedPublicExerciseData || cachedMyExerciseData) {
+      // console.log({ cachedMyExerciseData }, { data });
+      updateFilteredExercises(cachedPublicExerciseData, cachedMyExerciseData);
     }
   }, [cachedPublicExerciseData, isSuccess, cachedMyExerciseData, data]);
 
-  const isLabelValueObject = (input: any): boolean =>
-    input && typeof input === 'object' && 'label' in input && 'value' in input;
-
-  // Fetch exercises based on the query input
-
-  // const findExercise = async (input: string) => {
-  //   setQuery(input);
-  //   onchange?.(input);
-
-  //   // If input is empty, display cached `data`
-  //   if (!input && isSuccess) {
-  //     setFilteredExercises(data || []);
-  //     setHideResults(false);
-  //     return;
-  //   }
-
-  //   // Otherwise, fetch matching exercises from API
-  //   const result = (await handleExercisesOptionsFetch(input)) ?? [];
-  //   result > 0 ? setIsNewExercise(false) : setIsNewExercise(true);
-  //   setFilteredExercises(result);
-
-  // };
+  const addNewExerciseInAsyncStorage = async (data: IWorkoutExercisesHelper) => {
+    await addWorkoutExercises(data);
+  };
 
   return (
     <>
@@ -230,9 +232,21 @@ function AddExercise(props: {
                           // searchQuery={values?.exercise}
                           selectedItem={values?.exercise}
                           items={filteredExercises}
-                          onchange={(value: ExerciseElement) => {
-                            // console.log("INFO:: isLabelValueObject", { value }, isLabelValueObject(value));
+                          onchange={(value: IWorkoutExercisesHelper) => {
+                            const isNewsExercise =
+                              filteredExercises.findIndex(
+                                (item: IWorkoutExercisesHelper) => item._id === value?._id,
+                              ) === -1;
+
+                            // console.log('INFO:: isLabelValueObject', {
+                            //   value,
+                            //   isLabelValueObject: isLabelValueObject(value),
+                            //   isNewsExercise,
+                            // });
                             setFieldValue('exercise', value, false);
+                            if (isNewsExercise) {
+                              addNewExerciseInAsyncStorage(value);
+                            }
                           }}
                           placeholder="Select"
                         />

@@ -31,9 +31,10 @@ const useWorkoutNonLoggedInUser = () => {
   };
 
   const handleAddWorkoutForNonLoggedInUser = async ({ workoutName }: { workoutName: string }) => {
-    await addWorkout({
+    const workoutId = await addWorkout({
       name: workoutName,
     });
+    router.push(`/workout/${workoutId}`);
   };
 
   const handleEditWorkoutForNonLoggedInUser = async ({ workoutName }: { workoutName: string }) => {

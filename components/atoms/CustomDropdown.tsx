@@ -1,10 +1,11 @@
 import { StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
 import { AntDesign } from '@expo/vector-icons';
 import { tailwind } from '@/utils/tailwind';
 import { Text, View } from '../Themed';
-import { exerciseAutoSuggest } from '@/services/workouts';
+import { generateBigNumberId } from '@/utils/helper';
+import { getWorkoutExercisesList } from '@/utils/workoutExercisesHelper';
 
 interface CustomDropdownProps {
   open: boolean;
@@ -32,6 +33,7 @@ const CustomDropdown = (props: CustomDropdownProps) => {
   } = props;
 
   const [isFocus, setIsFocus] = React.useState(false);
+  const [dropdownItems, setDropdownItems] = React.useState(items);
 
   const renderLabel = () => {
     if (selectedItem || isFocus) {
@@ -39,6 +41,35 @@ const CustomDropdown = (props: CustomDropdownProps) => {
     }
     return null;
   };
+
+  const handleSearchChange = (input: string) => {
+    // setQuery(input);
+
+    const foundItem = dropdownItems.some(item => item.label.toLowerCase() === input.toLowerCase());
+    if (!foundItem && input.trim() !== '') {
+      const clientSideExerciseId = generateBigNumberId();
+      const newItem = {
+        label: input,
+        name: input,
+        value: clientSideExerciseId,
+        _id: clientSideExerciseId,
+      };
+      setDropdownItems([...items, newItem]);
+    }
+  };
+
+  const updateDropdownItems = async (items: any) => {
+    const localExercises = await getWorkoutExercisesList();
+    // console.log('localExercises', localExercises);
+    setDropdownItems([...items, ...localExercises]);
+    // setDropdownItems(items);
+  };
+
+  useEffect(() => {
+    if (items?.length) {
+      updateDropdownItems(items);
+    }
+  }, [items]);
 
   return (
     <View style={{}}>
@@ -53,10 +84,14 @@ const CustomDropdown = (props: CustomDropdownProps) => {
         selectedTextProps={{ numberOfLines: 1 }}
         inputSearchStyle={[styles.inputSearchStyle, tailwind(''), { outlineStyle: 'none' }]}
         iconStyle={styles.iconStyle}
-        data={items}
+        data={dropdownItems}
         search={search}
-        searchQuery={searchQuery}
+        // searchQuery={query}
+        searchQuery={(keyword, labelValue) =>
+          labelValue.toLowerCase().includes(keyword.toLowerCase())
+        }
         value={selectedItem}
+        onChangeText={handleSearchChange}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         // onChangeText={onchange}
