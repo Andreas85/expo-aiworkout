@@ -19,7 +19,7 @@ const useWorkoutNonLoggedInUser = () => {
   const toast = useToast();
   // Duplicate workout to the array of workouts in AsyncStorage
   const handleDuplicateWorkoutForNonLoggedInUser = async (workout: Pick<Workout, 'name'>) => {
-    const newWorkout = await duplicateWorkout(workout);
+    const newWorkout = await duplicateWorkout(workout, slug);
 
     toast.show('Duplicate success', { type: 'success' });
     router.push(`/workout/${newWorkout?._id}`);

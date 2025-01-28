@@ -63,8 +63,12 @@ export const editWorkout = async (
 };
 
 // Duplicate workout to the array of workouts in AsyncStorage
-export const duplicateWorkout = async (workout: Pick<Workout, 'name'>): Promise<any> => {
+export const duplicateWorkout = async (
+  workout: Pick<Workout, 'name'>,
+  duplicateWorkoutId: string,
+): Promise<any> => {
   const workouts = await getWorkouts();
+  const duplicatedWorkout = await getWorkoutDetail(duplicateWorkoutId);
   const workoutId = generateBigNumberId();
   // Create a new workout object
   const newWorkout = {
@@ -73,6 +77,7 @@ export const duplicateWorkout = async (workout: Pick<Workout, 'name'>): Promise<
     isPublic: false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    exercises: duplicatedWorkout?.exercises || [],
   };
 
   workouts?.push?.(newWorkout); // Add the new workout to the array
