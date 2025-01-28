@@ -9,6 +9,7 @@ export interface IWorkoutExercisesHelper {
   name: string;
   value: string;
   label: string;
+  isNew: boolean;
 }
 
 // 1. Get current workout session from AsyncStorage

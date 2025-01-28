@@ -9,6 +9,8 @@ import TextContainer from '../atoms/TextContainer';
 import Container from '../atoms/Container';
 import { ActionButton } from '../atoms/ActionButton';
 import SyncDataPercentageCircle from '../atoms/SyncDataPercentageCircle';
+import { useQueryClient } from '@tanstack/react-query';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
 interface IDisplaySyncModalProps {
   isVisible: boolean;
@@ -18,6 +20,7 @@ interface IDisplaySyncModalProps {
 
 const DisplaySyncModal = (props: IDisplaySyncModalProps) => {
   const { isVisible, toggleModal } = props;
+  const queryClient = useQueryClient();
   const { isLargeScreen } = useWebBreakPoints();
   const progressMessage = useSyncDataStore(state => state.progressMessage);
   const isSyncing = useSyncDataStore(state => state.isSyncing);
@@ -37,6 +40,9 @@ const DisplaySyncModal = (props: IDisplaySyncModalProps) => {
   useEffect(() => {
     if (syncStatus === 'complete') {
       console.log('sync complete');
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      });
       toggleModal();
     }
   }, [syncStatus]);

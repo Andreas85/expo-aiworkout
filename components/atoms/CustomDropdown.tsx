@@ -53,6 +53,7 @@ const CustomDropdown = (props: CustomDropdownProps) => {
         name: input,
         value: clientSideExerciseId,
         _id: clientSideExerciseId,
+        isNew: true, // To differentiate
       };
       setDropdownItems([...items, newItem]);
     }
@@ -102,6 +103,18 @@ const CustomDropdown = (props: CustomDropdownProps) => {
         placeholder={placeholder ?? 'Select'}
         labelField={'label'}
         valueField={'value'}
+        renderItem={item => (
+          <View
+            style={{
+              padding: 17,
+              justifyContent: 'space-between',
+              backgroundColor: 'transparent',
+              flexDirection: 'row',
+            }}>
+            <Text style={styles.itemText}>{item.label}</Text>
+            {item.isNew ? <Text style={styles.itemText}>{`(New)`} </Text> : null}
+          </View>
+        )}
         {...restProps}
       />
     </View>
@@ -145,5 +158,9 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#000',
   },
 });
