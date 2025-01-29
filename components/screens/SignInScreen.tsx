@@ -36,9 +36,13 @@ export default function SignInIndexPage() {
   const [otpSendSuccess, setOtpSendSuccess] = useState<boolean>(false);
   const [timePassed, setTimePassed] = useState<number>(OTP_EXPIRED_TIME);
   const [otpCode, setOtpCode] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
   const formikRef = useRef<any>();
   const authStore = useAuthStore();
+  const [formValues, setFormValues] = useState<{
+    email: string;
+  }>({
+    email: '',
+  });
 
   // Update the timer
   useEffect(() => {
@@ -51,13 +55,13 @@ export default function SignInIndexPage() {
   const { mutate: login, isPending } = useMutation({
     mutationFn: loginService,
     onSuccess: (data, variables) => {
+      const { input } = variables.formData;
       // console.log('datas-uccess', { variables, email: formikRef.current?.values?.input });
-      setEmail(formikRef.current?.values?.input);
+      setFormValues({ email: input });
       setOtpSendSuccess(true);
       setResponseError('');
     },
     onError: (error: string) => {
-      setEmail('');
       setResponseError(error);
       setOtpSendSuccess(false);
     },
@@ -107,7 +111,7 @@ export default function SignInIndexPage() {
   const handleOtpVerification = () => {
     const payload = {
       formData: {
-        input: email ?? '',
+        input: formValues?.email ?? '',
         otp: otpCode,
       },
     };
@@ -139,7 +143,7 @@ export default function SignInIndexPage() {
           data={'Sign in to your account'}
         />
         <Formik
-          initialValues={{ email: '' }}
+          initialValues={{ email: formValues?.email ?? '' }}
           validationSchema={validationSchema}
           innerRef={e => (formikRef.current = e)}
           enableReinitialize={true}
@@ -223,7 +227,7 @@ export default function SignInIndexPage() {
             }),
             tailwind('break-words'),
           ]}>
-          We have send an OTP on you email {email}
+          We have send an OTP on you email {formValues?.email}
           &nbsp;(
           <Text
             onPress={handleChange}
@@ -265,7 +269,7 @@ export default function SignInIndexPage() {
             <ActionButton
               uppercase={true}
               label={'Resend'}
-              onPress={() => handleSubmit({ email }, true)}
+              onPress={() => handleSubmit({ email: formValues?.email }, true)}
               // isLoading={loginOtpPending}
               labelStyle={tailwind('font-bold text-WORKOUT_PURPLE')}
               style={tailwind('rounded-lg bg-transparent p-0 ')}
