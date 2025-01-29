@@ -153,6 +153,7 @@ export default function TabLayout() {
           />
           <Tabs.Screen
             name="profile"
+            redirect={!isAuthenticated}
             options={{
               title: 'Profile',
               headerShown: false,

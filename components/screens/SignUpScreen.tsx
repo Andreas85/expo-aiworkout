@@ -22,6 +22,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { IRegister } from '@/services/interfaces';
 
 const validationSchema = yup.object().shape({
+  firstName: yup.string().required('Field is required'),
+  lastName: yup.string().required('Field is required'),
   email: yup.string().required('Field is required').email('Invalid email format'),
 });
 
