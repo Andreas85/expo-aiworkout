@@ -7,7 +7,15 @@ module.exports = {
   tabWidth: 2,
   semi: true,
   printWidth: 100,
-  plugins: ["prettier-plugin-tailwindcss"],
-  tailwindFunctions: ["tailwind"],
-  tailwindPreserveWhitespace: true
+  plugins: ['prettier-plugin-tailwindcss'],
+  tailwindFunctions: ['tailwind'],
+  tailwindPreserveWhitespace: true,
+  overrides: [
+    {
+      files: ['*.json', '*.md', '*.tsx'], // Files where you want double quotes
+      options: {
+        singleQuote: false,
+      },
+    },
+  ],
 };

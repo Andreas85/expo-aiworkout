@@ -30,7 +30,7 @@ const validationSchema = yup.object().shape({
 
 const OTP_EXPIRED_TIME = 180; // minutes
 
-export default function SignInIndexPage() {
+export default function SignupIndexPage() {
   const { isMediumScreen, isLargeScreen } = useBreakPoints();
   const [responseError, setResponseError] = useState<string>();
   const [otpSendSuccess, setOtpSendSuccess] = useState<boolean>(false);
@@ -119,21 +119,18 @@ export default function SignInIndexPage() {
   const renderForm = () => {
     return (
       <Container
-        style={[
-          tailwind(
+        style={Platform.select({
+          native: tailwind(
             `h-full w-full flex-1 grow justify-center gap-y-4 self-center px-4 ${!isMediumScreen && 'px-40'}`,
           ),
-        ]}
-        className="items-center1 flex  w-96 flex-col gap-8 ">
-        <TextContainer
-          style={[tailwind('text-9 w-full text-center font-bold text-white')]}
-          className="text-center text-3xl font-bold leading-9 lg:text-4xl"
-          data={'Welcome back'}
-        />
+          web: tailwind(
+            `w-full grow justify-center gap-y-4 self-center bg-transparent px-4 ${isLargeScreen ? '' : 'px-40'}`,
+          ),
+        })}>
         <TextContainer
           style={tailwind('text-6 self-center font-bold ')}
           className="text-2xl"
-          data={'Sign in to your account'}
+          data={'Create an account'}
         />
         <Formik
           initialValues={{ email: '' }}
@@ -142,7 +139,29 @@ export default function SignInIndexPage() {
           enableReinitialize={true}
           onSubmit={values => handleSubmit(values)}>
           {({ handleChange, handleSubmit, values, errors, isSubmitting }: any) => (
-            <Container className="w-full space-y-4" style={tailwind('w-full gap-y-4')}>
+            <Container
+              className="w-full space-y-4"
+              style={tailwind('w-full gap-y-4 bg-transparent')}>
+              <AppTextInput
+                value={values.email}
+                placeholder="Enter your first name"
+                onChangeText={handleChange('email')}
+                errorMessage={errors?.email}
+                keyboardType="email-address"
+                placeholderTextColor={'#fff'}
+                autoCapitalize="none"
+                containerStyle={{ marginBottom: 20 }}
+              />
+              <AppTextInput
+                value={values.email}
+                placeholder="Enter your last name"
+                onChangeText={handleChange('email')}
+                errorMessage={errors?.email}
+                keyboardType="email-address"
+                placeholderTextColor={'#fff'}
+                autoCapitalize="none"
+                containerStyle={{ marginBottom: 20 }}
+              />
               <AppTextInput
                 value={values.email}
                 placeholder="Enter your email"
@@ -162,28 +181,25 @@ export default function SignInIndexPage() {
               )}
               <ActionButton
                 uppercase={true}
-                label={'Log in using OTP'}
+                label={'Create Account'}
                 onPress={handleSubmit}
                 isLoading={isPending}
                 type="submit"
                 style={tailwind('rounded-lg')}
               />
-              <Container
-                className="text-center"
-                style={tailwind('flex-row items-center justify-center')}>
+              <Container style={tailwind('flex-row items-center justify-center')}>
                 <TextContainer
                   style={tailwind('text-sm')}
                   className="inline text-xs"
-                  data={'Not Registered?'}
+                  data={'Already have an account?'}
                 />
-
                 <TouchableOpacity
-                  onPress={() => router.push('/signup')}
+                  onPress={() => router.push('/signin')}
                   style={tailwind('p-1 font-bold text-WORKOUT_PURPLE')}>
                   <TextContainer
                     style={tailwind('text-sm font-bold')}
                     className="inline text-xs font-medium"
-                    data={'Create an account'}
+                    data={'Sign in'}
                   />
                 </TouchableOpacity>
               </Container>

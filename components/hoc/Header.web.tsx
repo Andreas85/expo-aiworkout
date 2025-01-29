@@ -39,7 +39,7 @@ const Header = () => {
               </Link>
             );
           })}
-          <ActionButton label={'Sign in'} onPress={() => router.push('/signin')} />
+          <ActionButton label={'Sign in'} onPress={() => router.push('/(auth)/signin')} />
         </div>
       );
     }

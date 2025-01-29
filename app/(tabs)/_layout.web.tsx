@@ -178,9 +178,12 @@ export default function TabLayout() {
             }}
           />
           <Tabs.Screen
-            name="signin"
+            name="(auth)"
+            redirect={isAuthenticated}
             options={{
-              title: 'Sign in',
+              title: 'Sign in/ Sign up',
+              headerTransparent: true,
+
               headerShown: false,
               unmountOnBlur: true,
               tabBarItemStyle: {
