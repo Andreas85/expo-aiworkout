@@ -5,6 +5,8 @@ export const ICON_SIZE = 20;
 export const STRING_DATA = {
   SHORT_VERSION: 'Short version',
   REST: 'rest',
+  CAMERA: 'Camera',
+  GALLERY: 'Gallery',
 };
 
 export const NAVBAR_TABS: INavbarTabs[] = [
