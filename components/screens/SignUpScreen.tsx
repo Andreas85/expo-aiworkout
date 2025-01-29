@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as yup from 'yup';
 import { Platform, StyleSheet } from 'react-native';
 import { useMutation } from '@tanstack/react-query';
-import { loginService, loginUsingOTPService } from '@/services/auth';
+import { loginUsingOTPService, registerService } from '@/services/auth';
 import { useAuthStore } from '@/store/authStore';
 import { router } from 'expo-router';
 import useBreakPoints from '@/hooks/useBreakPoints';
@@ -19,10 +19,7 @@ import { formatTimeForMinutes } from '@/utils/helper';
 import React from 'react';
 import KeyboardView from '../atoms/KeyboardView';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
-interface Values {
-  email: string;
-}
+import { IRegister } from '@/services/interfaces';
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Field is required').email('Invalid email format'),
@@ -48,8 +45,8 @@ export default function SignupIndexPage() {
     }
   }, [timePassed, otpSendSuccess]);
 
-  const { mutate: login, isPending } = useMutation({
-    mutationFn: loginService,
+  const { mutate: register, isPending: isPendingRegister } = useMutation({
+    mutationFn: registerService,
     onSuccess: data => {
       console.log('datas-uccess', data);
       setEmail(formikRef.current?.values?.email);
@@ -77,17 +74,22 @@ export default function SignupIndexPage() {
     },
   });
 
-  const submitFormData = async (values: { email: string }) => {
-    const { email } = values;
-    const payload = {
-      formData: {
-        input: email,
-      },
-    };
-    login(payload);
+  const submitFormData = async (values: Partial<IRegister>) => {
+    const { email, firstName, lastName } = values;
+    if (email && firstName && lastName) {
+      const payload = {
+        email,
+        firstName,
+        lastName,
+      };
+      register(payload);
+    }
   };
 
-  const handleSubmit = async (values: Values, isResendOtp?: boolean) => {
+  const handleSubmit = async (
+    values: Omit<IRegister, 'firstName' | 'lastName'>,
+    isResendOtp?: boolean,
+  ) => {
     if (isResendOtp) {
       setTimePassed(OTP_EXPIRED_TIME);
     }
@@ -133,7 +135,7 @@ export default function SignupIndexPage() {
           data={'Create an account'}
         />
         <Formik
-          initialValues={{ email: '' }}
+          initialValues={{ firstName: '', lastName: '', email: '' }}
           validationSchema={validationSchema}
           innerRef={e => (formikRef.current = e)}
           enableReinitialize={true}
@@ -143,21 +145,21 @@ export default function SignupIndexPage() {
               className="w-full space-y-4"
               style={tailwind('w-full gap-y-4 bg-transparent')}>
               <AppTextInput
-                value={values.email}
+                value={values.firstName}
                 placeholder="Enter your first name"
-                onChangeText={handleChange('email')}
-                errorMessage={errors?.email}
-                keyboardType="email-address"
+                onChangeText={handleChange('firstName')}
+                errorMessage={errors?.firstName}
+                keyboardType="name-phone-pad"
                 placeholderTextColor={'#fff'}
                 autoCapitalize="none"
                 containerStyle={{ marginBottom: 20 }}
               />
               <AppTextInput
-                value={values.email}
+                value={values.lastName}
                 placeholder="Enter your last name"
-                onChangeText={handleChange('email')}
-                errorMessage={errors?.email}
-                keyboardType="email-address"
+                onChangeText={handleChange('lastName')}
+                errorMessage={errors?.lastName}
+                keyboardType="name-phone-pad"
                 placeholderTextColor={'#fff'}
                 autoCapitalize="none"
                 containerStyle={{ marginBottom: 20 }}
@@ -183,7 +185,7 @@ export default function SignupIndexPage() {
                 uppercase={true}
                 label={'Create Account'}
                 onPress={handleSubmit}
-                isLoading={isPending}
+                isLoading={isPendingRegister}
                 type="submit"
                 style={tailwind('rounded-lg')}
               />
@@ -272,7 +274,7 @@ export default function SignupIndexPage() {
             <ActionButton
               uppercase={true}
               label={formatTimeForMinutes(timePassed)}
-              isLoading={isPending}
+              isLoading={isPendingRegister}
               style={tailwind('cursor-default rounded-lg bg-transparent p-0')}
             />
             <ActionButton

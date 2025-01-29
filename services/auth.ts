@@ -1,17 +1,18 @@
 import { postRequest } from '@/utils/axios';
 import { API_ENPOINTS } from './api';
 import { extractedErrorMessage } from '@/utils/helper';
+import { IRegister } from './interfaces';
 
-export const registerService = async (payload: any) => {
+export const registerService = async (payload: IRegister) => {
   try {
     const URL = API_ENPOINTS.REGISTER;
     const { data } = await postRequest({
       API: URL,
-      DATA: payload.formData,
+      DATA: payload,
     });
     return data;
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
   }
 };
 

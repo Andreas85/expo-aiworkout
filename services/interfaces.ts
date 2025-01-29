@@ -161,3 +161,9 @@ export interface IPayloadUpdateExerciseData {
   formData: any;
   queryParams: { id: any };
 }
+
+export interface IRegister {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
