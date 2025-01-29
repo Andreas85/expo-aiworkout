@@ -50,9 +50,9 @@ export default function SignInIndexPage() {
 
   const { mutate: login, isPending } = useMutation({
     mutationFn: loginService,
-    onSuccess: data => {
-      console.log('datas-uccess', data);
-      setEmail(formikRef.current?.values?.email);
+    onSuccess: (data, variables) => {
+      // console.log('datas-uccess', { variables, email: formikRef.current?.values?.input });
+      setEmail(formikRef.current?.values?.input);
       setOtpSendSuccess(true);
       setResponseError('');
     },
@@ -79,12 +79,15 @@ export default function SignInIndexPage() {
 
   const submitFormData = async (values: { email: string }) => {
     const { email } = values;
-    const payload = {
-      formData: {
-        input: email,
-      },
-    };
-    login(payload);
+    console.log('email', email);
+    if (email) {
+      const payload = {
+        formData: {
+          input: email,
+        },
+      };
+      login(payload);
+    }
   };
 
   const handleSubmit = async (values: Values, isResendOtp?: boolean) => {

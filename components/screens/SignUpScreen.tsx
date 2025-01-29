@@ -6,9 +6,9 @@ import { tailwind } from '@/utils/tailwind';
 import { Formik } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 import * as yup from 'yup';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 import { useMutation } from '@tanstack/react-query';
-import { loginUsingOTPService, registerService } from '@/services/auth';
+import { loginService, loginUsingOTPService, registerService } from '@/services/auth';
 import { useAuthStore } from '@/store/authStore';
 import { router } from 'expo-router';
 import useBreakPoints from '@/hooks/useBreakPoints';
@@ -27,6 +27,12 @@ const validationSchema = yup.object().shape({
   email: yup.string().required('Field is required').email('Invalid email format'),
 });
 
+const initialValues: IRegister = {
+  firstName: '',
+  lastName: '',
+  email: '',
+};
+
 const OTP_EXPIRED_TIME = 180; // minutes
 
 export default function SignupIndexPage() {
@@ -35,9 +41,9 @@ export default function SignupIndexPage() {
   const [otpSendSuccess, setOtpSendSuccess] = useState<boolean>(false);
   const [timePassed, setTimePassed] = useState<number>(OTP_EXPIRED_TIME);
   const [otpCode, setOtpCode] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
   const formikRef = useRef<any>();
   const authStore = useAuthStore();
+  const [formValues, setFormValues] = useState<IRegister | null>(null);
 
   // Update the timer
   useEffect(() => {
@@ -50,13 +56,31 @@ export default function SignupIndexPage() {
   const { mutate: register, isPending: isPendingRegister } = useMutation({
     mutationFn: registerService,
     onSuccess: data => {
-      console.log('datas-uccess', data);
-      setEmail(formikRef.current?.values?.email);
+      const responseData = data?.data;
+      const extractedEmail = responseData?.user?.email;
+      setFormValues({
+        firstName: responseData?.user?.firstName,
+        lastName: responseData?.user?.lastName,
+        email: extractedEmail,
+      });
+
       setOtpSendSuccess(true);
       setResponseError('');
     },
     onError: (error: string) => {
-      setEmail('');
+      setResponseError(error);
+      setOtpSendSuccess(false);
+    },
+  });
+
+  const { mutate: mutateResend, isPending: isPendingResend } = useMutation({
+    mutationFn: loginService,
+    onSuccess: (data, variables) => {
+      // console.log('datas-uccess', { variables });
+      setOtpSendSuccess(true);
+      setResponseError('');
+    },
+    onError: (error: string) => {
       setResponseError(error);
       setOtpSendSuccess(false);
     },
@@ -78,7 +102,7 @@ export default function SignupIndexPage() {
 
   const submitFormData = async (values: Partial<IRegister>) => {
     const { email, firstName, lastName } = values;
-    if (email && firstName && lastName) {
+    if (email) {
       const payload = {
         email,
         firstName,
@@ -94,6 +118,10 @@ export default function SignupIndexPage() {
   ) => {
     if (isResendOtp) {
       setTimePassed(OTP_EXPIRED_TIME);
+      if (formValues?.email) {
+        mutateResend({ formData: { input: formValues?.email } });
+      }
+      return;
     }
     await submitFormData(values);
   };
@@ -108,7 +136,7 @@ export default function SignupIndexPage() {
   const handleOtpVerification = () => {
     const payload = {
       formData: {
-        input: email ?? '',
+        input: formValues?.email ?? '',
         otp: otpCode,
       },
     };
@@ -137,7 +165,10 @@ export default function SignupIndexPage() {
           data={'Create an account'}
         />
         <Formik
-          initialValues={{ firstName: '', lastName: '', email: '' }}
+          initialValues={{
+            ...initialValues,
+            ...formValues,
+          }}
           validationSchema={validationSchema}
           innerRef={e => (formikRef.current = e)}
           enableReinitialize={true}
@@ -240,7 +271,7 @@ export default function SignupIndexPage() {
             }),
             tailwind('break-words'),
           ]}>
-          We have send an OTP on you email {email}
+          We have send an OTP on you email {formValues?.email}
           &nbsp;(
           <Text
             onPress={handleChange}
@@ -276,13 +307,13 @@ export default function SignupIndexPage() {
             <ActionButton
               uppercase={true}
               label={formatTimeForMinutes(timePassed)}
-              isLoading={isPendingRegister}
+              isLoading={isPendingResend}
               style={tailwind('cursor-default rounded-lg bg-transparent p-0')}
             />
             <ActionButton
               uppercase={true}
               label={'Resend'}
-              onPress={() => handleSubmit({ email }, true)}
+              onPress={() => handleSubmit({ email: formValues?.email ?? '' }, true)}
               // isLoading={loginOtpPending}
               labelStyle={tailwind('font-bold text-WORKOUT_PURPLE')}
               style={tailwind('rounded-lg bg-transparent p-0 ')}

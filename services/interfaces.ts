@@ -163,7 +163,7 @@ export interface IPayloadUpdateExerciseData {
 }
 
 export interface IRegister {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
 }
