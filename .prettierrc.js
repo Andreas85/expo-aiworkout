@@ -12,9 +12,15 @@ module.exports = {
   tailwindPreserveWhitespace: true,
   overrides: [
     {
-      files: ['*.json', '*.md', '*.tsx'], // Files where you want double quotes
+      files: ['*.json', '*.md'],
       options: {
-        singleQuote: false,
+        singleQuote: false, // Double quotes for JSON and MD files
+      },
+    },
+    {
+      files: ['*.tsx', '*.jsx'],
+      options: {
+        singleQuote: true, // Keep single quotes for JSX/TSX if needed
       },
     },
   ],

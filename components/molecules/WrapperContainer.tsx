@@ -14,8 +14,8 @@ const WrapperContainer = (props: IWrapperContainer) => {
     <Container
       style={[
         Platform.select({
-          web: tailwind(`rounded-lg  bg-[#252425] p-2`, wrapperContainerStyle?.web),
-          native: tailwind('rounded-lg bg-[#252425] px-1', wrapperContainerStyle?.native),
+          web: tailwind(`rounded-lg  bg-[#252425] p-2` + wrapperContainerStyle?.web),
+          native: tailwind('rounded-lg bg-[#252425] px-1' + wrapperContainerStyle?.native),
         }),
       ]}>
       {children}
