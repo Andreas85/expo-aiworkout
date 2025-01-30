@@ -58,10 +58,13 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
         <ShowLabelValue
           container={{
             web: `${isLargeScreen ? 'gap-[0.75rem]' : ' gap-[6rem]'} w-auto self-center `,
+            native: `flex-1 flex-row items-center justify-center self-center gap-[0.75rem]`,
           }}
           label="Duration "
-          labelContainer={{ web: `${isRestCard ? 'flex-0' : ''}` }}
-          // valueContainer={`${isRestCard ? 'flex-0' : ''}`}
+          labelContainer={{ web: `flex-0`, native: 'flex-1 text-right text-xs' }}
+          valueContainer={{
+            native: 'text-left text-xs',
+          }}
           value={`${item?.duration ? pluralise(item?.duration, `${item?.duration} second`) : '-'}`}
         />
       );
@@ -71,14 +74,18 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
         <ShowLabelValue
           container={{
             web: `${isLargeScreen ? 'gap-[0.75rem] justify-center' : ''}`,
-            native: 'gap-[0.75rem] justify-center items-center ',
+            native: 'flex-1   flex-row  justify-center items-center ',
           }}
           label={hasReps ? 'No. of Reps ' : 'Duration'}
           value={hasReps ? repsValue : durationValue}
-          noOfLinesLabel={hasReps ? undefined : 1}
-          noOfLinesValue={hasReps ? undefined : 1}
-          labelContainer={{ web: isLargeScreen ? 'flex-none' : '', native: 'flex-none' }}
-          valueContainer={{ web: isLargeScreen ? '' : 'flex-none', native: 'flex-1 text-right' }}
+          labelContainer={{
+            web: isLargeScreen ? 'flex-none' : '',
+            native: `${hasReps ? 'flex-1.5' : 'flex-1'} text-xs `,
+          }}
+          valueContainer={{
+            web: isLargeScreen ? '' : 'flex-none',
+            native: `${hasReps ? 'flex-1' : 'flex-1.5'} text-xs text-right `,
+          }}
         />
       </>
     );
@@ -96,7 +103,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
             ),
           ] as any,
           native: tailwind(
-            `h-5.4375rem flex-row justify-center gap-[0.75rem]  rounded-lg bg-NAVBAR_BACKGROUND p-[0.75rem] opacity-55`,
+            `${isRestCard ? 'h-5.4375rem' : ''} flex-row justify-center gap-[0.75rem]  rounded-lg bg-NAVBAR_BACKGROUND p-[0.75rem] opacity-55`,
           ),
         }),
       ]}
@@ -113,7 +120,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
                   ` flex-1 flex-col ${isRestCard ? 'items-center' : 'items-start'}  mx-auto w-[537px] justify-center gap-[1.25rem]`,
                 ),
             native: tailwind(
-              `flex-col justify-center ${isRestCard ? ' w-3/5 items-center ' : 'flex-1 items-start '}  mx-auto `,
+              `flex-col justify-center ${isRestCard ? ' flex-1 items-center ' : 'flex-2  items-start '}  mx-auto `,
             ),
           }),
         ]}>

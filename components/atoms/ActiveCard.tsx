@@ -84,7 +84,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
           style={Platform.select({
             web: tailwind(`flex-1 items-center justify-center gap-[0.75rem]`),
             native: tailwind(
-              `${hasReps ? 'flex-1' : 'flex-1.2'} self-center'  items-center justify-start gap-[0.75rem]`,
+              `${hasReps ? 'w-full flex-1' : 'w-full flex-1  '} self-center'  items-center justify-start gap-[0.75rem]`,
             ),
           })}>
           <ShowLabelValue
@@ -96,15 +96,15 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
             }
             container={{
               web: `  flex-1  items-start justify-center `,
-              native: '  flex-none self-stretch bg-g1reen-600 items-start justify-center',
+              native: 'flex-1  flex-row items-start justify-center',
             }}
             labelContainer={{
               web: `flex-1`,
-              native: '',
+              native: `${hasReps ? 'flex-none' : 'flex-1'} text-[0.8175rem]`,
             }}
             valueContainer={{
               web: `flex-1 text-[0.8175rem]`,
-              native: ' ',
+              native: hasReps ? 'flex-1 text-center' : 'flex-3',
             }}
             // noOfLinesValue={1}
           />
@@ -112,7 +112,9 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
         <Container
           style={Platform.select({
             web: tailwind(`flex-1 flex-row  justify-between gap-4`),
-            native: tailwind('flex-1 flex-row items-center justify-between gap-4 self-center'),
+            native: tailwind(
+              `${hasReps ? 'flex-1' : 'flex-0'} flex-row items-center justify-between gap-4 self-center`,
+            ),
           })}>
           {renderActionButtons()}
         </Container>

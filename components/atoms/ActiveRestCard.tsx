@@ -103,7 +103,7 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
             web: tailwind(
               `${isLargeScreen ? 'flex-col gap-4' : 'flex-row gap-12'} items-center justify-center  `,
             ),
-            native: tailwind('w-3/5 flex-col items-center justify-center gap-4'),
+            native: tailwind('flex-1 flex-col items-center justify-center gap-4'),
           })}>
           <Container
             style={Platform.select({
@@ -118,11 +118,11 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
               }}
               labelContainer={{
                 web: `flex-0`,
-                native: 'text-center',
+                native: 'text-right text-xs',
               }}
               valueContainer={{
                 web: ``,
-                native: 'text-center',
+                native: 'text-left text-xs',
               }}
               value={`${durationValue ? `${pluralise(durationValue, `${durationValue} second`)}` : '-'}`}
             />
