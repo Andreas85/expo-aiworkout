@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CustomTopHeader from '../atoms/CustomTopHeader';
 import Container from '../atoms/Container';
 import { tailwind } from '@/utils/tailwind';
@@ -15,6 +15,8 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { ICON_SIZE } from '@/utils/appConstants';
 import ConfirmationModal from '../modals/ConfirmationModal';
 import useModal from '@/hooks/useModal';
+import { ActionButton } from '../atoms/ActionButton';
+import { User } from '@/services/interfaces';
 
 const ProfileScreen = () => {
   const { clearTokenFromStore } = useAuthStore();
@@ -30,8 +32,24 @@ const ProfileScreen = () => {
   } = useModal();
 
   const userData = useAuthStore(state => state.userData);
+  const [isEditFormVisible, setIsEditFormVisible] = useState(false);
   const { isLargeScreen } = useWebBreakPoints();
+  const [editedData, setEditedData] = useState<User | null>(userData);
 
+  // Add this useEffect to sync with userData updates
+  useEffect(() => {
+    setEditedData(userData);
+  }, [userData]);
+
+  // Update handleChange to modify editedData
+  function handleChange(name: string) {
+    return (text: string) => {
+      setEditedData((prev: any) => ({
+        ...prev,
+        [name]: text,
+      }));
+    };
+  }
   const handleLogout = () => {
     clearTokenFromStore();
     router.navigate('/');
@@ -44,6 +62,100 @@ const ProfileScreen = () => {
   const handleDeleteProfile = () => {
     showModalDeleteProfile();
   };
+
+  function handleEditProfile() {
+    setIsEditFormVisible((prev: boolean) => !prev);
+  }
+
+  function renderUserDetailContainer() {
+    return (
+      <>
+        <ShowLabelValue
+          label={'First Name :'}
+          value={editedData?.firstName}
+          isEditable={isEditFormVisible}
+          container={{
+            web: `  flex-1  items-start justify-start `,
+            native: 'flex-none ',
+          }}
+          onChangeText={handleChange('firstName')}
+          labelContainer={{
+            web: `'flex-1 `,
+            native: '',
+          }}
+          valueContainer={{
+            web: `flex-2 `,
+            native: 'flex-2',
+          }}
+          noOfLinesValue={1}
+        />
+        <ShowLabelValue
+          label={'Last Name :'}
+          value={editedData?.lastName}
+          isEditable={isEditFormVisible}
+          onChangeText={handleChange('lastName')}
+          container={{
+            web: `  flex-1  items-start justify-center `,
+            native: ' flex-none ',
+          }}
+          labelContainer={{
+            web: `flex-1 `,
+            native: '',
+          }}
+          valueContainer={{
+            web: `flex-2 `,
+            native: 'flex-2 ',
+          }}
+          noOfLinesValue={1}
+        />
+        <ShowLabelValue
+          label={'Email :'}
+          value={editedData?.email}
+          isEditable={isEditFormVisible}
+          onChangeText={handleChange('email')}
+          container={{
+            web: `  flex-1  items-start justify-center `,
+            native: 'flex-none ',
+          }}
+          labelContainer={{
+            web: `flex-1 `,
+            native: '',
+          }}
+          valueContainer={{
+            web: `flex-2 `,
+            native: ' flex-2',
+          }}
+          noOfLinesValue={2}
+        />
+        {isEditFormVisible && (
+          <Container style={tailwind('flex-row items-center justify-center gap-4')}>
+            <ActionButton
+              uppercase={true}
+              label={'Cancel'}
+              onPress={() => {
+                setIsEditFormVisible(false);
+                // setEditedData(userData)
+              }}
+              isOutline={true}
+              style={tailwind('rounded-lg')}
+            />
+            <ActionButton
+              uppercase={true}
+              label={'Save Changes'}
+              onPress={handleSubmit}
+              disabled={true}
+              style={tailwind('rounded-lg')}
+            />
+          </Container>
+        )}
+      </>
+    );
+  }
+
+  function handleSubmit(values: any) {
+    console.log('values', values);
+  }
+
   return (
     <Container style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
       <CustomTopHeader heading="Profile" />
@@ -56,13 +168,13 @@ const ProfileScreen = () => {
         })}>
         <WrapperContainer
           wrapperContainerStyle={{
-            web: `flex ${isLargeScreen ? ' self-stretch px-4 pb-4 pt-4 gap-6' : 'flex-2 px-[2rem] py-[2.25rem] gap-[2.75rem]'}   flex-col items-start `,
-            native: `justify-start   gap-4 px-4 py-4`,
+            web: ` ${isLargeScreen ? ' self-stretch px-4 pb-4 pt-4 gap-6' : 'flex-2 px-[2rem] py-[2.25rem] gap-[2.75rem]'}   flex-col items-start `,
+            native: `justify-start   gap-4 px-4 py-4  w-full`,
           }}>
           <Container
             style={Platform.select({
-              web: tailwind('absolute right-4 top-4'),
-              native: tailwind('absolute right-4 top-4'),
+              web: tailwind('flex w-full justify-end'),
+              native: tailwind('w-full justify-end'),
             })}>
             <LabelContainer
               label={'Edit'}
@@ -74,11 +186,11 @@ const ProfileScreen = () => {
                   native: tailwind('text-sm font-bold'),
                 }),
               ]}
-              onPress={() => {}}
+              onPress={handleEditProfile}
               containerStyle={[
                 Platform.select({
-                  web: tailwind('flex-1 justify-end'),
-                  // native: tailwind('flex-1'),
+                  web: tailwind('flex-1 justify-end self-end'),
+                  native: tailwind('self-end'),
                 }),
               ]}
               left={
@@ -90,57 +202,8 @@ const ProfileScreen = () => {
               }
             />
           </Container>
-          <ShowLabelValue
-            label={'First Name :'}
-            value={userData?.firstName}
-            container={{
-              web: `  flex-1  items-start justify-center `,
-              native: 'flex-none ',
-            }}
-            labelContainer={{
-              web: `flex-1 `,
-              native: '',
-            }}
-            valueContainer={{
-              web: `flex-2 `,
-              native: 'flex-2',
-            }}
-            noOfLinesValue={1}
-          />
-          <ShowLabelValue
-            label={'Last Name :'}
-            value={userData?.lastName}
-            container={{
-              web: `  flex-1  items-start justify-center `,
-              native: ' flex-none ',
-            }}
-            labelContainer={{
-              web: `flex-1 `,
-              native: '',
-            }}
-            valueContainer={{
-              web: `flex-2 `,
-              native: 'flex-2 ',
-            }}
-            noOfLinesValue={1}
-          />
-          <ShowLabelValue
-            label={'Email :'}
-            value={userData?.email}
-            container={{
-              web: `  flex-1  items-start justify-center `,
-              native: 'flex-none ',
-            }}
-            labelContainer={{
-              web: `flex-1 `,
-              native: '',
-            }}
-            valueContainer={{
-              web: `flex-2 `,
-              native: ' flex-2',
-            }}
-            noOfLinesValue={2}
-          />
+
+          {renderUserDetailContainer()}
           <Container
             style={Platform.select({
               web: tailwind('mb-4 w-full border-[0.5px] border-white'),

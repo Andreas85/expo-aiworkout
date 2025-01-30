@@ -68,21 +68,19 @@ const WorkoutSessionList = ({
                 ),
               }),
             ]}>
-            {/* Workout Status */}
-            <View
-              style={tailwind(
-                'absolute bottom-7 left-2 z-40 mb-2 flex-row items-center justify-center',
-              )}>
-              <WorkoutStatus itemStatus={item?.status?.toUpperCase() as 'FINISHED' | 'PENDING'} />
+            {/* Image Container with Status Overlay */}
+            <View style={tailwind('relative aspect-square')}>
+              {!isEnabled && (
+                <ImageContainer
+                  source={IMAGES.fitness}
+                  styleNative={tailwind('h-full w-full self-center rounded-2xl')}
+                  contentFit="fill"
+                />
+              )}
+              <View style={tailwind('absolute bottom-2 left-2 z-40')}>
+                <WorkoutStatus itemStatus={item?.status?.toUpperCase() as 'FINISHED' | 'PENDING'} />
+              </View>
             </View>
-
-            {!isEnabled && (
-              <ImageContainer
-                source={IMAGES.fitness}
-                styleNative={[tailwind(`aspect-square w-full self-center rounded-2xl`)]}
-                contentFit="fill"
-              />
-            )}
             {/* Workout Details */}
             <Container style={tailwind('mt-2')}>
               <TextContainer
