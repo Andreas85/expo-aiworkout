@@ -3,9 +3,7 @@ import { Text } from '@/components/Themed';
 import { tailwind } from '@/utils/tailwind';
 import { useCallback, useState } from 'react';
 import CustomSwitch from '../atoms/CustomSwitch';
-import { useAuthStore } from '@/store/authStore';
 import { LayoutAnimation, Platform } from 'react-native';
-import { debounce } from 'lodash';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import React from 'react';
 import WorkoutSessionList from '../molecules/WorkoutSessionList';
@@ -14,19 +12,14 @@ import { router } from 'expo-router';
 
 export default function WorkoutSessions(props: { workoutSessionData: any }) {
   const { workoutSessionData } = props;
-  const { isAuthenticated } = useAuthStore();
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
   // const toggleSwitch = () => setIsEnabled(prev => !prev);
-
-  const toggleSwitch = useCallback(
-    debounce(() => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setIsEnabled(prevState => !prevState);
-    }, 500), // 500ms delay
-    [],
-  );
+  const toggleSwitch = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsEnabled(prevState => !prevState);
+  }, []);
 
   const handleCardClick = (item: WorkoutSession) => {
     router.push(`/workout-session/${item?._id}/detail` as any);

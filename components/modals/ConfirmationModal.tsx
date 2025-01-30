@@ -11,13 +11,22 @@ interface IConfirmationModal {
   message: string;
   title?: string;
   labelAction: string;
-  isLoading: boolean;
+  isLoading?: boolean;
+  disabledAction?: boolean;
   handleAction: () => void;
 }
 
 function ConfirmationModal(props: IConfirmationModal) {
-  const { isModalVisible, title, closeModal, handleAction, isLoading, message, labelAction } =
-    props;
+  const {
+    isModalVisible,
+    title,
+    closeModal,
+    handleAction,
+    isLoading,
+    message,
+    labelAction,
+    disabledAction,
+  } = props;
 
   return (
     <>
@@ -40,6 +49,7 @@ function ConfirmationModal(props: IConfirmationModal) {
                 uppercase={true}
                 isLoading={isLoading}
                 label={labelAction}
+                disabled={disabledAction || isLoading}
                 onPress={handleAction}
                 style={tailwind('grow rounded-md')}
               />

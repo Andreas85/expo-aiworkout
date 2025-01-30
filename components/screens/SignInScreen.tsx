@@ -188,8 +188,7 @@ export default function SignInIndexPage() {
                   onPress={() => router.push('/signup')}
                   style={tailwind('p-1 font-bold text-WORKOUT_PURPLE')}>
                   <TextContainer
-                    style={tailwind('text-sm font-bold')}
-                    className="inline text-xs font-medium"
+                    style={tailwind('text-sm font-bold underline')}
                     data={'Create an account'}
                   />
                 </TouchableOpacity>

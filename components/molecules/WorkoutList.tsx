@@ -95,7 +95,7 @@ const WorkoutList = ({
       data={data}
       numColumns={numColumns}
       keyExtractor={item => item?._id || keyName}
-      key={numColumns}
+      key={`${numColumns}-${isEnabled}`}
       initialNumToRender={4}
       maxToRenderPerBatch={5}
       updateCellsBatchingPeriod={50}
@@ -107,7 +107,6 @@ const WorkoutList = ({
           web: tailwind(`${isMediumScreen ? 'gap-y-4 py-4 pt-0' : 'gap-y-4 py-2 pt-0'}`),
         }),
       ]}
-      removeClippedSubviews={true}
       onEndReachedThreshold={0.5}
       columnWrapperStyle={{
         flex: 1,

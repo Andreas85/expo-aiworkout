@@ -94,7 +94,7 @@ export const WORKOUT_STATUS = {
 };
 
 export const STATUS_COLORS = {
-  PENDING: { background: 'text-yellow-900', text: 'bg-yellow-500' },
-  COMPLETED: { background: 'text-green-900', text: 'bg-green-500' },
-  FINISHED: { background: 'text-green-900', text: 'bg-green-500' },
+  PENDING: { text: 'text-[#fff', background: 'bg-[#B78A0F]' },
+  COMPLETED: { text: 'text-[#fff', background: 'bg-[#A27DE1]' },
+  FINISHED: { text: 'text-[#fff', background: 'bg-[#A27DE1]' },
 };

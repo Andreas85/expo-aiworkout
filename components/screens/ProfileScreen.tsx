@@ -10,18 +10,39 @@ import WrapperContainer from '../molecules/WrapperContainer';
 import ShowLabelValue from '../atoms/ShowLabelValue';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import TextContainer from '../atoms/TextContainer';
+import LabelContainer from '../atoms/LabelContainer';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { ICON_SIZE } from '@/utils/appConstants';
+import ConfirmationModal from '../modals/ConfirmationModal';
+import useModal from '@/hooks/useModal';
 
 const ProfileScreen = () => {
   const { clearTokenFromStore } = useAuthStore();
+  const {
+    openModal: openModalLogout,
+    showModal: showModalLogout,
+    hideModal: hideModalLogout,
+  } = useModal();
+  const {
+    openModal: openModalDeleteProfile,
+    showModal: showModalDeleteProfile,
+    hideModal: hideModalDeleteProfile,
+  } = useModal();
+
   const userData = useAuthStore(state => state.userData);
   const { isLargeScreen } = useWebBreakPoints();
+
   const handleLogout = () => {
     clearTokenFromStore();
     router.navigate('/');
   };
 
+  const handleLogoutClick = () => {
+    showModalLogout();
+  };
+
   const handleDeleteProfile = () => {
-    console.log('Delete account');
+    showModalDeleteProfile();
   };
   return (
     <Container style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
@@ -35,11 +56,42 @@ const ProfileScreen = () => {
         })}>
         <WrapperContainer
           wrapperContainerStyle={{
-            web: `flex ${isLargeScreen ? ' self-stretch px-4 py-4' : 'flex-2 px-[2rem] py-[2.25rem]'}   flex-col items-start gap-[2.75rem]`,
+            web: `flex ${isLargeScreen ? ' self-stretch px-4 pb-4 pt-4 gap-6' : 'flex-2 px-[2rem] py-[2.25rem] gap-[2.75rem]'}   flex-col items-start `,
             native: `justify-start   gap-4 px-4 py-4`,
           }}>
+          <Container
+            style={Platform.select({
+              web: tailwind('absolute right-4 top-4'),
+              native: tailwind('absolute right-4 top-4'),
+            })}>
+            <LabelContainer
+              label={'Edit'}
+              labelStyle={[
+                Platform.select({
+                  web: tailwind(
+                    ` ${isLargeScreen ? 'text-[0.8125rem]' : 'text-xl'} text-center  font-normal not-italic leading-[150%] text-white`,
+                  ),
+                  native: tailwind('text-sm font-bold'),
+                }),
+              ]}
+              onPress={() => {}}
+              containerStyle={[
+                Platform.select({
+                  web: tailwind('flex-1 justify-end'),
+                  // native: tailwind('flex-1'),
+                }),
+              ]}
+              left={
+                <FontAwesome5
+                  name="edit"
+                  color="#A27DE1"
+                  size={isLargeScreen ? ICON_SIZE - 4 : ICON_SIZE}
+                />
+              }
+            />
+          </Container>
           <ShowLabelValue
-            label={'Firstname :'}
+            label={'First Name :'}
             value={userData?.firstName}
             container={{
               web: `  flex-1  items-start justify-center `,
@@ -50,13 +102,13 @@ const ProfileScreen = () => {
               native: '',
             }}
             valueContainer={{
-              web: `flex-1 `,
-              native: 'flex-1',
+              web: `flex-2 `,
+              native: 'flex-2',
             }}
             noOfLinesValue={1}
           />
           <ShowLabelValue
-            label={'Lastname :'}
+            label={'Last Name :'}
             value={userData?.lastName}
             container={{
               web: `  flex-1  items-start justify-center `,
@@ -67,8 +119,8 @@ const ProfileScreen = () => {
               native: '',
             }}
             valueContainer={{
-              web: `flex-1 `,
-              native: ' ',
+              web: `flex-2 `,
+              native: 'flex-2 ',
             }}
             noOfLinesValue={1}
           />
@@ -84,10 +136,10 @@ const ProfileScreen = () => {
               native: '',
             }}
             valueContainer={{
-              web: `flex-1 `,
-              native: ' ',
+              web: `flex-2 `,
+              native: ' flex-2',
             }}
-            noOfLinesValue={1}
+            noOfLinesValue={2}
           />
           <Container
             style={Platform.select({
@@ -95,7 +147,7 @@ const ProfileScreen = () => {
               native: tailwind('mb-4 border-[0.5px] border-white '),
             })}
           />
-          <TouchableOpacity onPress={handleLogout}>
+          <TouchableOpacity onPress={handleLogoutClick}>
             <TextContainer
               data={'Log Out'}
               style={Platform.select({
@@ -118,6 +170,21 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </WrapperContainer>
       </Container>
+      <ConfirmationModal
+        isModalVisible={openModalDeleteProfile}
+        handleAction={() => {}}
+        closeModal={hideModalDeleteProfile}
+        labelAction="Delete"
+        disabledAction={true}
+        message={'Are you sure you want to delete your profile?'}
+      />
+      <ConfirmationModal
+        isModalVisible={openModalLogout}
+        handleAction={handleLogout}
+        closeModal={hideModalLogout}
+        message={'Are you sure you want to Log Out?'}
+        labelAction={'Log Out'}
+      />
     </Container>
   );
 };

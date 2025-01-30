@@ -231,11 +231,7 @@ export default function SignupIndexPage() {
                 <TouchableOpacity
                   onPress={() => router.push('/signin')}
                   style={tailwind('p-1 font-bold text-WORKOUT_PURPLE')}>
-                  <TextContainer
-                    style={tailwind('text-sm font-bold')}
-                    className="inline text-xs font-medium"
-                    data={'Sign in'}
-                  />
+                  <TextContainer style={tailwind('text-sm font-bold underline')} data={'Sign in'} />
                 </TouchableOpacity>
               </Container>
             </Container>

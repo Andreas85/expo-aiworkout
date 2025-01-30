@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
-import { router, useNavigation } from 'expo-router';
+import { useNavigation } from 'expo-router';
 
 import { LayoutAnimation, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
@@ -18,17 +18,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 
 import PublicWorkoutExercisesRender from '../molecules/PublicWorkoutExercisesRender';
-import { debounce } from 'lodash';
-import { addWorkoutSession } from '@/utils/workoutSessionHelper';
-import { expandRestAsExercisesInExistingExercises, generateBigNumberId } from '@/utils/helper';
-import { useAuthStore } from '@/store/authStore';
 import useWorkoutSessionDetailsTracking from '@/hooks/useWorkoutSessionDetails';
 
 const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isPublicWorkout = false } = props;
   const navigation = useNavigation();
 
-  const userData = useAuthStore(state => state.userData);
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
@@ -36,18 +31,11 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   const [loading, setLoading] = useState(false);
 
-  // const toggleSwitch = useCallback(() => {
-  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  //   setIsEnabled(prev => !prev);
-  // }, []);
+  const toggleSwitch = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsEnabled(prevState => !prevState);
+  }, []);
 
-  const toggleSwitch = useCallback(
-    debounce(() => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setIsEnabled(prevState => !prevState);
-    }, 500), // 500ms delay
-    [],
-  );
   const [refreshing, setRefreshing] = useState(false);
   const queryClient = useQueryClient();
 

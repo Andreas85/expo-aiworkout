@@ -27,7 +27,7 @@ function ModalWrapper(props: IAddAndEditWorkoutModalProps) {
           style={{
             flex: 1,
             justifyContent: 'center',
-            paddingHorizontal: 16,
+            // paddingHorizontal: 16,
           }}>
           <ScrollView
             contentContainerStyle={{

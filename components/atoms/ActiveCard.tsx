@@ -78,12 +78,14 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
           web: tailwind(
             `flex-1 ${isLargeScreen ? '' : 'gap-12'} flex-row  items-center justify-center  `,
           ),
-          native: tailwind('flex-1 flex-row items-center justify-center  self-center'),
+          native: tailwind('flex-1 flex-row items-center justify-center self-center '),
         })}>
         <Container
           style={Platform.select({
             web: tailwind(`flex-1 items-center justify-center gap-[0.75rem]`),
-            native: tailwind('  items-center justify-center gap-[0.75rem] self-center'),
+            native: tailwind(
+              `${hasReps ? 'flex-1' : 'flex-1.2'} self-center'  items-center justify-start gap-[0.75rem]`,
+            ),
           })}>
           <ShowLabelValue
             label={hasReps ? 'No. of Reps ' : 'Duration'}
@@ -94,7 +96,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
             }
             container={{
               web: `  flex-1  items-start justify-center `,
-              native: '  flex-1 items-start justify-center',
+              native: '  flex-none self-stretch bg-g1reen-600 items-start justify-center',
             }}
             labelContainer={{
               web: `flex-1`,
@@ -104,7 +106,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
               web: `flex-1 text-[0.8175rem]`,
               native: ' ',
             }}
-            noOfLinesValue={1}
+            // noOfLinesValue={1}
           />
         </Container>
         <Container

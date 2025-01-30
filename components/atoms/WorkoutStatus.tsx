@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 
 export default function WorkoutStatus(props: { itemStatus: 'PENDING' | 'FINISHED' }) {
   const { itemStatus } = props;
+  const status = itemStatus ? (itemStatus === 'PENDING' ? 'IN PROGRESS' : 'COMPLETED') : 'Unknown';
   const [colorObject, setColorObject] = useState<{
     background: string;
     text: string;
@@ -25,12 +26,9 @@ export default function WorkoutStatus(props: { itemStatus: 'PENDING' | 'FINISHED
   }, [itemStatus]);
 
   return (
-    <View style={tailwind(`items-center justify-center  ${colorObject.background} `)}>
-      <Text
-        style={tailwind(
-          `rounded-full text-center text-sm font-medium ${colorObject.text} px-2 py-1`,
-        )}>
-        {itemStatus || 'Unknown'}
+    <View style={tailwind(`items-center justify-center rounded  ${colorObject.background} `)}>
+      <Text style={tailwind(` px-2 py-1 text-center text-sm font-medium text-white`)}>
+        {status}
       </Text>
     </View>
   );

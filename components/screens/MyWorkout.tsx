@@ -16,7 +16,6 @@ import useModal from '@/hooks/useModal';
 import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
 import { router } from 'expo-router';
 import { LayoutAnimation, Platform } from 'react-native';
-import { debounce } from 'lodash';
 import WorkoutList from '../molecules/WorkoutList';
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
@@ -31,14 +30,12 @@ export default function MyWorkout() {
   const queryClient = useQueryClient();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   // Using LayoutAnimation for smooth transitions
-  const toggleSwitch = useCallback(
-    debounce(() => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setIsEnabled(prevState => !prevState);
-    }, 500), // 500ms delay
-    [],
-  );
+  const toggleSwitch = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsEnabled(prevState => !prevState);
+  }, []);
 
   const getFetchFunction = async () => {
     return await fetchMyWorkoutService();

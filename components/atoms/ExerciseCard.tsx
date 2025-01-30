@@ -16,7 +16,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   addExerciseToWorkoutRequest,
   removeExerciseToWorkoutRequest,
-  sortExercisesRequest,
   updateExerciseToWorkoutRequest,
 } from '@/services/workouts';
 import { useLocalSearchParams } from 'expo-router';
@@ -24,7 +23,6 @@ import { useToast } from 'react-native-toast-notifications';
 import AddExercise from '../modals/AddExercise';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { debounce } from 'lodash';
-import { getReorderItemsForSortingWorkoutExercises } from '@/utils/helper';
 import { useAuthStore } from '@/store/authStore';
 import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 

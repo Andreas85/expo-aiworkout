@@ -1,12 +1,11 @@
 import React, { useCallback, memo } from 'react';
-import { FlatList, Pressable, Platform, View, Text } from 'react-native';
+import { FlatList, Pressable, Platform, View } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import Container from '../atoms/Container';
 import ImageContainer from '../atoms/ImageContainer';
 import TextContainer from '../atoms/TextContainer';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { IMAGES } from '@/utils/images';
-import { getStatusColor } from '@/utils/helper';
 import WorkoutStatus from '../atoms/WorkoutStatus';
 
 interface WorkoutListProps {
@@ -72,7 +71,7 @@ const WorkoutSessionList = ({
             {/* Workout Status */}
             <View
               style={tailwind(
-                'absolute right-2 top-2 z-40 mb-2 flex-row items-center justify-center',
+                'absolute bottom-7 left-2 z-40 mb-2 flex-row items-center justify-center',
               )}>
               <WorkoutStatus itemStatus={item?.status?.toUpperCase() as 'FINISHED' | 'PENDING'} />
             </View>
@@ -101,7 +100,7 @@ const WorkoutSessionList = ({
         </Pressable>
       );
     },
-    [data, isEnabled, onItemPress],
+    [data, onItemPress],
   );
 
   return (
@@ -109,7 +108,7 @@ const WorkoutSessionList = ({
       data={data}
       numColumns={numColumns}
       keyExtractor={item => item?._id || keyName}
-      key={numColumns}
+      key={`${numColumns}-${isEnabled}`}
       initialNumToRender={4}
       maxToRenderPerBatch={5}
       updateCellsBatchingPeriod={50}
@@ -121,7 +120,7 @@ const WorkoutSessionList = ({
           web: tailwind(`${isMediumScreen ? 'gap-y-4 py-4 pt-0' : 'gap-y-4 py-2 pt-0'}`),
         }),
       ]}
-      removeClippedSubviews={true}
+      // removeClippedSubviews={true}
       onEndReachedThreshold={0.5}
       columnWrapperStyle={{
         flex: 1,
