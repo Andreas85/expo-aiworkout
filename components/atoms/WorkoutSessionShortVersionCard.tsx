@@ -15,7 +15,7 @@ const WorkoutSessionShortVersionCard = (props: {
   const { item } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const handleCardClick = (item: any) => {
-    router.push(`/workout-session/${item?._id}/detail` as any);
+    router.push(`/workout-session/${item?._id}/info` as any);
   };
   return (
     <Pressable

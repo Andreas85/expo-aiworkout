@@ -16,6 +16,7 @@ import { pluralise } from '@/utils/helper';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { useAuthStore } from '@/store/authStore';
 
 interface ActiveCardProps {
   item: ExerciseElement;
@@ -28,6 +29,8 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const isWorkoutTimerRunning = useWorkoutSessionStore(state => state.isWorkoutTimerRunning);
   const { updateExercisePropertyZustand } = useWorkoutSessionStore();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isWorkoutOwner = useWorkoutSessionStore(state => state.isWorkoutOwner);
 
   const hasReps = !!item?.reps;
   const repsValue = item?.reps ?? 0;
@@ -61,7 +64,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   };
 
   const renderActionButtons = () => {
-    if (hasReps) {
+    if (hasReps && (isWorkoutOwner || !isAuthenticated)) {
       return (
         <>
           <MinusActionButton onPressMinus={onPressMinusHandler} />

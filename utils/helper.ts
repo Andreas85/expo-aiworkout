@@ -3,6 +3,7 @@ import { ERROR_MESSAGE, STATUS_COLORS, STRING_DATA } from './appConstants';
 import { ExerciseElement } from '@/services/interfaces';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
+import { router } from 'expo-router';
 
 export const queryClient = new QueryClient();
 
@@ -208,4 +209,12 @@ export const getStatusColor = (status: WorkoutSessionStatus) => {
 export function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
+}
+
+export function navigateToWorkoutDetail(isPrivate: boolean, workoutId: string) {
+  if (isPrivate) {
+    router.push(`/workout/${workoutId}`);
+  } else {
+    router.push(`/workout/public/${workoutId}`);
+  }
 }

@@ -12,7 +12,7 @@ import { WorkoutSessionResponseData } from '@/services/interfaces';
 const WorkoutSessionCard = (props: { item: WorkoutSessionResponseData; isEnabled?: boolean }) => {
   const { item, isEnabled } = props;
   const handleCardClick = (item: WorkoutSessionResponseData) => {
-    router.push(`/workout-session/${item?._id}/detail` as any);
+    router.push(`/workout-session/${item?._id}/info` as any);
   };
   return (
     <Pressable

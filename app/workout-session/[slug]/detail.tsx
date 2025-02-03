@@ -18,9 +18,11 @@ const WorkoutSessionDetail = () => {
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const userData = useAuthStore(state => state.userData);
   const {
     setWorkoutSessionDetails,
     updateIsWorkoutSessionDetailScreenTimerPaused,
+    updateIsWorkoutOwner,
     updateWorkoutSessionDetailsScreen: updateWorkoutSessionDetailScreen,
   } = useWorkoutSessionStore();
 
@@ -38,9 +40,17 @@ const WorkoutSessionDetail = () => {
   useEffect(() => {
     if (isAuthenticated && dataWorkoutSessionDetails?.data) {
       const results = dataWorkoutSessionDetails?.data?.workout;
+      const ownerId = dataWorkoutSessionDetails?.data?.workout?.createdBy;
+      const isWorkoutOwner = ownerId === userData?._id;
       const updatedData = { ...results, status: dataWorkoutSessionDetails?.data?.status };
-      // console.log('(isAuthenticated-workout-session-details) INFO:: ', updatedData);
+
+      console.log('(isAuthenticated-workout-session-details) INFO:: ', {
+        ownerId,
+        isWorkoutOwner,
+        userId: userData?._id,
+      });
       setWorkoutSessionDetails(updatedData);
+      updateIsWorkoutOwner(isWorkoutOwner);
     }
   }, [isAuthenticated, dataWorkoutSessionDetails?.data]);
 

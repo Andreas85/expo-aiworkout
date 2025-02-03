@@ -13,6 +13,7 @@ import ActiveWorkoutIcon from './ActiveWorkoutIcon';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { useAuthStore } from '@/store/authStore';
 
 interface ActiveRestCardProps {
   item: ExerciseElement;
@@ -23,6 +24,8 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
   const { updateExercisePropertyZustand } = useWorkoutSessionStore();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isWorkoutOwner = useWorkoutSessionStore(state => state.isWorkoutOwner);
   // Use the item.duration as the single source of truth
   const durationValue = item?.duration ?? 0;
 
@@ -49,12 +52,14 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
   };
 
   const renderActionButtons = () => {
-    return (
-      <>
-        <MinusActionButton onPressMinus={onPressMinusHandler} />
-        <PlusActionButton onPressPlus={onPressPlusHandler} />
-      </>
-    );
+    if (isWorkoutOwner || !isAuthenticated) {
+      return (
+        <>
+          <MinusActionButton onPressMinus={onPressMinusHandler} />
+          <PlusActionButton onPressPlus={onPressPlusHandler} />
+        </>
+      );
+    }
   };
   return (
     <Container

@@ -21,6 +21,7 @@ interface AppTextSingleInputProps {
   containerStyleAppTextInput?: StyleProp<ViewStyle>;
   right?: any;
   onChangeText?: (fieldName: string, text: string) => void;
+  disableAppTextInput?: boolean;
 }
 
 const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
@@ -36,6 +37,7 @@ const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
   testInputStyle,
   containerStyleAppTextInput,
   onChangeText,
+  disableAppTextInput = false,
   right,
   ...rest
 }) => {
@@ -72,6 +74,7 @@ const AppTextSingleInput: React.FC<AppTextSingleInputProps> = ({
                 onChangeText(fieldName, text); // Call custom handler if provided
               }
             }}
+            editable={disableAppTextInput ? false : true}
             errorMessage={
               errors?.[fieldName] && touched?.[fieldName] ? errors[fieldName] : undefined
             }

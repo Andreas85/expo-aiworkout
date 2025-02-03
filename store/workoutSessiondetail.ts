@@ -15,6 +15,7 @@ type State = {
   isWorkoutSessionDetailScreenTimerPaused?: boolean;
   isWorkoutSessionDetailScreen?: boolean;
   isActiveRepExerciseCard?: boolean;
+  isWorkoutOwner?: boolean;
 };
 
 type Action = {
@@ -35,6 +36,7 @@ type Action = {
   updateWorkoutStatusInZustandStore: (payload: 'PENDING' | 'FINISHED') => void;
   updateWorkoutSessionDetailsScreen: (payload: boolean) => void;
   updateIsActiveRepExerciseCard?: (payload: boolean) => void;
+  updateIsWorkoutOwner: (payload: boolean) => void;
 };
 
 export interface IWorkoutSessionStore extends State, Action {}
@@ -51,6 +53,7 @@ export const useWorkoutSessionStore = create<IWorkoutSessionStore>()(
     isWorkoutSessionDetailsScreenTimerPaused: false,
     isWorkoutSessionDetailsScreen: false,
     isActiveRepExerciseCard: false,
+    isWorkoutOwner: false,
     setWorkoutSessionDetails: async payload => {
       if (payload) {
         const sortedExercisesList = _.sortBy(payload.exercises, ['order']); // Sort exercises
@@ -136,6 +139,10 @@ export const useWorkoutSessionStore = create<IWorkoutSessionStore>()(
 
     updateIsActiveRepExerciseCard: async (payload: any) => {
       set({ isActiveRepExerciseCard: payload });
+    },
+
+    updateIsWorkoutOwner: async (payload: any) => {
+      set({ isWorkoutOwner: payload });
     },
   })),
 );

@@ -6,6 +6,7 @@ import { tailwind } from '@/utils/tailwind';
 import { Text, View } from '../Themed';
 import { generateBigNumberId } from '@/utils/helper';
 import { getWorkoutExercisesList } from '@/utils/workoutExercisesHelper';
+import Colors from '@/constants/Colors';
 
 interface CustomDropdownProps {
   open: boolean;
@@ -112,7 +113,9 @@ const CustomDropdown = (props: CustomDropdownProps) => {
               flexDirection: 'row',
             }}>
             <Text style={styles.itemText}>{item.label}</Text>
-            {item.isNew ? <Text style={styles.itemText}>{`(New)`} </Text> : null}
+            {item.isNew ? (
+              <Text style={{ ...styles.itemText, color: Colors.brandColor }}>{`(New)`} </Text>
+            ) : null}
           </View>
         )}
         {...restProps}
