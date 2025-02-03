@@ -26,7 +26,7 @@ export default function WorkoutStatus(props: { itemStatus: 'PENDING' | 'FINISHED
   }, [itemStatus]);
 
   return (
-    <View style={tailwind(`items-center justify-center rounded  ${colorObject.background} `)}>
+    <View style={tailwind(`items-center justify-center rounded-lg  ${colorObject.background} `)}>
       <Text style={tailwind(` px-2 py-1 text-center text-sm font-medium text-white`)}>
         {status}
       </Text>

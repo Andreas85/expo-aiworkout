@@ -120,6 +120,7 @@ export interface Workout {
   status?: string;
   remainingTime?: number;
   __v: number;
+  workoutId?: string;
 }
 
 export interface ExerciseElement {
@@ -166,4 +167,20 @@ export interface IRegister {
   firstName?: string;
   lastName?: string;
   email: string;
+}
+
+export interface WorkoutSessionResponseData {
+  _id: string;
+  deleted: boolean;
+  workout: Workout;
+  name?: string; // local workout name
+  status: 'FINISHED' | 'PENDING';
+  totalDuration: number;
+  totalExercisesCompleted: number;
+  totalWeightTaken: number;
+  totalRestTaken: number;
+  user: User;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
 }

@@ -1,12 +1,11 @@
-import React, { useCallback, memo } from 'react';
-import { FlatList, Pressable, Platform, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { FlatList, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
-import Container from '../atoms/Container';
-import ImageContainer from '../atoms/ImageContainer';
-import TextContainer from '../atoms/TextContainer';
 import useBreakPoints from '@/hooks/useBreakPoints';
-import { IMAGES } from '@/utils/images';
-import WorkoutStatus from '../atoms/WorkoutStatus';
+import WorkoutSessionCard from '../atoms/WorkoutSessionCard';
+import WorkoutSessionShortVersionCard from '../atoms/WorkoutSessionShortVersionCard';
+import Container from '../atoms/Container';
+import { WorkoutSessionResponseData } from '@/services/interfaces';
 
 interface WorkoutListProps {
   data: any[];
@@ -23,17 +22,22 @@ const WorkoutSessionList = ({
   data,
   isPending,
   numColumns,
-  onItemPress,
   isEnabled,
   onRefresh,
-  keyName,
-  isMyWorkout,
 }: WorkoutListProps) => {
   const { isMediumScreen } = useBreakPoints();
+  const MemoizedWorkoutSessionCard = React.memo(WorkoutSessionCard);
+  const MemoizedWorkoutSessionCardShort = React.memo(WorkoutSessionShortVersionCard);
 
   // Memoize the renderItem to avoid re-renders
-  const renderItem = useCallback(
-    ({ item, index }: { item: any; index: number }) => {
+  const renderListItem = useCallback(
+    ({
+      item,
+      index,
+    }: {
+      item: WorkoutSessionResponseData & { isPlaceholder?: boolean };
+      index: number;
+    }) => {
       if (index >= data?.length) return null;
       if (item?.isPlaceholder) {
         return (
@@ -47,70 +51,70 @@ const WorkoutSessionList = ({
           />
         );
       }
-      return (
-        <Pressable
-          style={[
-            Platform.select({
-              web: tailwind('flex-1'),
-              native: tailwind('mb-2 flex-1'),
-            }),
-          ]}
-          onPress={() => onItemPress(item)}
-          key={item._id}>
-          <Container
-            style={[
-              Platform.select({
-                web: tailwind(
-                  `relative h-full w-full flex-1 grow cursor-pointer self-center ${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''}`,
-                ),
-                native: tailwind(
-                  `${isEnabled ? 'rounded-lg bg-NAVBAR_BACKGROUND' : ''} h-full flex-1 grow`,
-                ),
-              }),
-            ]}>
-            {/* Image Container with Status Overlay */}
-            <View style={tailwind('relative aspect-square')}>
-              {!isEnabled && (
-                <ImageContainer
-                  source={IMAGES.fitness}
-                  styleNative={tailwind('h-full w-full self-center rounded-2xl')}
-                  contentFit="fill"
-                />
-              )}
-              <View style={tailwind('absolute bottom-2 left-2 z-40')}>
-                <WorkoutStatus itemStatus={item?.status?.toUpperCase() as 'FINISHED' | 'PENDING'} />
-              </View>
-            </View>
-            {/* Workout Details */}
-            <Container style={tailwind('mt-2')}>
-              <TextContainer
-                data={item?.name || item?.workout?.name || 'Workout Name'}
-                style={[
-                  tailwind('text-center text-base font-semibold'),
-                  Platform.select({
-                    web: tailwind('text-lg'),
-                    native: tailwind('text-base'),
-                  }),
-                ]}
-              />
-            </Container>
-          </Container>
-        </Pressable>
-      );
+      return <MemoizedWorkoutSessionCard key={item?._id} item={item} />;
     },
-    [data, onItemPress],
+    [],
   );
+
+  const renderListItemIsShortVersion = useCallback(
+    ({ item, index }: { item: WorkoutSessionResponseData; index: number }) => {
+      return <MemoizedWorkoutSessionCardShort item={item} />;
+    },
+    [],
+  );
+
+  if (isEnabled) {
+    return (
+      <FlatList
+        data={data}
+        numColumns={!isMediumScreen ? numColumns : undefined}
+        keyExtractor={(item, index) =>
+          item?._id?.toString() + 'is-workout-session-short-version' + index.toString()
+        }
+        key={`${numColumns}-${isEnabled}`}
+        initialNumToRender={4}
+        maxToRenderPerBatch={5}
+        updateCellsBatchingPeriod={50}
+        renderItem={renderListItemIsShortVersion}
+        refreshing={isPending}
+        onRefresh={onRefresh}
+        contentContainerStyle={[
+          Platform.select({
+            web: tailwind(`${isMediumScreen ? 'gap-y-4 py-4 pt-0' : 'gap-y-4 py-2 pt-0'}`),
+            // native: tailwind('flex-1 gap-y-4 py-2 pt-0'),
+          }),
+        ]}
+        columnWrapperStyle={
+          !isMediumScreen && {
+            flex: 1,
+            columnGap: 20,
+            rowGap: 20,
+            justifyContent: 'space-evenly',
+          }
+        }
+        // removeClippedSubviews={true}
+        onEndReachedThreshold={0.5}
+        getItemLayout={(data, index) => ({
+          length: 150,
+          offset: 150 * index,
+          index,
+        })}
+      />
+    );
+  }
 
   return (
     <FlatList
       data={data}
       numColumns={numColumns}
-      keyExtractor={item => item?._id || keyName}
+      keyExtractor={(item, index) =>
+        item?._id?.toString() + 'is-workout-session-full-version' + index.toString()
+      }
       key={`${numColumns}-${isEnabled}`}
       initialNumToRender={4}
       maxToRenderPerBatch={5}
       updateCellsBatchingPeriod={50}
-      renderItem={renderItem}
+      renderItem={renderListItem}
       refreshing={isPending}
       onRefresh={onRefresh}
       contentContainerStyle={[
@@ -136,4 +140,4 @@ const WorkoutSessionList = ({
 };
 
 // Memoize WorkoutList to prevent re-renders on unchanged props
-export default memo(WorkoutSessionList);
+export default WorkoutSessionList;
