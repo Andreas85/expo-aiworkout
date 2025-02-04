@@ -319,6 +319,7 @@ const StartWorkoutExercisesList = (props: any) => {
     const { durationTaken, currentExerciseCompleted } = props;
     const hasReps = getCurrentExerciseData()?.reps;
     const isCurrentRest = getCurrentExerciseData()?.type === STRING_DATA.REST;
+    const isNextExerciseRest = getNextExerciseData()?.type === STRING_DATA.REST;
 
     const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
     // console.log('exerciseDataexerciseData (scrollToItem)', { exerciseData });
@@ -349,12 +350,17 @@ const StartWorkoutExercisesList = (props: any) => {
       return;
     }
 
-    playSound();
-    setTimeout(() => {
-      stopSound();
-      updateWorkoutTimer(true);
+    console.log('playSound', { isNextExerciseRest, isCurrentRest, hasReps });
+    if (isNextExerciseRest) {
       startNextExercise();
-    }, 300);
+    } else {
+      playSound();
+      setTimeout(() => {
+        stopSound();
+        updateWorkoutTimer(true);
+        startNextExercise();
+      }, 300);
+    }
   };
 
   const handleNextRepsExercise = (props: {
@@ -377,6 +383,13 @@ const StartWorkoutExercisesList = (props: any) => {
       updateWorkoutTimer(false);
       updateWorkoutCompleted(true);
 
+      return;
+    }
+
+    const isNextExerciseRest = getNextExerciseData()?.type === STRING_DATA.REST;
+
+    if (isNextExerciseRest) {
+      startNextExercise();
       return;
     }
 
