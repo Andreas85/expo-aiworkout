@@ -8,7 +8,7 @@ import { fetchMyWorkoutService, getWorkoutDetailById } from '@/services/workouts
 import { tailwind } from '@/utils/tailwind';
 import { useCallback, useEffect, useState } from 'react';
 import { ActionButton } from '../atoms/ActionButton';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 
 import CustomSwitch from '../atoms/CustomSwitch';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
@@ -23,10 +23,16 @@ import NoDataFallbackContainer from '../atoms/NoDataFallbackContainer';
 import { useAuthStore } from '@/store/authStore';
 import MyWorkoutNotLoggedInList from '../molecules/MyWorkoutNotLoggedInList';
 import { Workout } from '@/services/interfaces';
+import GenerateWorkoutModal from '../modals/GenerateWorkoutModal';
 
 export default function MyWorkout() {
-  const { isSmallScreen, isLargeScreen } = useBreakPoints();
+  const { isSmallScreen, isLargeScreen, isMediumScreen } = useBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
+  const {
+    hideModal: hideGenerateModal,
+    showModal: showGenerateModal,
+    openModal: openGenerateModal,
+  } = useModal();
   const queryClient = useQueryClient();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -75,6 +81,11 @@ export default function MyWorkout() {
     router.push(`/workout/${item?._id}`);
   };
 
+  const handleGenerateWorkout = () => {
+    // console.log('Generate Workout');
+    showGenerateModal();
+  };
+
   const renderWorkingListing = () => {
     if (isLoading) {
       return <Loading />;
@@ -117,9 +128,58 @@ export default function MyWorkout() {
         <Container
           style={[tailwind('flex-row items-center justify-between rounded-2xl ')]}
           className="mb-4 flex w-full flex-1 flex-col gap-2">
-          <Container
-            style={tailwind('mb-4 flex w-full flex-row justify-between gap-y-4')}
+          {/* <Container
+            style={Platform.select({
+              web: tailwind(
+                `mb-4  ${isMediumScreen ? 'flex-1 flex-col items-start justify-start' : 'flex w-full flex-row justify-between'}  gap-y-4`,
+              ),
+              native: tailwind('mb-4 flex w-full flex-col items-start justify-start gap-y-4'),
+            })}
             className="flex items-center justify-between">
+            <Text
+              style={[
+                Platform.select({
+                  web: tailwind(
+                    `text-5 text-center capitalize not-italic leading-10 text-white ${!isLargeScreen ? 'text-8' : ''}`,
+                  ),
+                  native: tailwind(
+                    `text-4 text-center capitalize not-italic leading-10 text-white `,
+                  ),
+                }),
+              ]}>
+              List of workouts
+            </Text>
+            <Container
+              style={Platform.select({
+                web: tailwind('flex flex-row flex-wrap justify-end gap-4'),
+                native: tailwind('flex flex-row justify-end gap-4'),
+              })}>
+              <ActionButton
+                label={'Generate Workout'}
+                onPress={handleGenerateWorkout}
+                style={[
+                  Platform.select({
+                    web: tailwind('rounded-xl px-2'),
+                    native: tailwind('rounded-xl px-2'),
+                  }),
+                ]}
+                left={<FontAwesome5 name="robot" size={20} color="white" />}
+              />
+              <ActionButton
+                label={'Add Workout'}
+                onPress={handleAddWorkout}
+                style={[
+                  Platform.select({
+                    web: tailwind(`rounded-xl ${isMediumScreen ? 'px-2' : ''}`),
+                    native: tailwind('rounded-xl px-3.5'),
+                  }),
+                ]}
+                left={<AntDesign name="pluscircleo" size={20} color="white" />}
+              />
+            </Container>
+          </Container> */}
+
+          <Container style={tailwind('mb-4 flex w-full flex-row justify-between gap-y-4')}>
             <Text
               style={[
                 Platform.select({
@@ -181,6 +241,11 @@ export default function MyWorkout() {
           refetch={refetch}
         />
       )}
+      {/* <GenerateWorkoutModal
+        isVisible={openGenerateModal}
+        toggleModal={hideGenerateModal}
+        onComplete={() => console.log('Generate Workout')}
+      /> */}
     </>
   );
 }
