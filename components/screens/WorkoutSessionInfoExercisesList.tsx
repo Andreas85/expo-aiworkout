@@ -20,7 +20,7 @@ const WorkoutSessionInfoExercisesList = () => {
   };
 
   const renderBottomContainer = () => {
-    if (hasExerciseWorkoutSession && status === 'PENDING') {
+    if (hasExerciseWorkoutSession && status?.toUpperCase() === 'PENDING') {
       return (
         <Container
           style={[

@@ -201,7 +201,7 @@ export const updateExerciseIdOfWorkoutInWorkoutSession = async (
 // 5. Update exercise in a workout session
 export const updateExerciseInSession = async (
   sessionId: string,
-  exerciseId: string,
+  workoutSessionExerciseId: string,
   durationTaken: number,
   repsTaken: number,
 ): Promise<void> => {
@@ -210,8 +210,9 @@ export const updateExerciseInSession = async (
     const session = sessions.find(s => s._id === sessionId);
     // console.log('Session-update-workout-session', session, sessions);
     if (session) {
-      const updatedExercises = session.exercises.map(exercise => {
-        if (exercise._id === exerciseId) {
+      const updatedExercises = session.exercises.map((exercise: ExerciseElement) => {
+        if (exercise?._id === workoutSessionExerciseId) {
+          console.log('Exercise-update-workout-session', exercise, workoutSessionExerciseId);
           return {
             ...exercise,
             isCompleted: true,

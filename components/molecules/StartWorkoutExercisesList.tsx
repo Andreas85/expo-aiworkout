@@ -15,12 +15,7 @@ import usePlatform from '@/hooks/usePlatform';
 import WorkoutComplete from '../modals/WorkoutComplete';
 import useModal from '@/hooks/useModal';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import {
-  getWorkoutSessionById,
-  scrollToIndex,
-  updateExerciseInSession,
-  updateWorkoutSessionStatus,
-} from '@/utils/workoutSessionHelper';
+import { scrollToIndex, updateWorkoutSessionStatus } from '@/utils/workoutSessionHelper';
 import { interactionStore } from '@/store/interactionStore';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { useAuthStore } from '@/store/authStore';
@@ -122,7 +117,7 @@ const StartWorkoutExercisesList = (props: any) => {
       }
       if (unfinishedExerciseData) {
         const reqIndex = workoutExercises.findIndex(
-          (item: any) => item?.exerciseId === unfinishedExerciseData?.exerciseId,
+          (item: ExerciseElement) => item?.exerciseId === unfinishedExerciseData?.exerciseId,
         );
         // console.log('hasRunInitially.current1', {
         //   reqIndex,
@@ -285,10 +280,13 @@ const StartWorkoutExercisesList = (props: any) => {
     // if (isLastExerciseCard) {
     //   await updateWorkoutSessionStatus(slug, 'FINISHED');
     // }
-
+    console.log('currentExercise (before handleUpdateExerciseInWorkoutSession)', {
+      currentExercise,
+    });
     handleUpdateExerciseInWorkoutSession({
       sessionId: slug ?? '',
       exerciseId: currentExercise?.exerciseId ?? '',
+      workoutSessionExerciseId: currentExercise?._id ?? '',
       durationTaken: durationTaken,
       repsTaken: currentExercise?.reps ?? 0,
       isLastExerciseCard,
@@ -323,7 +321,7 @@ const StartWorkoutExercisesList = (props: any) => {
     const isCurrentRest = getCurrentExerciseData()?.type === STRING_DATA.REST;
 
     const isLastExerciseCard = selectedIndex + 1 >= exerciseData?.length;
-    // console.log('exerciseDataexerciseData', { exerciseData });
+    // console.log('exerciseDataexerciseData (scrollToItem)', { exerciseData });
     // Save the current exercise record
     saveWorkoutSessionExerciseRecord({
       durationTaken,

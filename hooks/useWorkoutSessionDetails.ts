@@ -68,11 +68,19 @@ const useWorkoutSessionDetailsTracking = () => {
   const handleUpdateExerciseInWorkoutSession = async (payload: {
     sessionId: string;
     exerciseId: string;
+    workoutSessionExerciseId: string;
     durationTaken: number;
     repsTaken: number;
     isLastExerciseCard?: boolean;
   }) => {
-    const { sessionId, exerciseId, durationTaken, repsTaken, isLastExerciseCard } = payload;
+    const {
+      sessionId,
+      exerciseId,
+      durationTaken,
+      repsTaken,
+      isLastExerciseCard,
+      workoutSessionExerciseId,
+    } = payload;
     if (isAuthenticated) {
       // Sync exercise with the server
       console.log('(API_CALLING) INFO:: handleUpdateExerciseInWorkoutSession');
@@ -99,7 +107,7 @@ const useWorkoutSessionDetailsTracking = () => {
       return;
     }
 
-    await updateExerciseInSession(sessionId, exerciseId, durationTaken, repsTaken);
+    await updateExerciseInSession(sessionId, workoutSessionExerciseId, durationTaken, repsTaken);
     if (isLastExerciseCard) {
       await updateWorkoutSessionStatus(slug, 'FINISHED');
     }

@@ -16,6 +16,7 @@ const WorkoutSessionExerciseInfoCard = (props: { item: ExerciseElement }) => {
     rest: item?.rest ? item?.rest + '' : '0',
     reps: item?.reps ? item?.reps + '' : '0',
     duration: item?.duration ? item?.duration + '' : '0',
+    durationTaken: item?.durationTaken ? item?.durationTaken + '' : '0',
   });
 
   const renderWorkoutSessionExerciseData = () => {
@@ -27,17 +28,19 @@ const WorkoutSessionExerciseInfoCard = (props: { item: ExerciseElement }) => {
         })}>
         <WorkoutInput
           workoutInputLabel={`Weight ${isMediumScreen ? '(kg)' : '(in kg)'}`}
-          workoutInputInitialValue={{ weight: inputValues.weight }}
+          workoutInputInitialValue={{ weight: `0/${inputValues.weight}` }}
           disableAppTextInput={true}
         />
         <WorkoutInput
           workoutInputLabel="Reps"
-          workoutInputInitialValue={{ weight: inputValues.reps }}
+          workoutInputInitialValue={{ weight: `${inputValues.reps}/${inputValues.reps}` }}
           disableAppTextInput={true}
         />
         <WorkoutInput
           workoutInputLabel={`Duration ${isMediumScreen ? '(sec)' : '(in seconds)'}`}
-          workoutInputInitialValue={{ weight: inputValues.duration }}
+          workoutInputInitialValue={{
+            weight: `${inputValues.durationTaken}/${inputValues.duration}`,
+          }}
           disableAppTextInput={true}
         />
       </Container>

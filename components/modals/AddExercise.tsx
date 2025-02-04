@@ -305,7 +305,7 @@ function AddExercise(props: {
                     <AppTextInput
                       value={values.duration}
                       placeholder={
-                        values.isDuration ? 'Reps Duration (in seconds)' : 'Duration (in seconds)'
+                        !values.isDuration ? 'Reps Duration (in seconds)' : 'Duration (in seconds)'
                       }
                       onChangeText={handleChange('duration')}
                       errorMessage={errors?.duration}
