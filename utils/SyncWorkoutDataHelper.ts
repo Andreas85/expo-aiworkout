@@ -2,6 +2,7 @@ import { addExerciseToWorkoutRequest, addWorkoutService } from '@/services/worko
 import { ISyncProgressTracker } from './SyncDataHelper';
 import { updateWorkoutIdInWorkoutSession } from './workoutSessionHelper';
 import { deleteWorkout } from './workoutStorageOperationHelper';
+import { updateExerciseIdsInLocalStorage } from './workoutExercisesHelper';
 
 // Utility to sync workouts
 export const syncWorkouts = async (
@@ -66,7 +67,7 @@ export const syncExercisesForWorkout = async (
   for (let i = 0; i < exercises.length; i++) {
     const exercise = exercises[i];
     try {
-      await addExerciseToWorkoutRequest({
+      const response = await addExerciseToWorkoutRequest({
         queryParams: { id: workoutId },
         formData: {
           exerciseId: exercise.exerciseId,
@@ -81,9 +82,18 @@ export const syncExercisesForWorkout = async (
           // Add other required exercise fields
         },
       });
-
+      const oldExerciseId = exercises[i]?.exerciseId;
+      const newExerciseId = response.data?.exercises[i]?._id;
+      // console.log('Exercise created with ID:', {
+      //   newExerciseId,
+      //   oldExerciseId,
+      //   exerciseData: exercises[i],
+      // });
       successfullySyncedExercises.push(exercise);
-
+      // Update exercise IDs in workouts and workout sessions
+      if (newExerciseId !== oldExerciseId) {
+        await updateExerciseIdsInLocalStorage(oldExerciseId, newExerciseId);
+      }
       // tracker.completed++;
       // updateProgress(`Syncing exercises ${tracker.completed}/${total}`);
     } catch (error) {
