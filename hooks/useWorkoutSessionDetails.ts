@@ -14,6 +14,7 @@ import {
 import { WORKOUT_STATUS } from '@/utils/appConstants';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { ExerciseElement } from '@/services/interfaces';
 
 const useWorkoutSessionDetailsTracking = () => {
   const { slug } = useLocalSearchParams() as { slug: string };
@@ -47,10 +48,16 @@ const useWorkoutSessionDetailsTracking = () => {
       return;
     }
     const sessionId = generateBigNumberId();
+    const getWorkoutSessionExercises = workoutDetail?.exercises.map(
+      (exercise: ExerciseElement) => ({
+        ...exercise,
+        exerciseId: generateBigNumberId(),
+      }),
+    );
     const payload = {
       _id: sessionId,
       workoutId: workoutDetail?._id ?? '',
-      exercises: workoutDetail?.exercises ?? [],
+      exercises: getWorkoutSessionExercises ?? [],
       status: 'pending',
       totalDuration: 0,
       totalExercisesCompleted: 0,
@@ -63,7 +70,7 @@ const useWorkoutSessionDetailsTracking = () => {
       createdAt: new Date().toISOString(),
     };
     await addWorkoutSession(payload);
-    setWorkoutSessionDetails(workoutDetail);
+    setWorkoutSessionDetails(payload);
     if (isPublicWorkout) {
       updateIsWorkoutOwner(false);
     } else {

@@ -1,11 +1,12 @@
-import { ExerciseElement, Workout } from '@/services/interfaces';
+import { ExerciseElement } from '@/services/interfaces';
 import { calculateDurationOFCompleteExercises, calculateTotalDuration } from '@/utils/helper';
+import { WorkoutSession } from '@/utils/workoutSessionHelper';
 import _ from 'lodash';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 type State = {
-  workoutSessionDetails: Workout | null;
+  workoutSessionDetails: WorkoutSession | null;
   hasExercises: boolean;
   isLoading?: boolean;
   totalWorkoutTime?: number;

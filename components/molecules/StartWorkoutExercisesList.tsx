@@ -15,7 +15,11 @@ import usePlatform from '@/hooks/usePlatform';
 import WorkoutComplete from '../modals/WorkoutComplete';
 import useModal from '@/hooks/useModal';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { scrollToIndex, updateWorkoutSessionStatus } from '@/utils/workoutSessionHelper';
+import {
+  scrollToIndex,
+  updateWorkoutSessionStatus,
+  WorkoutSession,
+} from '@/utils/workoutSessionHelper';
 import { interactionStore } from '@/store/interactionStore';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { useAuthStore } from '@/store/authStore';
@@ -86,7 +90,7 @@ const StartWorkoutExercisesList = (props: any) => {
 
   const processDataBasedOnSession = (
     workoutExercises: ExerciseElement[],
-    workoutDetailData: Workout,
+    workoutDetailData: WorkoutSession,
   ) => {
     // const workoutSessionOfExercises = await getWorkoutSessionById(slug ?? '');
     const workoutSessionOfExercises = workoutDetailData;
@@ -341,6 +345,7 @@ const StartWorkoutExercisesList = (props: any) => {
       }
       return;
     }
+    disableWorkoutTimer(hasReps);
     if (hasReps) return;
 
     if (isCurrentRest) {
@@ -389,6 +394,7 @@ const StartWorkoutExercisesList = (props: any) => {
     const isNextExerciseRest = getNextExerciseData()?.type === STRING_DATA.REST;
 
     if (isNextExerciseRest) {
+      disableWorkoutTimer(0);
       startNextExercise();
       return;
     }
