@@ -97,7 +97,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
   };
 
   const handleStartWorkoutClick = () => {
-    handleAddWorkoutSession({ setLoading });
+    handleAddWorkoutSession({ setLoading, isPublicWorkout: true });
   };
 
   const renderStartWorkoutButton = () => {

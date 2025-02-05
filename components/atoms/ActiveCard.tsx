@@ -12,11 +12,16 @@ import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import ActiveWorkoutIcon from './ActiveWorkoutIcon';
 import MinusActionButton from './MinusActionButton';
 import PlusActionButton from './PlusActionButton';
-import { pluralise } from '@/utils/helper';
+import { debouncedMutate, pluralise } from '@/utils/helper';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import { useAuthStore } from '@/store/authStore';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateExerciseToWorkoutRequest } from '@/services/workouts';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { updateExercisePropertyOfWorkout } from '@/utils/workoutStorageOperationHelper';
 
 interface ActiveCardProps {
   item: ExerciseElement;
@@ -26,19 +31,59 @@ interface ActiveCardProps {
 
 const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
+  const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const isWorkoutTimerRunning = useWorkoutSessionStore(state => state.isWorkoutTimerRunning);
   const { updateExercisePropertyZustand } = useWorkoutSessionStore();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isWorkoutOwner = useWorkoutSessionStore(state => state.isWorkoutOwner);
-
+  const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
+  const { updateWorkoutExercises } = useWorkoutDetailStore();
   const hasReps = !!item?.reps;
   const repsValue = item?.reps ?? 0;
   const durationValue = item?.duration ?? 0;
 
+  const { mutate: mutateUpdateExerciseToWorkoutRequest } = useMutation({
+    mutationFn: updateExerciseToWorkoutRequest,
+    onSuccess: async data => {
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      updateWorkoutExercises(data?.data?.exercises);
+    },
+    onError: (error: any) => {
+      console.log('error', error);
+      // toast.show(error, { type: 'danger' });
+    },
+    onSettled: () => {
+      console.log('onSettled');
+    },
+  });
+
+  // For Reps newDuration is (no of reps) / For Rest newDuration is (no. of seconds
   const handlePress = async (newDuration: number) => {
-    // console.log('Normal exercise-Active-card', { item });
-    await updateExerciseProperty(slug ?? '', item?._id ?? '', 'reps', newDuration);
+    if (isAuthenticated) {
+      console.log('Active-card', { item, newDuration });
+      // Modify 'reps' based on 'isEnabled'
+      const payload = {
+        formData: {
+          index: item?.order,
+          exercise: {
+            reps: newDuration ?? 0,
+            ...(hasReps && { repsTaken: newDuration }),
+          },
+        },
+        queryParams: { id: workoutSessionDetails?.workoutId },
+      };
+      debouncedMutate(mutateUpdateExerciseToWorkoutRequest, payload);
+    } else {
+      console.log('Normal exercise-Active-card', { item });
+      await updateExerciseProperty(slug ?? '', item?._id ?? '', 'reps', newDuration);
+      updateExercisePropertyOfWorkout(
+        workoutSessionDetails?.workoutId ?? '',
+        item?._id,
+        'reps',
+        newDuration,
+      );
+    }
     updateExercisePropertyZustand(item.order, 'reps', newDuration);
   };
 
@@ -64,7 +109,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   };
 
   const renderActionButtons = () => {
-    if (hasReps && (isWorkoutOwner || !isAuthenticated)) {
+    if (hasReps && isWorkoutOwner) {
       return (
         <>
           <MinusActionButton onPressMinus={onPressMinusHandler} />

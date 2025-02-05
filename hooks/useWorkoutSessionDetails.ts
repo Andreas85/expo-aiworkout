@@ -21,10 +21,13 @@ const useWorkoutSessionDetailsTracking = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const userData = useAuthStore(state => state.userData);
-  const { setWorkoutSessionDetails } = useWorkoutSessionStore();
+  const { setWorkoutSessionDetails, updateIsWorkoutOwner } = useWorkoutSessionStore();
 
-  const handleAddWorkoutSession = async (props: { setLoading: (loading: boolean) => void }) => {
-    const { setLoading } = props;
+  const handleAddWorkoutSession = async (props: {
+    setLoading: (loading: boolean) => void;
+    isPublicWorkout?: boolean;
+  }) => {
+    const { setLoading, isPublicWorkout = false } = props;
     setLoading(true);
     if (isAuthenticated && workoutDetail) {
       console.log('(API_CALLING) INFO:: handleAddWorkoutSession');
@@ -61,6 +64,11 @@ const useWorkoutSessionDetailsTracking = () => {
     };
     await addWorkoutSession(payload);
     setWorkoutSessionDetails(workoutDetail);
+    if (isPublicWorkout) {
+      updateIsWorkoutOwner(false);
+    } else {
+      updateIsWorkoutOwner(true);
+    }
     setLoading(false);
     router.push(`/workout-session/${sessionId}` as any);
   };

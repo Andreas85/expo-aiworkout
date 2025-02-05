@@ -6,7 +6,7 @@ import { Text } from '../Themed';
 import { tailwind } from '@/utils/tailwind';
 import { ExerciseElement } from '@/services/interfaces';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { pluralise } from '@/utils/helper';
+import { debouncedMutate, pluralise } from '@/utils/helper';
 import MinusActionButton from './MinusActionButton';
 import PlusActionButton from './PlusActionButton';
 import ActiveWorkoutIcon from './ActiveWorkoutIcon';
@@ -14,26 +14,71 @@ import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams } from 'expo-router';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import { useAuthStore } from '@/store/authStore';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateExerciseToWorkoutRequest } from '@/services/workouts';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { updateExercisePropertyOfWorkout } from '@/utils/workoutStorageOperationHelper';
 
 interface ActiveRestCardProps {
   item: ExerciseElement;
   index: number;
 }
 
-const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
+const ActiveRestCard = ({ item, index }: ActiveRestCardProps) => {
   const { isLargeScreen } = useWebBreakPoints();
+  const queryClient = useQueryClient();
+  const { updateWorkoutExercises } = useWorkoutDetailStore();
   const { updateExercisePropertyZustand } = useWorkoutSessionStore();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isWorkoutOwner = useWorkoutSessionStore(state => state.isWorkoutOwner);
+  const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
   // Use the item.duration as the single source of truth
   const durationValue = item?.duration ?? 0;
 
+  const { mutate: mutateUpdateExerciseToWorkoutRequest } = useMutation({
+    mutationFn: updateExerciseToWorkoutRequest,
+    onSuccess: async data => {
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      updateWorkoutExercises(data?.data?.exercises);
+    },
+    onError: (error: any) => {
+      console.log('error', error);
+      // toast.show(error, { type: 'danger' });
+    },
+    onSettled: () => {
+      console.log('onSettled');
+    },
+  });
+
   const handlePress = async (newDuration: number) => {
     const hasRest = item?.type === 'rest';
+    console.log('Rest exercise-Active-card', { item, hasRest });
     if (hasRest && item?.preExerciseId && item?.preExerciseOrder?.toString()) {
-      // console.log('Rest exercise-Active-card', { item, hasRest });
-      await updateExerciseProperty(slug ?? '', item?.preExerciseId ?? '', 'rest', newDuration);
+      if (isAuthenticated) {
+        // Modify 'reps' based on 'isEnabled'
+        const payload = {
+          formData: {
+            index: item?.preExerciseOrder,
+            exercise: {
+              rest: newDuration ?? 0,
+            },
+          },
+          queryParams: { id: workoutSessionDetails?.workoutId },
+        };
+        // console.log('Api call', payload);
+        debouncedMutate(mutateUpdateExerciseToWorkoutRequest, payload);
+      } else {
+        // console.log('Rest exercise-Active-card', { item, hasRest });
+        await updateExerciseProperty(slug ?? '', item?.preExerciseId ?? '', 'rest', newDuration);
+        updateExercisePropertyOfWorkout(
+          workoutSessionDetails?.workoutId ?? '',
+          item?.preExerciseId,
+          'rest',
+          newDuration,
+        );
+      }
 
       updateExercisePropertyZustand(item?.preExerciseOrder, 'rest', newDuration);
     }
@@ -52,7 +97,7 @@ const ActiveRestCard = ({ item }: ActiveRestCardProps) => {
   };
 
   const renderActionButtons = () => {
-    if (isWorkoutOwner || !isAuthenticated) {
+    if (isWorkoutOwner) {
       return (
         <>
           <MinusActionButton onPressMinus={onPressMinusHandler} />

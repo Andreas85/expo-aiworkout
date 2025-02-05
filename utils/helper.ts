@@ -4,6 +4,7 @@ import { ExerciseElement } from '@/services/interfaces';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { router } from 'expo-router';
+import { debounce } from 'lodash';
 
 export const queryClient = new QueryClient();
 
@@ -143,7 +144,11 @@ export const expandRestAsExercisesInExistingExercises = (exercises: ExerciseElem
   const expandedExercises = [];
 
   for (let i = 0; i < exercises.length; i++) {
-    const exercise = exercises[i];
+    const exercise: any = exercises[i];
+    // i want to check one property in exercise object
+    if (!('order' in exercise)) {
+      exercise.order = i;
+    }
     expandedExercises.push(exercise);
 
     // Add a rest exercise only if it's not the last exercise
@@ -154,8 +159,8 @@ export const expandRestAsExercisesInExistingExercises = (exercises: ExerciseElem
         exercise: {
           name: 'Rest',
         },
-        preExerciseId: exercise._id, // Add preExerciseId to the rest exercise
-        preExerciseOrder: exercise.order,
+        preExerciseId: exercise?.exerciseId, // Add preExerciseId to the rest exercise
+        preExerciseOrder: exercise.order ?? i,
         rest: exercise.rest,
       };
       expandedExercises.push(restExercise);
@@ -218,3 +223,8 @@ export function navigateToWorkoutDetail(isPrivate: boolean, workoutId: string) {
     router.push(`/workout/public/${workoutId}`);
   }
 }
+
+// Debounced function outside the component scope
+export const debouncedMutate = debounce((mutateFn, payload) => {
+  mutateFn(payload);
+}, 500);

@@ -136,6 +136,7 @@ export interface ExerciseElement {
   isCompleted?: boolean;
   exerciseId?: string;
   durationTaken?: number;
+  repsTaken?: number;
   preExerciseOrder?: number; //only for rest exercise
   preExerciseId?: string; //only for rest exercise
 }

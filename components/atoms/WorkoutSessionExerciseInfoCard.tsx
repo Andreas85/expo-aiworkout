@@ -12,11 +12,11 @@ const WorkoutSessionExerciseInfoCard = (props: { item: ExerciseElement }) => {
   const { item } = props;
   const { isMediumScreen } = useWebBreakPoints();
   const inputValues = {
-    weight: item?.weight ? item?.weight + '' : '0',
-    rest: item?.rest ? item?.rest + '' : '0',
-    reps: item?.reps ? item?.reps + '' : '0',
-    duration: item?.duration ? item?.duration + '' : '0',
-    durationTaken: item?.durationTaken ? item?.durationTaken + '' : '0',
+    weight: item?.weight ? item?.weight : '0',
+    rest: item?.rest ? item?.rest : '0',
+    reps: item?.reps ? item?.reps : '0',
+    duration: item?.duration ? item?.duration : '0',
+    durationTaken: item?.durationTaken ? item?.durationTaken : '0',
   };
 
   const renderWorkoutSessionExerciseData = () => {
@@ -33,13 +33,15 @@ const WorkoutSessionExerciseInfoCard = (props: { item: ExerciseElement }) => {
         />
         <WorkoutInput
           workoutInputLabel="Reps"
-          workoutInputInitialValue={{ weight: `${inputValues.reps}/${inputValues.reps}` }}
+          workoutInputInitialValue={{
+            weight: `${item?.isCompleted ? inputValues.reps : 0}/${inputValues.reps}`,
+          }}
           disableAppTextInput={true}
         />
         <WorkoutInput
           workoutInputLabel={`Duration ${isMediumScreen ? '(sec)' : '(in seconds)'}`}
           workoutInputInitialValue={{
-            weight: `${inputValues.durationTaken}/${inputValues.duration}`,
+            weight: `${item?.isCompleted ? inputValues.durationTaken : 0}/${inputValues.duration}`,
           }}
           disableAppTextInput={true}
         />
