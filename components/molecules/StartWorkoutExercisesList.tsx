@@ -181,7 +181,7 @@ const StartWorkoutExercisesList = (props: any) => {
     if (muted) return;
     try {
       const { sound } = await Audio.Sound.createAsync(
-        require('@/assets/sounds/buzzer-countdown.mp3'), // Replace with your sound file
+        require('@/assets/sounds/buzzer-countdown1.mp3'), // Replace with your sound file
       );
       setSound(sound);
       await sound.playAsync();
@@ -222,6 +222,14 @@ const StartWorkoutExercisesList = (props: any) => {
 
   const getNextExerciseData = () => {
     return exerciseData[selectedIndex + 1];
+  };
+
+  const boomSoundStartAndPause = (mutateFn: any) => {
+    playSound();
+    setTimeout(() => {
+      stopSound();
+      mutateFn?.();
+    }, 300);
   };
 
   const handleModalClose = () => {
@@ -346,7 +354,7 @@ const StartWorkoutExercisesList = (props: any) => {
       return;
     }
     disableWorkoutTimer(hasReps);
-    if (hasReps) return;
+    // if (hasReps) return;
 
     if (isCurrentRest) {
       console.log('Rest card, starting next exercise');
@@ -356,16 +364,11 @@ const StartWorkoutExercisesList = (props: any) => {
     }
 
     console.log('playSound', { isNextExerciseRest, isCurrentRest, hasReps });
-    if (isNextExerciseRest) {
+
+    boomSoundStartAndPause(() => {
+      updateWorkoutTimer(true);
       startNextExercise();
-    } else {
-      playSound();
-      setTimeout(() => {
-        stopSound();
-        updateWorkoutTimer(true);
-        startNextExercise();
-      }, 300);
-    }
+    });
   };
 
   const handleNextRepsExercise = (props: {
@@ -395,7 +398,9 @@ const StartWorkoutExercisesList = (props: any) => {
 
     if (isNextExerciseRest) {
       disableWorkoutTimer(0);
-      startNextExercise();
+      boomSoundStartAndPause(() => {
+        startNextExercise();
+      });
       return;
     }
 

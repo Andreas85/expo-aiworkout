@@ -119,7 +119,9 @@ const ActiveRestCard = ({ item, index }: ActiveRestCardProps) => {
           webStyles.container,
         ] as any,
         native: [
-          tailwind('relative flex-1 flex-col gap-4 rounded-lg bg-NAVBAR_BACKGROUND px-2 py-1'),
+          tailwind(
+            `relative flex-1 flex-col gap-4 rounded-lg bg-NAVBAR_BACKGROUND px-2 ${!isWorkoutOwner ? 'py-4' : 'py-1'} `,
+          ),
           webStyles.container,
         ],
       })}>
@@ -180,7 +182,7 @@ const ActiveRestCard = ({ item, index }: ActiveRestCardProps) => {
           <Container
             style={Platform.select({
               web: tailwind(`flex-1 flex-row gap-4`),
-              native: tailwind('mb-4 flex-1 flex-row gap-4'),
+              native: tailwind(`${isWorkoutOwner ? 'mb-4' : ''} flex-1 flex-row gap-4`),
             })}>
             {renderActionButtons()}
           </Container>
