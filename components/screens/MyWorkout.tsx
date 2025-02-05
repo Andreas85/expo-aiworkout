@@ -24,6 +24,7 @@ import { useAuthStore } from '@/store/authStore';
 import MyWorkoutNotLoggedInList from '../molecules/MyWorkoutNotLoggedInList';
 import { Workout } from '@/services/interfaces';
 import GenerateWorkoutModal from '../modals/GenerateWorkoutModal';
+import StarsIcon from '../atoms/AiStarsIcon';
 
 export default function MyWorkout() {
   const { isSmallScreen, isLargeScreen, isMediumScreen } = useBreakPoints();
@@ -163,7 +164,7 @@ export default function MyWorkout() {
                     native: tailwind('rounded-xl px-2'),
                   }),
                 ]}
-                left={<FontAwesome5 name="robot" size={20} color="white" />}
+                left={<StarsIcon height={20} width={20} />}
               />
               <ActionButton
                 label={'Add Workout'}

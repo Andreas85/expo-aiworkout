@@ -47,14 +47,16 @@ export function ActionButton({
       ]}>
       <Container style={tailwind('flex-row items-center gap-x-2 self-center')}>
         {left}
-        <Text
-          style={[
-            tailwind('text-4  leading-6 text-white'),
-            labelStyle,
-            { textTransform: uppercase ? 'uppercase' : 'capitalize' },
-          ]}>
-          {isLoading ? <ActivityIndicator /> : label}
-        </Text>
+        {label && (
+          <Text
+            style={[
+              tailwind('text-4  leading-6 text-white'),
+              labelStyle,
+              { textTransform: uppercase ? 'uppercase' : 'capitalize' },
+            ]}>
+            {isLoading ? <ActivityIndicator /> : label}
+          </Text>
+        )}
       </Container>
     </Pressable>
   );

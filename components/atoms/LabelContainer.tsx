@@ -1,4 +1,4 @@
-import { Pressable, StyleProp, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import React, { ReactNode } from 'react';
 import { GestureResponderEvent } from 'react-native-modal';
 import { tailwind } from '@/utils/tailwind';
@@ -10,7 +10,7 @@ const LabelContainer = (props: {
   right?: ReactNode;
   isLoading?: boolean;
   uppercase?: boolean;
-  labelStyle?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;

@@ -10,10 +10,11 @@ interface IWorkoutInput {
   workoutInputLabel: string;
   workoutInputInitialValue: any;
   disableAppTextInput?: boolean;
+  onChangeText?: (text: string) => void;
 }
 
 const WorkoutInput = (props: IWorkoutInput) => {
-  const { workoutInputInitialValue, disableAppTextInput, workoutInputLabel } = props;
+  const { workoutInputInitialValue, disableAppTextInput, workoutInputLabel, onChangeText } = props;
   const { isMobileDeviceOnly } = useWebBreakPoints();
   return (
     <Container
@@ -38,6 +39,7 @@ const WorkoutInput = (props: IWorkoutInput) => {
         placeholder=""
         fieldName={'weight'}
         disableAppTextInput={disableAppTextInput}
+        onChangeText={onChangeText}
         containerStyle={[
           Platform.select({
             web: tailwind('w-full self-center border-none'),
