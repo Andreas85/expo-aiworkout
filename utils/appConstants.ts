@@ -26,6 +26,7 @@ export const USER_ROLE = {
 };
 
 export const BREAK_POINTS = {
+  EXTRA_SMALL_DEVICE: 375,
   MOBILE_DEVICE: 500,
   SMALL_DEVICE: 640,
   MEDIUM_DEVICE: 768,
