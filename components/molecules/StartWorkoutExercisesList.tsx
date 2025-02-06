@@ -8,8 +8,7 @@ import {
   expandRestAsExercisesInExistingExercises,
   findFirstIncompleteExercise,
 } from '@/utils/helper';
-import { ExerciseElement, Workout } from '@/services/interfaces';
-import { Audio } from 'expo-av';
+import { ExerciseElement } from '@/services/interfaces';
 import BaseTimer from '../modals/BaseTimer';
 import usePlatform from '@/hooks/usePlatform';
 import WorkoutComplete from '../modals/WorkoutComplete';
@@ -26,12 +25,15 @@ import { useAuthStore } from '@/store/authStore';
 import { updateWorkoutSessionFinishedStatus } from '@/services/workouts';
 import useWorkoutSessionDetailsTracking from '@/hooks/useWorkoutSessionDetails';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import boomSound from '@/assets/sounds/buzzer-countdown1.mp3';
 
 const ITEM_HEIGHT = 100; // Replace with the actual height of your list items
 const CONTAINER_HEIGHT = 500; // Replace with the actual height of the FlatList container
 
 const StartWorkoutExercisesList = (props: any) => {
   const hasRunInitially = useRef(false);
+  const { loadAudio, startAudio, stopAudio } = useAudioPlayer();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useWebBreakPoints();
   const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
@@ -47,7 +49,6 @@ const StartWorkoutExercisesList = (props: any) => {
   const [exerciseData, setExerciseData] = useState<ExerciseElement[]>([]);
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
-  const [sound, setSound] = useState<Audio.Sound | null>(null); // State for sound
   const [showModal, setShowModel] = useState(false);
   const {
     openModal: openWorkoutComplete,
@@ -161,52 +162,14 @@ const StartWorkoutExercisesList = (props: any) => {
       processDataBasedOnSession(updateData, workoutSessionDetails);
       // setExerciseData(workoutExercises);
     }
-    return () => {
-      if (sound) {
-        sound.unloadAsync(); // Cleanup sound resource
-      }
-    };
   }, [workoutSessionDetails]);
 
   useFocusEffect(
     useCallback(() => {
-      // if (!isStale) {
+      loadAudio(boomSound);
       hasRunInitially.current = false;
-      // }
     }, []),
   );
-
-  // Play a sound
-  const playSound = useCallback(async () => {
-    if (muted) return;
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('@/assets/sounds/buzzer-countdown1.mp3'), // Replace with your sound file
-      );
-      setSound(sound);
-      await sound.playAsync();
-    } catch (error) {
-      console.error('Error playing sound:', error);
-    }
-  }, [muted]);
-
-  // Stop and unload the sound
-  const stopSound = useCallback(async () => {
-    if (sound) {
-      const status = await sound.getStatusAsync();
-      if (status.isLoaded) {
-        try {
-          await sound.stopAsync();
-          await sound.unloadAsync();
-          setSound(null); // Clear sound after unloading
-        } catch (error) {
-          console.error('Error stopping sound:', error);
-        }
-      } else {
-        console.warn('Sound is not loaded, cannot stop it.');
-      }
-    }
-  }, [sound]);
 
   const onIncrement = () => {
     console.log('Increment');
@@ -225,9 +188,10 @@ const StartWorkoutExercisesList = (props: any) => {
   };
 
   const boomSoundStartAndPause = (mutateFn: any) => {
-    playSound();
+    // console.log('boomSoundStartAndPause', { muted });
+    startAudio(muted);
     setTimeout(() => {
-      stopSound();
+      stopAudio();
       mutateFn?.();
     }, 300);
   };

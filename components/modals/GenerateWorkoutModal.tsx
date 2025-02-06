@@ -15,8 +15,8 @@ import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { ActionButton } from '../atoms/ActionButton';
 import LabelContainer from '../atoms/LabelContainer';
 import StarsIcon from '../atoms/AiStarsIcon';
-import { debounce } from 'lodash';
 import Colors from '@/constants/Colors';
+import { COMMON_PROMTPS } from '@/utils/appConstants';
 
 interface IGenerateWorkoutProps {
   isVisible: boolean;
@@ -24,69 +24,28 @@ interface IGenerateWorkoutProps {
   onComplete?: () => void;
 }
 
-const commonPrompts = [
-  {
-    id: 1,
-    title: 'Upper Body Strength Routine',
-    description: 'Focus on building upper body strength with compound exercises.',
-    workouts: [
-      { name: 'Push-Ups', reps: 15, duration: 0, weight: 10, rest: 30 },
-      { name: 'Pull-Ups', reps: 10, duration: 0, weight: 10, rest: 45 },
-      {
-        name: 'Dumbbell Bench Press',
-        reps: 12,
-        duration: '0 min',
-        weight: '20 kg',
-        rest: '60 sec',
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: 'Full Body HIIT Session',
-    description: 'High-intensity interval training for full-body fat burn.',
-    workouts: [
-      { name: 'Burpees', reps: 20, duration: 0, weight: 10, rest: 30 },
-      {
-        name: 'Mountain Climbers',
-        reps: 30,
-        duration: '0 min',
-        weight: 10,
-        rest: '30 sec',
-      },
-      { name: 'Jump Squats', reps: 15, duration: 0, weight: 10, rest: 45 },
-    ],
-  },
-  {
-    id: 3,
-    title: 'Core and Abs Workout',
-    description: 'Strengthen your core muscles with focused ab exercises.',
-    workouts: [
-      { name: 'Plank', reps: 0, duration: 60, weight: 10, rest: 30 },
-      { name: 'Russian Twists', reps: 20, duration: 0, weight: 5, rest: 30 },
-      { name: 'Leg Raises', reps: 15, duration: 0, weight: 10, rest: 45 },
-    ],
-  },
-  {
-    id: 4,
-    title: 'Lower Body Power Exercises',
-    description: 'Boost leg strength and explosiveness with these exercises.',
-    workouts: [
-      { name: 'Squats', reps: 15, duration: 0, weight: 10, rest: 60 },
-      { name: 'Lunges', reps: 12, duration: 0, weight: 10, rest: 45 },
-      { name: 'Deadlifts', reps: 10, duration: 0, weight: 40, rest: 90 },
-    ],
-  },
-];
+interface PromptExercise {
+  exercise_name: string;
+  reps: number;
+  duration: number;
+  weight: number;
+  rest: number;
+}
+
+export interface ICommonPromts {
+  id: number;
+  name: string;
+  workout: PromptExercise[];
+}
 
 const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
   const { isVisible, toggleModal } = props;
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
 
-  const [workouts, setWorkouts] = useState([
-    { name: 'Kettlebell Swing', reps: 15, duration: 0, weight: 12, rest: 30 },
-    { name: 'Goblet Squat', reps: 12, duration: 0, weight: 16, rest: 60 },
-    { name: 'Kettlebell Row', reps: 10, duration: 0, weight: 12, rest: 45 },
+  const [workouts, setWorkouts] = useState<PromptExercise[]>([
+    { exercise_name: 'Kettlebell Swing', reps: 15, duration: 0, weight: 12, rest: 30 },
+    { exercise_name: 'Goblet Squat', reps: 12, duration: 0, weight: 16, rest: 60 },
+    { exercise_name: 'Kettlebell Row', reps: 10, duration: 0, weight: 12, rest: 45 },
   ]);
   const [prompt, setPrompt] = useState('');
 
@@ -94,14 +53,14 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
     console.log('Generating workout for prompt:', prompt);
     setWorkouts(prev => [
       {
-        name: `${prompt} Kettlebell Swing`,
+        exercise_name: `${prompt} Kettlebell Swing`,
         reps: 15,
         duration: 0,
         weight: 12,
         rest: 30,
       },
-      { name: 'Goblet Squat', reps: 12, duration: 0, weight: 16, rest: 60 },
-      { name: 'Kettlebell Row', reps: 10, duration: 0, weight: 12, rest: 45 },
+      { exercise_name: 'Goblet Squat', reps: 12, duration: 0, weight: 16, rest: 60 },
+      { exercise_name: 'Kettlebell Row', reps: 10, duration: 0, weight: 12, rest: 45 },
       ...prev,
     ]);
     setPrompt('');
@@ -109,31 +68,23 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
 
   const handleSaveAndCreateWorkout = () => {
     console.log('Workout saved and created!');
+    console.table(workouts);
     setWorkouts([]);
     toggleModal();
   };
 
   const handleClickCommonPrompt = (item: any) => () => {
     console.log('Common prompt clicked:', item);
-    setPrompt(item.title);
-    setWorkouts(item.workouts);
+    setPrompt(item.name);
+    setWorkouts(item.workout);
   };
 
-  const handleWorkoutChange = (index: number, field: string, value: string) => {
-    console.log('Workout change:', index, field, value);
+  const handleWorkoutChange = (index: number, field: string, value: number) => {
+    // console.log('Workout change:', index, field, value);
     const updatedWorkouts = [...workouts];
     updatedWorkouts[index] = { ...updatedWorkouts[index], [field]: value };
     setWorkouts(updatedWorkouts);
   };
-
-  // const handleTextChange = debounce((fieldName: string, text: string, index: number) => {
-  //   console.log('Field name:', fieldName, 'Text:', text);
-  //   const updatedWorkouts = [...workouts];
-  //   updatedWorkouts[index] = { ...updatedWorkouts[index], [fieldName]: text };
-  //   setWorkouts(updatedWorkouts);
-  // }, 1000);
-
-  // console.log('Workouts:', workouts);
 
   return (
     <Modal
@@ -163,7 +114,7 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
             style={styles.input}
             value={prompt}
             onChangeText={setPrompt}
-            placeholder="Enter your prompt"
+            placeholder="Enter workout details (e.g., Push-Ups, 15 reps, 60s rest, 30s duration)"
             placeholderTextColor="#aaa"
             multiline={true} // Makes it behave like a textarea
             numberOfLines={4} // Optional: Adjusts the height
@@ -184,12 +135,12 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.commonPromptContainer}>
-          {commonPrompts.map((item, index) => (
+          {COMMON_PROMTPS.map((item: ICommonPromts, index) => (
             <TouchableOpacity
               key={index}
               style={styles.commonPromptButton}
               onPress={handleClickCommonPrompt(item)}>
-              <Text style={styles.commonPromptText}>{item.title}</Text>
+              <Text style={styles.commonPromptText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -198,7 +149,7 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
           {workouts.map((item, index) => (
             <View key={index} style={styles.workoutItem}>
               <Text style={styles.workoutText} numberOfLines={1}>
-                {item.name}
+                {item.exercise_name}
               </Text>
               <View style={[styles.detailContainer, !isMediumScreen && styles.detailContainerRow]}>
                 <View style={styles.inputGroup}>
@@ -208,7 +159,7 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
                   <TextInput
                     style={styles.detailInput}
                     value={`${item.weight}`}
-                    onChangeText={value => handleWorkoutChange(index, 'weight', value)}
+                    onChangeText={value => handleWorkoutChange(index, 'weight', Number(value))}
                     placeholder="Weight"
                     placeholderTextColor="#aaa"
                   />
@@ -222,7 +173,7 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
                   <TextInput
                     style={styles.detailInput}
                     value={`${item.rest}`}
-                    onChangeText={value => handleWorkoutChange(index, 'rest', value)}
+                    onChangeText={value => handleWorkoutChange(index, 'rest', Number(value))}
                     placeholder="Rest"
                     placeholderTextColor="#aaa"
                   />
@@ -234,7 +185,7 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
                   <TextInput
                     style={styles.detailInput}
                     value={`${item.reps}`}
-                    onChangeText={value => handleWorkoutChange(index, 'reps', value)}
+                    onChangeText={value => handleWorkoutChange(index, 'reps', Number(value))}
                     placeholder="Reps"
                     placeholderTextColor="#aaa"
                     keyboardType="numeric"
@@ -249,7 +200,7 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
                   <TextInput
                     style={styles.detailInput}
                     value={`${item.duration}`}
-                    onChangeText={value => handleWorkoutChange(index, 'duration', value)}
+                    onChangeText={value => handleWorkoutChange(index, 'duration', Number(value))}
                     placeholder="Duration"
                     placeholderTextColor="#aaa"
                   />
