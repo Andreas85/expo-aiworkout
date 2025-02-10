@@ -13,4 +13,5 @@ export const API_ENPOINTS = {
   RESET: '/auth/reset-password',
   SIGNIN_USING_OTP: '/auth/signin-using-otp',
   WORKOUT_SESSION: '/workout-sessions',
+  ME: '/me',
 };

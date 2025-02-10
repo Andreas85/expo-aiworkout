@@ -65,6 +65,7 @@ export const REACT_QUERY_API_KEYS = {
   PUBLIC_EXERCISES: 'public-exercises',
   WORKOUT_SESSION_USER: 'workout-session-user',
   WORKOUT_SESSION_USER_DETAILS: 'workout-session-user-details',
+  ME: 'me',
 };
 
 export const REACT_QUERY_STALE_TIME = {

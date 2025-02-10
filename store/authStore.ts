@@ -15,6 +15,7 @@ type State = {
 type Action = {
   setTokenInStore: (payload: State['token']) => void;
   clearTokenFromStore: () => void;
+  setUserData: (user: User) => void;
   setAuthTokenAndUser: (payload: { token: string; user: User }) => void;
 };
 
@@ -46,6 +47,8 @@ export const useAuthStore = create<IAuthStore>()(
       await AsyncStorage.removeItem(STORE_KEY);
       set({ token: null, isAuthenticated: false, isAdmin: null, userData: null });
     },
+
+    setUserData: (user: User) => set({ userData: user }),
   })),
 );
 // Load token from AsyncStorage (e.g., during app startup)

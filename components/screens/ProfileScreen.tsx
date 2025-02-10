@@ -17,6 +17,8 @@ import ConfirmationModal from '../modals/ConfirmationModal';
 import useModal from '@/hooks/useModal';
 import { ActionButton } from '../atoms/ActionButton';
 import { User } from '@/services/interfaces';
+import { useMutation } from '@tanstack/react-query';
+import { deleteProfileService, updateProfileService } from '@/services/me';
 
 const ProfileScreen = () => {
   const { clearTokenFromStore } = useAuthStore();
@@ -35,6 +37,31 @@ const ProfileScreen = () => {
   const [isEditFormVisible, setIsEditFormVisible] = useState(false);
   const { isLargeScreen } = useWebBreakPoints();
   const [editedData, setEditedData] = useState<User | null>(userData);
+  const [responseError, setResponseError] = useState<string>();
+
+  const { mutate: mutateUpdateProfile, isPending: isPendingUpdateProfile } = useMutation({
+    mutationFn: updateProfileService,
+    onSuccess: (data, variables) => {
+      // const { input } = variables.formData;
+      console.log('datas-uccess', { variables });
+      setResponseError('');
+    },
+    onError: (error: string) => {
+      setResponseError(error);
+    },
+  });
+
+  const { mutate: mutateDeletProfile, isPending: isPendingDeleteProfile } = useMutation({
+    mutationFn: deleteProfileService,
+    onSuccess: () => {
+      clearTokenFromStore();
+      hideModalDeleteProfile();
+      router.replace('/');
+    },
+    onError: (error: string) => {
+      console.log('error', error);
+    },
+  });
 
   // Add this useEffect to sync with userData updates
   useEffect(() => {
@@ -61,6 +88,10 @@ const ProfileScreen = () => {
 
   const handleDeleteProfile = () => {
     showModalDeleteProfile();
+  };
+
+  const handleDeleteProfileClick = () => {
+    mutateDeletProfile();
   };
 
   function handleEditProfile() {
@@ -128,32 +159,49 @@ const ProfileScreen = () => {
           noOfLinesValue={2}
         />
         {isEditFormVisible && (
-          <Container style={tailwind('flex-row items-center justify-center gap-4')}>
-            <ActionButton
-              uppercase={true}
-              label={'Cancel'}
-              onPress={() => {
-                setIsEditFormVisible(false);
-                // setEditedData(userData)
-              }}
-              isOutline={true}
-              style={tailwind('rounded-lg')}
-            />
-            <ActionButton
-              uppercase={true}
-              label={'Save Changes'}
-              onPress={handleSubmit}
-              disabled={true}
-              style={tailwind('rounded-lg')}
-            />
-          </Container>
+          <>
+            {responseError && (
+              <TextContainer
+                style={tailwind('text-3 text-center text-red-400')}
+                className="text-center text-sm !text-red-400"
+                data={responseError}
+              />
+            )}
+            <Container style={tailwind('flex-row items-center justify-center gap-4')}>
+              <ActionButton
+                uppercase={true}
+                label={'Cancel'}
+                onPress={() => {
+                  setIsEditFormVisible(false);
+                  // setEditedData(userData)
+                }}
+                isOutline={true}
+                style={tailwind('rounded-lg')}
+              />
+              <ActionButton
+                uppercase={true}
+                label={'Save Changes'}
+                onPress={handleSubmit}
+                isLoading={isPendingUpdateProfile}
+                disabled={isPendingUpdateProfile}
+                style={tailwind('min-w-[8rem] rounded-lg')}
+              />
+            </Container>
+          </>
         )}
       </>
     );
   }
 
-  function handleSubmit(values: any) {
-    console.log('values', values);
+  function handleSubmit() {
+    if (editedData) {
+      const { firstName, lastName, email } = editedData;
+      mutateUpdateProfile({
+        firstName,
+        lastName,
+        email,
+      });
+    }
   }
 
   return (
@@ -235,10 +283,11 @@ const ProfileScreen = () => {
       </Container>
       <ConfirmationModal
         isModalVisible={openModalDeleteProfile}
-        handleAction={() => {}}
+        handleAction={handleDeleteProfileClick}
         closeModal={hideModalDeleteProfile}
         labelAction="Delete"
-        disabledAction={true}
+        isLoading={isPendingDeleteProfile}
+        disabledAction={isPendingDeleteProfile}
         message={'Are you sure you want to delete your profile?'}
       />
       <ConfirmationModal
