@@ -102,7 +102,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
 
   return (
     <div className=" overflow-y-auto bg-NAVBAR_BACKGROUND">
-      <div className="mx-auto max-w-2xl ">
+      <div className=" max-w-2xl ">
         <div className="rounded-xl border border-gray-800 bg-black p-4 sm:p-6">
           <div className="space-y-6">
             <ChatMessage isBot={true}>
@@ -171,7 +171,8 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                     </p>
                   </div>
                 </ChatMessage>
-                <div className="mt-6 flex justify-center">
+                <div className="mt-6 flex flex-col justify-center">
+                  {responseError && <div className="text-center text-red-500">{responseError}</div>}
                   <button
                     onClick={generateWorkout}
                     disabled={isPendingGenerateWorkout}
