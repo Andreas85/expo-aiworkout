@@ -22,13 +22,15 @@ export interface UserResponse {
 }
 
 export interface WorkoutPlan {
-  exercises: {
-    name: string;
-    sets: number;
-    reps: string;
-    rest: string;
+  workout: {
+    exercise_name: string;
+    duration: number;
+    reps: number;
+    rest: number;
+    weight: number;
   }[];
-  frequency: string;
-  duration: string;
-  notes: string;
+  name: string;
+  frequency?: string;
+  duration?: string;
+  notes?: string;
 }

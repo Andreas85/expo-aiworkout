@@ -25,6 +25,7 @@ import MyWorkoutNotLoggedInList from '../molecules/MyWorkoutNotLoggedInList';
 import { Workout } from '@/services/interfaces';
 import GenerateWorkoutModal from '../modals/GenerateWorkoutModal';
 import StarsIcon from '../atoms/AiStarsIcon';
+import GenerateWorkoutAiBot from '../modals/GenerateWorkoutAiBot';
 
 export default function MyWorkout() {
   const { isSmallScreen, isLargeScreen, isMediumScreen } = useBreakPoints();
@@ -129,7 +130,7 @@ export default function MyWorkout() {
         <Container
           style={[tailwind('flex-row items-center justify-between rounded-2xl ')]}
           className="mb-4 flex w-full flex-1 flex-col gap-2">
-          {/* <Container
+          <Container
             style={Platform.select({
               web: tailwind(
                 `mb-4  ${isMediumScreen ? 'flex-1 flex-col items-start justify-start' : 'flex w-full flex-row justify-between'}  gap-y-4`,
@@ -164,7 +165,10 @@ export default function MyWorkout() {
                     native: tailwind('rounded-xl px-2'),
                   }),
                 ]}
-                left={<StarsIcon height={20} width={20} />}
+                labelStyle={tailwind(isMediumScreen ? 'text-3.5' : '')}
+                left={
+                  <StarsIcon height={isMediumScreen ? 18 : 20} width={isMediumScreen ? 18 : 20} />
+                }
               />
               <ActionButton
                 label={'Add Workout'}
@@ -175,12 +179,15 @@ export default function MyWorkout() {
                     native: tailwind('rounded-xl px-3.5'),
                   }),
                 ]}
-                left={<AntDesign name="pluscircleo" size={20} color="white" />}
+                labelStyle={tailwind(isMediumScreen ? 'text-3.5' : '')}
+                left={
+                  <AntDesign name="pluscircleo" size={isMediumScreen ? 18 : 20} color="white" />
+                }
               />
             </Container>
-          </Container> */}
+          </Container>
 
-          <Container style={tailwind('mb-4 flex w-full flex-row justify-between gap-y-4')}>
+          {/* <Container style={tailwind('mb-4 flex w-full flex-row justify-between gap-y-4')}>
             <Text
               style={[
                 Platform.select({
@@ -205,7 +212,7 @@ export default function MyWorkout() {
               ]}
               left={<AntDesign name="pluscircleo" size={20} color="white" />}
             />
-          </Container>
+          </Container> */}
         </Container>
         <Container
           style={[tailwind('mb-4 border-[0.5px] border-white')]}
@@ -247,6 +254,7 @@ export default function MyWorkout() {
         toggleModal={hideGenerateModal}
         onComplete={() => console.log('Generate Workout')}
       /> */}
+      <GenerateWorkoutAiBot isVisible={openGenerateModal} toggleModal={hideGenerateModal} />
     </>
   );
 }

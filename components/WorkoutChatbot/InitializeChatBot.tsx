@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   FlatList,
-  ActivityIndicator,
   StyleSheet,
   Keyboard,
   TouchableWithoutFeedback,
@@ -18,14 +17,34 @@ import { STRING_DATA } from '@/utils/appConstants';
 import { UserResponse, WorkoutPlan } from '@/types';
 import { AntDesign } from '@expo/vector-icons';
 import { ActionButton } from '../atoms/ActionButton';
+import { useMutation } from '@tanstack/react-query';
+import { generateWorkoutService } from '@/services/workouts';
 
-function InitializeChatBot() {
+function InitializeChatBot(props: { toggleModal: () => void }) {
+  const { toggleModal } = props;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<UserResponse[]>([]);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+
   const [showSummary, setShowSummary] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const [responseError, setResponseError] = useState<string>();
+
+  const { mutate: mutateGenerateWorkout, isPending: isPendingGenerateWorkout } = useMutation({
+    mutationFn: generateWorkoutService,
+    onSuccess: (data, variables) => {
+      // const { input } = variables.formData;
+      console.log('datas-uccess', data);
+      const workoutPlan = data?.data;
+
+      setWorkoutPlan(workoutPlan);
+      setResponseError('');
+    },
+    onError: (error: string) => {
+      console.log('error', error);
+      setResponseError(error);
+    },
+  });
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -84,28 +103,14 @@ function InitializeChatBot() {
   };
 
   const generateWorkout = async () => {
-    setIsGenerating(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    const mockWorkout: WorkoutPlan = {
-      exercises: [
-        { name: 'Push-ups', sets: 3, reps: '12-15', rest: '60 sec' },
-        { name: 'Squats', sets: 4, reps: '10-12', rest: '90 sec' },
-        { name: 'Plank', sets: 3, reps: '45 sec', rest: '45 sec' },
-      ],
-      frequency: '3-4 times per week',
-      duration: '45 minutes',
-      notes:
-        'Start with a 5-minute warm-up. Focus on form over speed. Cool down with light stretching.',
-    };
-
-    setWorkoutPlan(mockWorkout);
-    setIsGenerating(false);
+    mutateGenerateWorkout({
+      prompt: 'Make me most fit person on earth in 5 days',
+    });
   };
 
   const saveWorkout = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    alert('Workout plan saved successfully!');
+    alert('Workout plan will be saved very soon!');
+    toggleModal();
   };
 
   const renderChatMessage = ({ item }: { item: UserResponse }) => (
@@ -184,14 +189,14 @@ function InitializeChatBot() {
 
         {!workoutPlan && showSummary && (
           <ActionButton
-            label={isGenerating ? 'Generating your workout plan...' : 'Generate Workout Plan'}
+            label={
+              isPendingGenerateWorkout ? 'Generating your workout plan...' : 'Generate Workout Plan'
+            }
             onPress={generateWorkout}
-            disabled={isGenerating}
-            isLoading={isGenerating}
+            disabled={isPendingGenerateWorkout}
+            isLoading={isPendingGenerateWorkout}
           />
         )}
-
-        {isGenerating && <ActivityIndicator size="large" color="#6b46c1" />}
       </View>
     </TouchableWithoutFeedback>
   );

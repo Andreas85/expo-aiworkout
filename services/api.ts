@@ -14,4 +14,5 @@ export const API_ENPOINTS = {
   SIGNIN_USING_OTP: '/auth/signin-using-otp',
   WORKOUT_SESSION: '/workout-sessions',
   ME: '/me',
+  WORKOUT_GENERATE: '/workouts/generate',
 };

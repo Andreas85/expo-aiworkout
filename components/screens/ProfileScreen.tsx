@@ -45,6 +45,7 @@ const ProfileScreen = () => {
       // const { input } = variables.formData;
       console.log('datas-uccess', { variables });
       setResponseError('');
+      setIsEditFormVisible(false);
     },
     onError: (error: string) => {
       setResponseError(error);
@@ -252,33 +253,37 @@ const ProfileScreen = () => {
           </Container>
 
           {renderUserDetailContainer()}
-          <Container
-            style={Platform.select({
-              web: tailwind('mb-4 w-full border-[0.5px] border-white'),
-              native: tailwind('mb-4 border-[0.5px] border-white '),
-            })}
-          />
-          <TouchableOpacity onPress={handleLogoutClick}>
-            <TextContainer
-              data={'Log Out'}
-              style={Platform.select({
-                web: tailwind(
-                  `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} `,
-                ),
-              })}
-            />
-          </TouchableOpacity>
+          {!isEditFormVisible && (
+            <>
+              <Container
+                style={Platform.select({
+                  web: tailwind('mb-4 w-full border-[0.5px] border-white'),
+                  native: tailwind('mb-4 border-[0.5px] border-white '),
+                })}
+              />
+              <TouchableOpacity onPress={handleLogoutClick}>
+                <TextContainer
+                  data={'Log Out'}
+                  style={Platform.select({
+                    web: tailwind(
+                      `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} text-WORKOUT_PURPLE `,
+                    ),
+                  })}
+                />
+              </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleDeleteProfile}>
-            <TextContainer
-              data={'Delete Profile'}
-              style={Platform.select({
-                web: tailwind(
-                  `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} `,
-                ),
-              })}
-            />
-          </TouchableOpacity>
+              <TouchableOpacity onPress={handleDeleteProfile}>
+                <TextContainer
+                  data={'Delete Profile'}
+                  style={Platform.select({
+                    web: tailwind(
+                      `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} text-red-400`,
+                    ),
+                  })}
+                />
+              </TouchableOpacity>
+            </>
+          )}
         </WrapperContainer>
       </Container>
       <ConfirmationModal
@@ -288,7 +293,10 @@ const ProfileScreen = () => {
         labelAction="Delete"
         isLoading={isPendingDeleteProfile}
         disabledAction={isPendingDeleteProfile}
-        message={'Are you sure you want to delete your profile?'}
+        message={
+          'Deleting your profile is permanent and cannot be undone. Are you sure you want to proceed?'
+        }
+        isDeleteAction={true}
       />
       <ConfirmationModal
         isModalVisible={openModalLogout}

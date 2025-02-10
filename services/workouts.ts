@@ -323,3 +323,16 @@ export const fetchPublicExerciseService = async () => {
     throw extractedErrorMessage(error?.response);
   }
 };
+
+export const generateWorkoutService = async (payload: { prompt: string }) => {
+  try {
+    const URL = API_ENPOINTS.WORKOUT_GENERATE;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: payload,
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};

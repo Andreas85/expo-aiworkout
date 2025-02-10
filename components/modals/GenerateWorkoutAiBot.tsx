@@ -98,7 +98,7 @@ const GenerateWorkoutAiBot = (props: IGenerateWorkoutAiBot) => {
                               `),
                 }),
               ]}>
-              <InitializeChatBot />
+              <InitializeChatBot toggleModal={toggleModal} />
             </ScrollView>
           </View>
         </TouchableWithoutFeedback>

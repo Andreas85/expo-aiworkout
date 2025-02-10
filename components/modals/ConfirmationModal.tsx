@@ -13,6 +13,7 @@ interface IConfirmationModal {
   labelAction: string;
   isLoading?: boolean;
   disabledAction?: boolean;
+  isDeleteAction?: boolean;
   handleAction: () => void;
 }
 
@@ -25,6 +26,7 @@ function ConfirmationModal(props: IConfirmationModal) {
     isLoading,
     message,
     labelAction,
+    isDeleteAction,
     disabledAction,
   } = props;
 
@@ -51,7 +53,7 @@ function ConfirmationModal(props: IConfirmationModal) {
                 label={labelAction}
                 disabled={disabledAction || isLoading}
                 onPress={handleAction}
-                style={tailwind('grow rounded-md')}
+                style={tailwind(`grow rounded-md ${isDeleteAction ? 'bg-red-500' : ''}`)}
               />
             </Container>
           </Container>

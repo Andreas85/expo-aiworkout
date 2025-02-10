@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface QuestionInputProps {
   question: { type: string; options?: readonly string[]; question: string };
@@ -8,11 +8,17 @@ interface QuestionInputProps {
 }
 
 export function QuestionInput({ question, value, onChange, onSubmit }: QuestionInputProps) {
+  const [inputValue, setInputValue] = useState(typeof value === 'string' ? value : '');
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       onSubmit();
     }
+  };
+
+  const handleTextChange = (text: string) => {
+    setInputValue(text);
   };
 
   switch (question.type) {
@@ -52,7 +58,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
                 Array.isArray(value) && value.includes(option)
-                  ? 'bg-purple-500 text-white'
+                  ? 'bg-NAVBAR_BACKGROUND text-white'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}>
               {option}
@@ -91,8 +97,8 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
       return (
         <div className="flex flex-col gap-2">
           <textarea
-            value={value as string}
-            onChange={e => onChange(e.target.value)}
+            value={inputValue as string}
+            onChange={e => handleTextChange(e.target.value)}
             onKeyDown={handleKeyDown}
             className="w-full resize-none rounded-lg border border-gray-700 bg-gray-900 p-3 text-white outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
             rows={3}

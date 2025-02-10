@@ -1,19 +1,23 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { ActionButton } from '../atoms/ActionButton';
+import { tailwind } from '@/utils/tailwind';
 
 interface Exercise {
-  name: string;
-  sets: number;
-  reps: string;
-  rest: string;
+  exercise_name: string;
+  duration: number;
+  reps: number;
+  rest: number;
+  weight: number;
 }
 
 interface WorkoutPlanProps {
   plan: {
-    exercises: Exercise[];
-    frequency: string;
-    duration: string;
+    workout: Exercise[];
+    name: string;
+    frequency?: string;
+    duration?: string;
     notes?: string;
   };
   onSave: () => void;
@@ -30,24 +34,29 @@ export function WorkoutPlanView({ plan, onSave }: WorkoutPlanProps) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Workout Details</Text>
         <View style={styles.detailsRow}>
+          <Text style={styles.detailLabel}>Name:</Text>
+          <Text style={styles.detailText}>{plan.name}</Text>
+        </View>
+        {/* <View style={styles.detailsRow}>
           <Text style={styles.detailLabel}>Frequency:</Text>
           <Text style={styles.detailText}>{plan.frequency}</Text>
         </View>
         <View style={styles.detailsRow}>
           <Text style={styles.detailLabel}>Duration:</Text>
           <Text style={styles.detailText}>{plan.duration}</Text>
-        </View>
+        </View> */}
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Exercises</Text>
-        {plan.exercises.map((exercise, index) => (
+        {plan.workout.map((exercise, index) => (
           <View key={index} style={styles.exerciseCard}>
-            <Text style={styles.exerciseName}>{exercise.name}</Text>
+            <Text style={styles.exerciseName}>{exercise.exercise_name}</Text>
             <View style={styles.exerciseDetails}>
-              <Text style={styles.exerciseText}>Sets: {exercise.sets}</Text>
+              <Text style={styles.exerciseText}>Duration: {exercise.duration}</Text>
               <Text style={styles.exerciseText}>Reps: {exercise.reps}</Text>
               <Text style={styles.exerciseText}>Rest: {exercise.rest}</Text>
+              <Text style={styles.exerciseText}>Weight: {exercise.weight}</Text>
             </View>
           </View>
         ))}
@@ -60,9 +69,11 @@ export function WorkoutPlanView({ plan, onSave }: WorkoutPlanProps) {
         </View>
       )}
 
-      <TouchableOpacity style={styles.saveButton} onPress={onSave}>
-        <Text style={styles.saveButtonText}>Save Workout Plan</Text>
-      </TouchableOpacity>
+      <ActionButton
+        label={'Create and Save Workout'}
+        onPress={onSave}
+        style={tailwind('grow rounded-md')}
+      />
     </View>
   );
 }
