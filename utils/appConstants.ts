@@ -8,6 +8,8 @@ export const STRING_DATA = {
   REST: 'rest',
   CAMERA: 'Camera',
   GALLERY: 'Gallery',
+  BOT_DEFAULT_MESSAGE: `Hi! I'm your personal trainer bot. I'll help you create a customized workout plan. Let's start with a few questions to understand your goals and preferences better.`,
+  BOT_REVIEW_MESSAGE: `Please review your answers above. Click "Generate Workout Plan" if you're ready to proceed, or use the back button to make changes.`,
 };
 
 export const NAVBAR_TABS: INavbarTabs[] = [

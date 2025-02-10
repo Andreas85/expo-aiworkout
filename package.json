@@ -55,6 +55,7 @@
     "expo-web-browser": "~13.0.3",
     "formik": "^2.4.6",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.475.0",
     "pauseable": "^0.3.2",
     "react": "18.2.0",
     "react-cropper": "^2.3.3",

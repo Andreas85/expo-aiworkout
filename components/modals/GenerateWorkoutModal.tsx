@@ -135,7 +135,7 @@ const GenerateWorkoutModal = (props: IGenerateWorkoutProps) => {
             </TouchableOpacity>
 
             <LabelContainer
-              label={`Generate Workout ${JSON.stringify(isExtraSmallDevice)}`}
+              label={`Generate Workout`}
               labelStyle={styles.header}
               right={<StarsIcon brandColor={Colors.brandColor} />}
             />
