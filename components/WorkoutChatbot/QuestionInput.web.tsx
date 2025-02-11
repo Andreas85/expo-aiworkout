@@ -58,7 +58,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
                 Array.isArray(value) && value.includes(option)
-                  ? 'bg-NAVBAR_BACKGROUND text-white'
+                  ? 'bg-purple-300 text-white'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}>
               {option}

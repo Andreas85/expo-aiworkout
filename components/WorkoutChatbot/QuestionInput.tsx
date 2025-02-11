@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedOption: {
-    backgroundColor: '#6b46c1',
+    backgroundColor: '#d8b4fe',
   },
   optionText: {
     color: '#fff',
