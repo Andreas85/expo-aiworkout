@@ -14,16 +14,17 @@ interface Exercise {
 
 interface WorkoutPlanProps {
   plan: {
-    workout: Exercise[];
-    name: string;
+    workout?: Exercise[];
+    name?: string;
     frequency?: string;
     duration?: string;
     notes?: string;
   };
   onSave: () => void;
+  showSaveButton: boolean;
 }
 
-export function WorkoutPlanView({ plan, onSave }: WorkoutPlanProps) {
+export function WorkoutPlanView({ plan, onSave, showSaveButton }: WorkoutPlanProps) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -49,7 +50,7 @@ export function WorkoutPlanView({ plan, onSave }: WorkoutPlanProps) {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Exercises</Text>
-        {plan.workout.map((exercise, index) => (
+        {plan?.workout?.map((exercise, index) => (
           <View key={index} style={styles.exerciseCard}>
             <Text style={styles.exerciseName}>{exercise.exercise_name}</Text>
             <View style={styles.exerciseDetails}>
@@ -69,11 +70,13 @@ export function WorkoutPlanView({ plan, onSave }: WorkoutPlanProps) {
         </View>
       )}
 
-      <ActionButton
-        label={'Create and Save Workout'}
-        onPress={onSave}
-        style={tailwind('grow rounded-md')}
-      />
+      {showSaveButton && (
+        <ActionButton
+          label={'Save Workout Plan '}
+          onPress={onSave}
+          style={tailwind('rounded-lg')}
+        />
+      )}
     </View>
   );
 }

@@ -1,36 +1,41 @@
-declare module '*png';
-declare module '*jpg';
-declare module '*jpeg';
-declare module 'pauseable';
-declare module '*webp';
-declare module '*.mp3' {
-  const src: string;
-  export default src;
-}
-
 export type QuestionType = 'single-select' | 'multi-select' | 'yes-no' | 'text';
+
+export interface QuestionOption {
+  label: string;
+  next: string;
+}
 
 export interface Question {
   question: string;
   type: QuestionType;
-  options?: string[];
+  options?: QuestionOption[];
+  next?: string;
+  message?: string;
+}
+
+export interface Questions {
+  [key: string]: Question;
 }
 
 export interface UserResponse {
-  questionIndex: number;
+  questionId: string;
   answer: string | string[];
+  question: string;
 }
 
 export interface WorkoutPlan {
-  workout: {
-    exercise_name: string;
-    duration: number;
-    reps: number;
-    rest: number;
-    weight: number;
+  exercises: {
+    name: string;
+    sets: number;
+    reps: string;
+    rest: string;
   }[];
-  name: string;
-  frequency?: string;
-  duration?: string;
-  notes?: string;
+  frequency: string;
+  duration: string;
+  notes: string;
+}
+
+export interface WorkoutFeedback {
+  rating: 'good' | 'needs_changes';
+  feedback?: string;
 }

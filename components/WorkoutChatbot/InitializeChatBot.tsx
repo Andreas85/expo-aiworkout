@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -20,6 +20,8 @@ import { ActionButton } from '../atoms/ActionButton';
 import { useChatBot } from '@/hooks/useChatBot';
 import TextContainer from '../atoms/TextContainer';
 import { tailwind } from '@/utils/tailwind';
+
+import { WorkoutFeedbackView } from './WorkoutFeedback';
 
 function InitializeChatBot(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
@@ -45,12 +47,16 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
   };
 
   const {
-    currentQuestionIndex,
+    currentQuestionId,
     responses,
     workoutPlan,
     showSummary,
     isPendingGenerateWorkout,
     responseError,
+
+    isWorkoutApproved,
+    showFeedback,
+    handleFeedback,
     handleAnswer,
     handleContinue,
     getCurrentResponse,
@@ -73,29 +79,30 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
             onContentSizeChange={() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
             }}>
-            <View>
+            <>
               <ChatMessage isBot={true}>{STRING_DATA.BOT_DEFAULT_MESSAGE}</ChatMessage>
-              {responses.map((item, index) => (
-                <React.Fragment key={index}>
-                  <ChatMessage isBot={true}>{questions[item.questionIndex].question}</ChatMessage>
-                  <ChatMessage isBot={false}>
-                    {Array.isArray(item.answer) ? item.answer.join(', ') : item.answer}
-                  </ChatMessage>
-                </React.Fragment>
-              ))}
+              {responses.map((item, index) => {
+                return (
+                  <React.Fragment key={index}>
+                    <ChatMessage isBot={true}>{questions[item.questionId].question}</ChatMessage>
 
-              {!workoutPlan && !showSummary && currentQuestionIndex < questions.length && (
+                    <ChatMessage isBot={false}>
+                      {Array.isArray(item.answer) ? item.answer.join(', ') : item.answer}
+                    </ChatMessage>
+                  </React.Fragment>
+                );
+              })}
+
+              {!workoutPlan && currentQuestionId !== 'end' && (
                 <>
                   <ChatMessage isBot={true}>
                     <TouchableOpacity style={{ paddingRight: 8 }} onPress={goBack}>
                       <AntDesign name="arrowleft" size={10} color={'#fff'} />
                     </TouchableOpacity>
-                    <Text style={styles.senderText}>
-                      {questions[currentQuestionIndex].question}
-                    </Text>
+                    <Text style={styles.senderText}>{questions[currentQuestionId].question}</Text>
                   </ChatMessage>
                   <QuestionInput
-                    question={questions[currentQuestionIndex]}
+                    question={questions[currentQuestionId]}
                     value={getCurrentResponse()}
                     onChange={handleAnswerClick}
                     onSubmit={handleContinue}
@@ -103,30 +110,24 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                 </>
               )}
 
-              {showSummary && !workoutPlan && (
-                <ChatMessage isBot={true} wrapChildren={true}>
-                  <Text style={styles.summaryTitle}>✅ Summary of Your Responses</Text>
-                  {responses.map((response, index) => (
-                    <View style={styles.responseContainer} key={index}>
-                      <Text style={styles.responseQuestion} numberOfLines={2} ellipsizeMode="tail">
-                        {questions[response.questionIndex].question}
-                      </Text>
-                      <Text style={styles.responseAnswer} numberOfLines={3} ellipsizeMode="tail">
-                        {Array.isArray(response.answer)
-                          ? response.answer.join(', ')
-                          : response.answer}
-                      </Text>
-                    </View>
-                  ))}
-                  <Text style={styles.reviewText}>{STRING_DATA.BOT_REVIEW_MESSAGE}</Text>
-                </ChatMessage>
+              {workoutPlan && (
+                <>
+                  <WorkoutPlanView
+                    plan={workoutPlan}
+                    onSave={saveWorkout}
+                    showSaveButton={isWorkoutApproved}
+                  />
+                  {showFeedback && !isWorkoutApproved && (
+                    <ChatMessage isBot={true}>
+                      <WorkoutFeedbackView onSubmit={handleFeedback} />
+                    </ChatMessage>
+                  )}
+                </>
               )}
-
-              {workoutPlan && <WorkoutPlanView plan={workoutPlan} onSave={saveWorkout} />}
-            </View>
+            </>
           </ScrollView>
 
-          {!workoutPlan && showSummary && (
+          {!workoutPlan && currentQuestionId === 'end' && (
             <>
               {responseError && (
                 <TextContainer
@@ -142,6 +143,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                     : 'Generate Workout Plan'
                 }
                 onPress={generateWorkout}
+                style={tailwind('rounded-lg')}
                 disabled={isPendingGenerateWorkout}
                 isLoading={isPendingGenerateWorkout}
               />

@@ -1,24 +1,27 @@
+import { Question } from '@/types';
 import React, { useState } from 'react';
 
 interface QuestionInputProps {
-  question: { type: string; options?: readonly string[]; question: string };
+  question: Question;
   value: string | string[];
   onChange: (value: string | string[]) => void;
   onSubmit: () => void;
 }
 
 export function QuestionInput({ question, value, onChange, onSubmit }: QuestionInputProps) {
-  const [inputValue, setInputValue] = useState(typeof value === 'string' ? value : '');
-
+  const [tempValue, setTempValue] = useState<string | string[]>(value);
+  // console.log('QuestionInput', { question, value });
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      onChange(tempValue);
       onSubmit();
     }
   };
 
-  const handleTextChange = (text: string) => {
-    setInputValue(text);
+  const handleSubmit = () => {
+    onChange(tempValue);
+    onSubmit();
   };
 
   switch (question.type) {
@@ -27,17 +30,17 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
         <div className="flex flex-col gap-2">
           {question.options?.map(option => (
             <button
-              key={option}
+              key={option.label}
               onClick={() => {
-                onChange(option);
+                onChange(option.label);
                 onSubmit();
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
-                value === option
+                value === option.label
                   ? 'bg-purple-500 text-white'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}>
-              {option}
+              {option.label}
             </button>
           ))}
         </div>
@@ -48,24 +51,24 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
         <div className="flex flex-col gap-2">
           {question.options?.map(option => (
             <button
-              key={option}
+              key={option.label}
               onClick={() => {
-                const currentValue = Array.isArray(value) ? value : [];
-                const newValue = currentValue.includes(option)
-                  ? currentValue.filter(v => v !== option)
-                  : [...currentValue, option];
-                onChange(newValue);
+                const currentValue = Array.isArray(tempValue) ? tempValue : [];
+                const newValue = currentValue.includes(option.label)
+                  ? currentValue.filter(v => v !== option.label)
+                  : [...currentValue, option.label];
+                setTempValue(newValue);
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
-                Array.isArray(value) && value.includes(option)
+                Array.isArray(tempValue) && tempValue.includes(option.label)
                   ? 'bg-purple-300 text-white'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}>
-              {option}
+              {option.label}
             </button>
           ))}
           <button
-            onClick={onSubmit}
+            onClick={handleSubmit}
             className="mt-2 rounded-lg bg-purple-500 p-3 text-white transition-colors hover:bg-purple-600">
             Continue
           </button>
@@ -75,19 +78,19 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
     case 'yes-no':
       return (
         <div className="flex gap-2">
-          {['Yes', 'No'].map(option => (
+          {question.options?.map(option => (
             <button
-              key={option}
+              key={option.label}
               onClick={() => {
-                onChange(option);
+                onChange(option.label);
                 onSubmit();
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
-                value === option
+                value === option.label
                   ? 'bg-purple-500 text-white'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}>
-              {option}
+              {option.label}
             </button>
           ))}
         </div>
@@ -97,15 +100,15 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
       return (
         <div className="flex flex-col gap-2">
           <textarea
-            value={inputValue as string}
-            onChange={e => handleTextChange(e.target.value)}
+            value={tempValue as string}
+            onChange={e => setTempValue(e.target.value)}
             onKeyDown={handleKeyDown}
             className="w-full resize-none rounded-lg border border-gray-700 bg-gray-900 p-3 text-white outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
             rows={3}
             placeholder="Type your answer here..."
           />
           <button
-            onClick={onSubmit}
+            onClick={handleSubmit}
             className="rounded-lg bg-purple-500 p-3 text-white transition-colors hover:bg-purple-600">
             Continue
           </button>

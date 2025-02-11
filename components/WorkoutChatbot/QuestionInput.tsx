@@ -1,8 +1,9 @@
+import { Question } from '@/types';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 interface QuestionInputProps {
-  question: { type: string; options?: readonly string[]; question: string };
+  question: Question;
   value: string | string[];
   onChange: (value: string | string[]) => void;
   onSubmit: () => void;
@@ -19,7 +20,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
       } else {
         onChange([...newValue, option]);
       }
-    } else if (question.type === 'type') {
+    } else if (question.type === 'text') {
       console.log('type', option);
       // onChange(option);
     } else {
@@ -40,14 +41,16 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
       {/* Single & Multi-Select */}
       {(question.type === 'single-select' || question.type === 'multi-select') &&
         question.options?.map(option => {
-          const isSelected = Array.isArray(value) ? value.includes(option) : value === option;
+          const isSelected = Array.isArray(value)
+            ? value.includes(option.label)
+            : value === option.label;
 
           return (
             <TouchableOpacity
-              key={option}
+              key={option.label}
               style={[styles.optionButton, isSelected && styles.selectedOption]}
-              onPress={() => handleSelectOption(option)}>
-              <Text style={styles.optionText}>{option}</Text>
+              onPress={() => handleSelectOption(option.label)}>
+              <Text style={styles.optionText}>{option.label}</Text>
             </TouchableOpacity>
           );
         })}
