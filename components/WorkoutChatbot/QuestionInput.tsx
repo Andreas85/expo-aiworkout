@@ -2,17 +2,21 @@ import { Question } from '@/types';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
+import { ActionButton } from '../atoms/ActionButton';
+import { tailwind } from '@/utils/tailwind';
+
 interface QuestionInputProps {
   question: Question;
   value: string | string[];
   onChange: (value: string | string[]) => void;
-  onSubmit: () => void;
+  onSubmit: (value: string | string[]) => void;
 }
 
 export function QuestionInput({ question, value, onChange, onSubmit }: QuestionInputProps) {
   const [inputValue, setInputValue] = useState(typeof value === 'string' ? value : '');
 
   const handleSelectOption = (option: string) => {
+    console.log('option', option);
     if (question.type === 'multi-select') {
       const newValue = Array.isArray(value) ? [...value] : [];
       if (newValue.includes(option)) {
@@ -25,13 +29,18 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
       // onChange(option);
     } else {
       onChange(option);
-      onSubmit();
+      onSubmit(option);
     }
   };
 
   const handleTextChange = (text: string) => {
     console.log('text', text);
     setInputValue(text);
+  };
+
+  const handleSubmit = () => {
+    onChange(inputValue);
+    onSubmit(inputValue);
   };
 
   return (
@@ -80,15 +89,20 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
             placeholderTextColor="#aaa"
             multiline
           />
-          <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
-            <Text style={styles.submitText}>Continue</Text>
-          </TouchableOpacity>
+
+          <ActionButton
+            label={'Continue'}
+            onPress={handleSubmit}
+            disabled={!inputValue}
+            type="submit"
+            style={tailwind('rounded-lg')}
+          />
         </>
       )}
 
       {/* Submit Button for Multi-Select */}
       {question.type === 'multi-select' && (
-        <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
+        <TouchableOpacity style={styles.submitButton} onPress={() => onSubmit(value)}>
           <Text style={styles.submitText}>Continue</Text>
         </TouchableOpacity>
       )}

@@ -45,6 +45,7 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
 
   const handleAnswer = (answer: string | string[]) => {
     const currentQuestion = questions[currentQuestionId];
+
     const newResponses = [
       ...responses.filter(r => r.questionId !== currentQuestionId),
       { questionId: currentQuestionId, answer, question: currentQuestion.question },
@@ -52,9 +53,9 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
 
     setResponses(newResponses);
 
-    if (currentQuestion.type === 'multi-select' || currentQuestion.type === 'text') {
-      return; // Don't advance automatically for multi-select and text
-    }
+    // if (currentQuestion.type === 'multi-select' || currentQuestion.type === 'text') {
+    //   return; // Don't advance automatically for multi-select and text
+    // }
 
     // Find the next question
     let nextQuestionId: string;
@@ -67,16 +68,20 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
       nextQuestionId = 'end';
     }
 
+    console.log('handleAnswer', { nextQuestionId });
+
     setCurrentQuestionId(nextQuestionId);
   };
 
-  const handleContinue = () => {
+  const handleContinue = (answer: string | string[]) => {
     const currentQuestion = questions[currentQuestionId];
+    console.log('handleContinue', { currentQuestion, answer });
     if (currentQuestion.next) {
       setCurrentQuestionId(currentQuestion.next);
-    } else if (currentQuestion.options) {
-      setCurrentQuestionId(currentQuestion.options[0].next);
     }
+    // else if (currentQuestion.options) {
+    //   setCurrentQuestionId(currentQuestion.options[0].next);
+    // }
   };
 
   const getCurrentResponse = () => {

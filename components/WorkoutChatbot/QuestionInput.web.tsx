@@ -1,11 +1,13 @@
 import { Question } from '@/types';
 import React, { useState } from 'react';
+import { ActionButton } from '../atoms/ActionButton';
+import { tailwind } from '@/utils/tailwind';
 
 interface QuestionInputProps {
   question: Question;
   value: string | string[];
   onChange: (value: string | string[]) => void;
-  onSubmit: () => void;
+  onSubmit: (value: string | string[]) => void;
 }
 
 export function QuestionInput({ question, value, onChange, onSubmit }: QuestionInputProps) {
@@ -15,13 +17,13 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       onChange(tempValue);
-      onSubmit();
+      onSubmit(tempValue);
     }
   };
 
   const handleSubmit = () => {
     onChange(tempValue);
-    onSubmit();
+    onSubmit(tempValue);
   };
 
   switch (question.type) {
@@ -33,7 +35,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
               key={option.label}
               onClick={() => {
                 onChange(option.label);
-                onSubmit();
+                onSubmit(option.label);
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
                 value === option.label
@@ -83,7 +85,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
               key={option.label}
               onClick={() => {
                 onChange(option.label);
-                onSubmit();
+                onSubmit(option.label);
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
                 value === option.label
@@ -107,11 +109,14 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
             rows={3}
             placeholder="Type your answer here..."
           />
-          <button
-            onClick={handleSubmit}
-            className="rounded-lg bg-purple-500 p-3 text-white transition-colors hover:bg-purple-600">
-            Continue
-          </button>
+
+          <ActionButton
+            label={'Continue'}
+            onPress={handleSubmit}
+            disabled={!tempValue}
+            type="submit"
+            style={tailwind('rounded-lg')}
+          />
         </div>
       );
 

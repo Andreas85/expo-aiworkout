@@ -96,9 +96,11 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
               {!workoutPlan && currentQuestionId !== 'end' && (
                 <>
                   <ChatMessage isBot={true}>
-                    <TouchableOpacity style={{ paddingRight: 8 }} onPress={goBack}>
-                      <AntDesign name="arrowleft" size={10} color={'#fff'} />
-                    </TouchableOpacity>
+                    {responses.length > 0 && (
+                      <TouchableOpacity style={{ paddingRight: 8 }} onPress={goBack}>
+                        <AntDesign name="arrowleft" size={10} color={'#fff'} />
+                      </TouchableOpacity>
+                    )}
                     <Text style={styles.senderText}>{questions[currentQuestionId].question}</Text>
                   </ChatMessage>
                   <QuestionInput
@@ -112,13 +114,16 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
 
               {workoutPlan && (
                 <>
-                  <WorkoutPlanView
-                    plan={workoutPlan}
-                    onSave={saveWorkout}
-                    showSaveButton={isWorkoutApproved}
-                  />
+                  <ChatMessage isBot={true} wrapChildren={true}>
+                    <WorkoutPlanView
+                      plan={workoutPlan}
+                      onSave={saveWorkout}
+                      showSaveButton={isWorkoutApproved}
+                    />
+                  </ChatMessage>
+
                   {showFeedback && !isWorkoutApproved && (
-                    <ChatMessage isBot={true}>
+                    <ChatMessage isBot={true} wrapChildren={true}>
                       <WorkoutFeedbackView onSubmit={handleFeedback} />
                     </ChatMessage>
                   )}

@@ -133,9 +133,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 4,
+    flex: 1,
   },
   exerciseText: {
     color: '#bbb',
+    flex: 1,
   },
   notesText: {
     color: '#bbb',
@@ -151,68 +153,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-// import React from 'react';
-// import { Dumbbell } from 'lucide-react';
-// import { WorkoutPlan } from '@/types';
-
-// interface WorkoutPlanProps {
-//   plan: WorkoutPlan;
-//   onSave: () => void;
-// }
-
-// export function WorkoutPlanView({ plan, onSave }: WorkoutPlanProps) {
-//   return (
-//     <div className="rounded-lg bg-gray-900 p-6">
-//       <div className="mb-6 flex items-center gap-2">
-//         <Dumbbell className="h-6 w-6 text-purple-500" />
-//         <h2 className="text-2xl font-bold text-white">Your Personalized Workout Plan</h2>
-//       </div>
-
-//       <div className="space-y-6">
-//         <div>
-//           <h3 className="mb-2 text-lg font-semibold text-white">Workout Details</h3>
-//           <div className="grid grid-cols-2 gap-4 text-sm">
-//             <div>
-//               <span className="text-gray-400">Frequency:</span>
-//               <p className="font-medium text-white">{plan.frequency}</p>
-//             </div>
-//             <div>
-//               <span className="text-gray-400">Duration:</span>
-//               <p className="font-medium text-white">{plan.duration}</p>
-//             </div>
-//           </div>
-//         </div>
-
-//         <div>
-//           <h3 className="mb-2 text-lg font-semibold text-white">Exercises</h3>
-//           <div className="space-y-4">
-//             {plan.exercises.map((exercise, index) => (
-//               <div key={index} className="rounded-lg bg-gray-800 p-4">
-//                 <h4 className="font-medium text-white">{exercise.name}</h4>
-//                 <div className="mt-2 grid grid-cols-3 gap-2 text-sm text-gray-300">
-//                   <div>Sets: {exercise.sets}</div>
-//                   <div>Reps: {exercise.reps}</div>
-//                   <div>Rest: {exercise.rest}</div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         {plan.notes && (
-//           <div>
-//             <h3 className="mb-2 text-lg font-semibold text-white">Additional Notes</h3>
-//             <p className="text-gray-300">{plan.notes}</p>
-//           </div>
-//         )}
-
-//         <button
-//           onClick={onSave}
-//           className="w-full rounded-lg bg-purple-500 p-3 text-white transition-colors hover:bg-purple-600">
-//           Save Workout Plan
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
