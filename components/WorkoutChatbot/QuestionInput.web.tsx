@@ -17,12 +17,12 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       onChange(tempValue);
-      onSubmit(tempValue);
+      // onSubmit(tempValue);
     }
   };
 
   const handleSubmit = () => {
-    onChange(tempValue);
+    // onChange(tempValue);
     onSubmit(tempValue);
   };
 
@@ -35,7 +35,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
               key={option.label}
               onClick={() => {
                 onChange(option.label);
-                onSubmit(option.label);
+                // onSubmit(option.label);
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
                 value === option.label
@@ -85,7 +85,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
               key={option.label}
               onClick={() => {
                 onChange(option.label);
-                onSubmit(option.label);
+                // onSubmit(option.label);
               }}
               className={`rounded-lg p-3 text-left transition-colors ${
                 value === option.label

@@ -57,9 +57,10 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
     setResponses(newResponses);
 
     if (currentQuestion.type === 'multi-select' || currentQuestion.type === 'text') {
-      if (currentQuestion.options) {
-        setCurrentQuestionId(currentQuestion.options[0].next);
-      }
+      // console.log('handleAnswer', { currentQuestion, answer });
+      // if (currentQuestion.options) {
+      //   setCurrentQuestionId(currentQuestion.options[0].next);
+      // }
       return; // Don't advance automatically for multi-select and text
     }
 
@@ -81,13 +82,16 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
 
   const handleContinue = (answer: string | string[]) => {
     const currentQuestion = questions[currentQuestionId];
-    // console.log('handleContinue', { currentQuestion, answer });
+    console.log('(INFO):: handleContinue', {
+      currentQuestionData: currentQuestion,
+
+      currentQuestionNext: currentQuestion.next,
+    });
     if (currentQuestion.next) {
       setCurrentQuestionId(currentQuestion.next);
+    } else if (currentQuestion.options) {
+      setCurrentQuestionId(currentQuestion.options[0].next);
     }
-    // else if (currentQuestion.options) {
-    //   setCurrentQuestionId(currentQuestion.options[0].next);
-    // }
   };
 
   const getCurrentResponse = () => {
@@ -110,8 +114,8 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
   };
 
   const handleGenerateWorkout = (hasFeedback?: boolean, feedback?: string) => {
-    // const payload = formatFitnessData(responses, workoutPlan ?? null, feedback);
-    // console.table(payload);
+    const payload = formatFitnessData(responses, workoutPlan ?? null, feedback);
+    console.log(payload);
     // mutateGenerateWorkout({ workoutPlanResponse: payload });
 
     mutateGenerateWorkout({

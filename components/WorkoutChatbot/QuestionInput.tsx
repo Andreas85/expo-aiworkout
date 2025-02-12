@@ -1,6 +1,6 @@
 import { Question } from '@/types';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 
 import { ActionButton } from '../atoms/ActionButton';
 import { tailwind } from '@/utils/tailwind';
@@ -16,8 +16,9 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
   const [inputValue, setInputValue] = useState(typeof value === 'string' ? value : '');
 
   const handleSelectOption = (option: string) => {
-    console.log('option', option);
     if (question.type === 'multi-select') {
+      console.log('optmulti-selection', option);
+
       const newValue = Array.isArray(value) ? [...value] : [];
       if (newValue.includes(option)) {
         onChange(newValue.filter(v => v !== option));
@@ -29,7 +30,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
       // onChange(option);
     } else {
       onChange(option);
-      onSubmit(option);
+      // onSubmit(option);
     }
   };
 
@@ -39,7 +40,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
   };
 
   const handleSubmit = () => {
-    onChange(inputValue);
+    // onChange(inputValue);
     onSubmit(inputValue);
   };
 
@@ -55,12 +56,12 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
             : value === option.label;
 
           return (
-            <TouchableOpacity
+            <Pressable
               key={option.label}
               style={[styles.optionButton, isSelected && styles.selectedOption]}
               onPress={() => handleSelectOption(option.label)}>
               <Text style={styles.optionText}>{option.label}</Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
 
@@ -69,12 +70,12 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
         ['Yes', 'No'].map(option => {
           const isSelected = value === option;
           return (
-            <TouchableOpacity
+            <Pressable
               key={option}
               style={[styles.optionButton, isSelected && styles.selectedOption]}
               onPress={() => handleSelectOption(option)}>
               <Text style={styles.optionText}>{option}</Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
 
@@ -104,9 +105,9 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
 
       {/* Submit Button for Multi-Select */}
       {question.type === 'multi-select' && (
-        <TouchableOpacity style={styles.submitButton} onPress={() => onSubmit(value)}>
+        <Pressable style={styles.submitButton} onPress={() => onSubmit(value)}>
           <Text style={styles.submitText}>Continue</Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );
