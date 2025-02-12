@@ -168,7 +168,7 @@ const ProfileScreen = () => {
                 data={responseError}
               />
             )}
-            <Container style={tailwind('flex-row items-center justify-center gap-4')}>
+            <Container style={tailwind('flex-row items-center justify-start gap-4')}>
               <ActionButton
                 uppercase={true}
                 label={'Cancel'}
@@ -268,6 +268,7 @@ const ProfileScreen = () => {
                     web: tailwind(
                       `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} text-WORKOUT_PURPLE `,
                     ),
+                    native: tailwind('text-WORKOUT_PURPLE'),
                   })}
                 />
               </TouchableOpacity>
@@ -279,6 +280,7 @@ const ProfileScreen = () => {
                     web: tailwind(
                       `${isLargeScreen ? 'text-[0.875rem]' : 'text-[1.25rem]  not-italic '} text-red-400`,
                     ),
+                    native: tailwind('text-red-400'),
                   })}
                 />
               </TouchableOpacity>

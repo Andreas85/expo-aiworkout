@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import { QuestionInput } from './QuestionInput';
 import { questions } from './questions';
@@ -8,7 +8,6 @@ import { WorkoutPlanView } from './WorkoutPlan';
 import { STRING_DATA } from '@/utils/appConstants';
 import { useChatBot } from '@/hooks/useChatBot';
 import { WorkoutFeedbackView } from './WorkoutFeedback.web';
-import { Text } from 'react-native';
 
 function InitializeChatBot(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
@@ -16,7 +15,6 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
     currentQuestionId,
     responses,
     workoutPlan,
-    showSummary,
     responseError,
     isPendingGenerateWorkout,
 

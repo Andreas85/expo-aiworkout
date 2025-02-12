@@ -87,7 +87,9 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
             onChangeText={text => handleTextChange(text)}
             placeholder="Type your answer..."
             placeholderTextColor="#aaa"
-            multiline
+            multiline={true}
+            numberOfLines={4}
+            textAlignVertical="top" // Aligns text to the top
           />
 
           <ActionButton

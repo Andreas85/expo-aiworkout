@@ -5,12 +5,12 @@ import { generateWorkoutService } from '@/services/workouts';
 import { questions } from '@/components/WorkoutChatbot/questions';
 import { FlatList } from 'react-native-gesture-handler';
 import usePlatform from './usePlatform';
+import { formatFitnessData } from '@/utils/AiWorkoutPlanHelper';
 
 export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void) => {
   const { isWeb } = usePlatform();
   const [currentQuestionId, setCurrentQuestionId] = useState('entry');
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<UserResponse[]>([]);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
   const [showSummary, setShowSummary] = useState(false);
@@ -19,7 +19,10 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
   const [responseError, setResponseError] = useState<string>();
   const [showFeedback, setShowFeedback] = useState(false);
   const [isWorkoutApproved, setIsWorkoutApproved] = useState(false);
-  const [currentFeedback, setCurrentFeedback] = useState<WorkoutFeedback | null>(null);
+  const [currentFeedback, setCurrentFeedback] = useState<WorkoutFeedback>({
+    rating: 'good',
+    feedback: '',
+  });
 
   const { mutate: mutateGenerateWorkout, isPending: isPendingGenerateWorkout } = useMutation({
     mutationFn: generateWorkoutService,
@@ -53,9 +56,12 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
 
     setResponses(newResponses);
 
-    // if (currentQuestion.type === 'multi-select' || currentQuestion.type === 'text') {
-    //   return; // Don't advance automatically for multi-select and text
-    // }
+    if (currentQuestion.type === 'multi-select' || currentQuestion.type === 'text') {
+      if (currentQuestion.options) {
+        setCurrentQuestionId(currentQuestion.options[0].next);
+      }
+      return; // Don't advance automatically for multi-select and text
+    }
 
     // Find the next question
     let nextQuestionId: string;
@@ -68,14 +74,14 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
       nextQuestionId = 'end';
     }
 
-    console.log('handleAnswer', { nextQuestionId });
+    // console.log('handleAnswer', { nextQuestionId });
 
     setCurrentQuestionId(nextQuestionId);
   };
 
   const handleContinue = (answer: string | string[]) => {
     const currentQuestion = questions[currentQuestionId];
-    console.log('handleContinue', { currentQuestion, answer });
+    // console.log('handleContinue', { currentQuestion, answer });
     if (currentQuestion.next) {
       setCurrentQuestionId(currentQuestion.next);
     }
@@ -103,16 +109,24 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
     }
   };
 
-  const generateWorkout = async () => {
+  const handleGenerateWorkout = (hasFeedback?: boolean, feedback?: string) => {
+    // const payload = formatFitnessData(responses, workoutPlan ?? null, feedback);
+    // console.table(payload);
+    // mutateGenerateWorkout({ workoutPlanResponse: payload });
+
     mutateGenerateWorkout({
       prompt: 'Make me the most fit person on earth in 5 days',
     });
+  };
+
+  const generateWorkout = () => {
+    handleGenerateWorkout();
 
     setShowFeedback(true);
   };
 
   const saveWorkout = async () => {
-    console.log('saveWorkout', responses);
+    // console.log('saveWorkout', responses);
     alert('Workout plan will be saved soon!');
     toggleModal();
   };
@@ -126,14 +140,13 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
       setWorkoutPlan(null);
       setShowFeedback(false);
 
-      mutateGenerateWorkout({ prompt: 'Make me the most fit person on earth in 5 days' });
+      handleGenerateWorkout(true, feedback.feedback); // Regenerate workout with feedback
 
       setShowFeedback(true);
     }
   };
 
   return {
-    currentQuestionIndex,
     responses,
     workoutPlan,
     showSummary,

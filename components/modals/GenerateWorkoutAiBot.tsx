@@ -76,7 +76,11 @@ const GenerateWorkoutAiBot = ({ isVisible, toggleModal }: IGenerateWorkoutAiBot)
       animationOut="fadeOut">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={tailwind('mx-auto rounded-lg bg-NAVBAR_BACKGROUND p-4')}>
+          <View
+            style={Platform.select({
+              web: tailwind('mx-auto rounded-lg bg-NAVBAR_BACKGROUND p-4'),
+              native: tailwind('rounded-lg bg-NAVBAR_BACKGROUND p-4'),
+            })}>
             {/* Close Button */}
             <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="#fff" />

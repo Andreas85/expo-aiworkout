@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     marginTop: 4,
+    flex: 1,
   },
   botBubble: {
     backgroundColor: '#1a202c',

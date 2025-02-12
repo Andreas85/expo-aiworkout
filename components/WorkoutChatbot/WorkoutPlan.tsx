@@ -54,7 +54,7 @@ export function WorkoutPlanView({ plan, onSave, showSaveButton }: WorkoutPlanPro
           <View key={index} style={styles.exerciseCard}>
             <Text style={styles.exerciseName}>{exercise.exercise_name}</Text>
             <View style={styles.exerciseDetails}>
-              <Text style={styles.exerciseText}>Duration: {exercise.duration}</Text>
+              {/* <Text style={styles.exerciseText}>Duration: {exercise.duration}</Text> */}
               <Text style={styles.exerciseText}>Reps: {exercise.reps}</Text>
               <Text style={styles.exerciseText}>Rest: {exercise.rest}</Text>
               <Text style={styles.exerciseText}>Weight: {exercise.weight}</Text>
