@@ -22,7 +22,8 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
   };
 
   const handleSubmit = () => {
-    // onChange(tempValue);
+    console.log('tempValue', tempValue);
+    onChange(tempValue);
     onSubmit(tempValue);
   };
 

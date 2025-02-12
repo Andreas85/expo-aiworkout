@@ -15,23 +15,25 @@ interface QuestionInputProps {
 export function QuestionInput({ question, value, onChange, onSubmit }: QuestionInputProps) {
   const [inputValue, setInputValue] = useState(typeof value === 'string' ? value : '');
 
-  const handleSelectOption = (option: string) => {
-    if (question.type === 'multi-select') {
-      console.log('optmulti-selection', option);
+  const [tempValue, setTempValue] = useState<string | string[]>(value);
 
-      const newValue = Array.isArray(value) ? [...value] : [];
-      if (newValue.includes(option)) {
-        onChange(newValue.filter(v => v !== option));
-      } else {
-        onChange([...newValue, option]);
-      }
-    } else if (question.type === 'text') {
+  const handleSelectOption = (option: string) => {
+    if (question.type === 'text') {
       console.log('type', option);
       // onChange(option);
     } else {
       onChange(option);
       // onSubmit(option);
     }
+  };
+
+  const handleMultiSelectOption = (optionLabel: string) => {
+    const currentValue = Array.isArray(tempValue) ? tempValue : [];
+    console.log('currentValue', { currentValue, optionLabel, inputValue });
+    const newValue = currentValue.includes(optionLabel)
+      ? currentValue.filter(v => v !== optionLabel)
+      : [...currentValue, optionLabel];
+    setTempValue(newValue);
   };
 
   const handleTextChange = (text: string) => {
@@ -44,12 +46,17 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
     onSubmit(inputValue);
   };
 
+  const onMultiSelectSubmit = () => {
+    onChange(tempValue);
+    onSubmit(tempValue);
+  };
+
   return (
     <View style={styles.container}>
       {/* <Text style={styles.questionText}>{question.question}</Text> */}
 
       {/* Single & Multi-Select */}
-      {(question.type === 'single-select' || question.type === 'multi-select') &&
+      {question.type === 'single-select' &&
         question.options?.map(option => {
           const isSelected = Array.isArray(value)
             ? value.includes(option.label)
@@ -105,9 +112,26 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
 
       {/* Submit Button for Multi-Select */}
       {question.type === 'multi-select' && (
-        <Pressable style={styles.submitButton} onPress={() => onSubmit(value)}>
-          <Text style={styles.submitText}>Continue</Text>
-        </Pressable>
+        <>
+          {question.options?.map(option => {
+            return (
+              <Pressable
+                key={option.label}
+                style={[
+                  styles.optionButton,
+                  Array.isArray(tempValue) &&
+                    tempValue.includes(option.label) &&
+                    styles.selectedOption,
+                ]}
+                onPress={() => handleMultiSelectOption(option.label)}>
+                <Text style={styles.optionText}>{option.label}</Text>
+              </Pressable>
+            );
+          })}
+          <Pressable style={styles.submitButton} onPress={() => onMultiSelectSubmit()}>
+            <Text style={styles.submitText}>Continue</Text>
+          </Pressable>
+        </>
       )}
     </View>
   );

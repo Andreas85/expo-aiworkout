@@ -3,9 +3,9 @@ import { useMutation } from '@tanstack/react-query';
 import { UserResponse, WorkoutFeedback, WorkoutPlan } from '@/types';
 import { generateWorkoutService } from '@/services/workouts';
 import { questions } from '@/components/WorkoutChatbot/questions';
-import { FlatList } from 'react-native-gesture-handler';
 import usePlatform from './usePlatform';
 import { formatFitnessData } from '@/utils/AiWorkoutPlanHelper';
+import { ScrollView } from 'react-native';
 
 export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void) => {
   const { isWeb } = usePlatform();
@@ -15,7 +15,7 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
   const [showSummary, setShowSummary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const flatListRef = useRef<FlatList>(null);
+  const nativeListRef = useRef<ScrollView>(null);
   const [responseError, setResponseError] = useState<string>();
   const [showFeedback, setShowFeedback] = useState(false);
   const [isWorkoutApproved, setIsWorkoutApproved] = useState(false);
@@ -43,6 +43,8 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
   useEffect(() => {
     if (currentQuestionId !== 'entry' && isWeb) {
       messageEndScrollToBottomInWeb();
+    } else if (currentQuestionId !== 'entry' && !isWeb) {
+      nativeListRef.current?.scrollToEnd({ animated: true });
     }
   }, [currentQuestionId, workoutPlan, showSummary]);
 
@@ -57,10 +59,11 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
     setResponses(newResponses);
 
     if (currentQuestion.type === 'multi-select' || currentQuestion.type === 'text') {
-      // console.log('handleAnswer', { currentQuestion, answer });
-      // if (currentQuestion.options) {
-      //   setCurrentQuestionId(currentQuestion.options[0].next);
-      // }
+      console.log('(INFO)::handleAnswer with type multi-select or text ', {
+        currentQuestion,
+        answer,
+      });
+
       return; // Don't advance automatically for multi-select and text
     }
 
@@ -157,7 +160,7 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
     responseError,
     isPendingGenerateWorkout,
     messagesEndRef,
-    flatListRef,
+    nativeListRef,
     currentQuestionId,
     isWorkoutApproved,
     showFeedback,

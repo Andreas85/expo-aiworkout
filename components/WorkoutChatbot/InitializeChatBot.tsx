@@ -22,11 +22,13 @@ import TextContainer from '../atoms/TextContainer';
 import { tailwind } from '@/utils/tailwind';
 
 import { WorkoutFeedbackView } from './WorkoutFeedback';
+import useBreakPoints from '@/hooks/useBreakPoints';
 
 function InitializeChatBot(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
 
   const scrollViewRef = useRef<ScrollView>(null);
+  const { isExtraSmallDevice } = useBreakPoints();
 
   useEffect(() => {
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
@@ -73,9 +75,9 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
           style={{ flex: 1 }}>
           <ScrollView
             ref={scrollViewRef}
-            // style={{
-            //   height: 400,
-            // }}
+            style={{
+              height: isExtraSmallDevice ? 350 : 400,
+            }}
             onContentSizeChange={() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
             }}>
@@ -83,18 +85,18 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
               <ChatMessage isBot={true}>{STRING_DATA.BOT_DEFAULT_MESSAGE}</ChatMessage>
               {responses.map((item, index) => {
                 return (
-                  <React.Fragment key={index}>
+                  <TouchableOpacity key={index} activeOpacity={1}>
                     <ChatMessage isBot={true}>{questions[item.questionId].question}</ChatMessage>
 
                     <ChatMessage isBot={false}>
                       {Array.isArray(item.answer) ? item.answer.join(', ') : item.answer}
                     </ChatMessage>
-                  </React.Fragment>
+                  </TouchableOpacity>
                 );
               })}
 
               {!workoutPlan && currentQuestionId !== 'end' && (
-                <>
+                <TouchableOpacity activeOpacity={1}>
                   <ChatMessage isBot={true}>
                     {responses.length > 0 && (
                       <TouchableOpacity style={{ paddingRight: 8 }} onPress={goBack}>
@@ -109,11 +111,11 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                     onChange={handleAnswerClick}
                     onSubmit={handleContinue}
                   />
-                </>
+                </TouchableOpacity>
               )}
 
               {workoutPlan && (
-                <>
+                <TouchableOpacity activeOpacity={1}>
                   <ChatMessage isBot={true} wrapChildren={true}>
                     <WorkoutPlanView
                       plan={workoutPlan}
@@ -127,7 +129,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                       <WorkoutFeedbackView onSubmit={handleFeedback} />
                     </ChatMessage>
                   )}
-                </>
+                </TouchableOpacity>
               )}
             </>
           </ScrollView>

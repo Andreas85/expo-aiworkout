@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Text,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { tailwind } from '@/utils/tailwind';
@@ -17,6 +18,11 @@ import InitializeChatBot from '../WorkoutChatbot/InitializeChatBot';
 import LabelContainer from '../atoms/LabelContainer';
 import Colors from '@/constants/Colors';
 import StarsIcon from '../atoms/AiStarsIcon';
+import { useAuthStore } from '@/store/authStore';
+import Container from '../atoms/Container';
+import NoDataSvg from '../svgs/NoDataSvg';
+import { ActionButton } from '../atoms/ActionButton';
+import { router } from 'expo-router';
 
 interface IGenerateWorkoutAiBot {
   isVisible: boolean;
@@ -58,6 +64,7 @@ const useKeyboardVisibility = () => {
 const GenerateWorkoutAiBot = ({ isVisible, toggleModal }: IGenerateWorkoutAiBot) => {
   const { isExtraSmallDevice, isMobileDevice } = useBreakPoints();
   const isKeyboardVisible = useKeyboardVisibility();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   // Dynamic max height calculation based on device type and keyboard visibility
   const scrollContainerStyle = useCallback(() => {
@@ -66,6 +73,25 @@ const GenerateWorkoutAiBot = ({ isVisible, toggleModal }: IGenerateWorkoutAiBot)
     if (isExtraSmallDevice) return tailwind(isKeyboardVisible ? 'max-h-[230px]' : 'max-h-[350px]');
     return undefined;
   }, [isKeyboardVisible, isMobileDevice, isExtraSmallDevice]);
+
+  const handleSignIn = () => {
+    toggleModal();
+    router.push('/(auth)/signin');
+  };
+
+  const renderWorkoutContainer = () => {
+    if (isAuthenticated) {
+      return <InitializeChatBot toggleModal={toggleModal} />;
+    }
+    return (
+      <Container style={tailwind('w-full items-center justify-center gap-y-4 self-center p-8')}>
+        <Text style={tailwind('self-center  font-semibold text-white')}>
+          Please sign to perform this action
+        </Text>
+        <ActionButton label="Sign In" onPress={handleSignIn} />
+      </Container>
+    );
+  };
 
   return (
     <Modal
@@ -92,13 +118,11 @@ const GenerateWorkoutAiBot = ({ isVisible, toggleModal }: IGenerateWorkoutAiBot)
               labelStyle={styles.header}
               right={<StarsIcon brandColor={Colors.brandColor} />}
             />
-
-            {/* Chatbot Scrollable Section */}
             <ScrollView
               showsVerticalScrollIndicator={false}
               nestedScrollEnabled
               style={scrollContainerStyle()}>
-              <InitializeChatBot toggleModal={toggleModal} />
+              {renderWorkoutContainer()}
             </ScrollView>
           </View>
         </TouchableWithoutFeedback>
