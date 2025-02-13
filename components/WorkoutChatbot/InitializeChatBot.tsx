@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { ChatMessage } from './ChatMessage';
 import { QuestionInput } from './QuestionInput';
@@ -23,9 +24,12 @@ import { tailwind } from '@/utils/tailwind';
 
 import { WorkoutFeedbackView } from './WorkoutFeedback';
 import useBreakPoints from '@/hooks/useBreakPoints';
+import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
 
 function InitializeChatBot(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
+  const { height } = useWindowDimensions();
+  const isKeyboardVisible = useKeyboardVisibility();
 
   const scrollViewRef = useRef<ScrollView>(null);
   const { isExtraSmallDevice } = useBreakPoints();
@@ -67,22 +71,56 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
     saveWorkout,
   } = useChatBot(toggleModal, scrollToBottom);
 
+  const isGenerateWorkoutbuttonPlanVisible = !workoutPlan && currentQuestionId === 'end';
+
+  // const getDynamicHeight = () => {
+  // return isExtraSmallDevice
+  //   ? height * 0.9 - (isGenerateWorkoutbuttonPlanVisible ? 100 : 50)
+  //   : height * 0.9 - 50;
+  // };
+
+  const getDynamicHeight = () => {
+    if (isKeyboardVisible) {
+      return isExtraSmallDevice
+        ? height * 0.5 // Reduce height further for extra small devices
+        : height * 0.75; // Adjust for other devices
+    }
+    return isExtraSmallDevice
+      ? height * 0.9 - (isGenerateWorkoutbuttonPlanVisible ? 100 : 50)
+      : height * 0.9 - 50;
+  };
+  const scrollHeightStyle = useCallback(() => {
+    return {
+      height: getDynamicHeight(),
+    };
+  }, [isKeyboardVisible, isGenerateWorkoutbuttonPlanVisible, isExtraSmallDevice, height]);
+
+  useEffect(() => {
+    if (isKeyboardVisible) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 200); // Slight delay ensures proper scrolling
+    }
+  }, [isKeyboardVisible]);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={{ flex: 1 }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          // keyboardVerticalOffset={0}
           style={{ flex: 1 }}>
           <ScrollView
             ref={scrollViewRef}
-            style={{
-              height: isExtraSmallDevice ? 350 : 400,
-            }}
+            style={[
+              isKeyboardVisible && isExtraSmallDevice ? { height: 200 } : scrollHeightStyle(),
+            ]}
+            keyboardShouldPersistTaps="handled"
             onContentSizeChange={() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
             }}>
             <>
-              <ChatMessage isBot={true}>{STRING_DATA.BOT_DEFAULT_MESSAGE}</ChatMessage>
+              <ChatMessage isBot={true}>{STRING_DATA.BOT_DEFAULT_MESSAGE} </ChatMessage>
               {responses.map((item, index) => {
                 return (
                   <TouchableOpacity key={index} activeOpacity={1}>
@@ -96,15 +134,16 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
               })}
 
               {!workoutPlan && currentQuestionId !== 'end' && (
-                <TouchableOpacity activeOpacity={1}>
+                <TouchableOpacity activeOpacity={1} style={tailwind('flex-1')}>
                   <ChatMessage isBot={true}>
                     {responses.length > 0 && (
                       <TouchableOpacity style={{ paddingRight: 8 }} onPress={goBack}>
                         <AntDesign name="arrowleft" size={10} color={'#fff'} />
                       </TouchableOpacity>
                     )}
-                    <Text style={styles.senderText}>{questions[currentQuestionId].question}</Text>
+                    <Text style={styles.senderText}>{questions[currentQuestionId].question} </Text>
                   </ChatMessage>
+
                   <QuestionInput
                     question={questions[currentQuestionId]}
                     value={getCurrentResponse()}
@@ -133,9 +172,8 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
               )}
             </>
           </ScrollView>
-
           {!workoutPlan && currentQuestionId === 'end' && (
-            <>
+            <TouchableOpacity activeOpacity={1}>
               {responseError && (
                 <TextContainer
                   style={tailwind('text-3 text-center text-red-400')}
@@ -154,7 +192,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                 disabled={isPendingGenerateWorkout}
                 isLoading={isPendingGenerateWorkout}
               />
-            </>
+            </TouchableOpacity>
           )}
         </KeyboardAvoidingView>
       </View>

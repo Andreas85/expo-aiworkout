@@ -89,16 +89,18 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
       {/* Text Input */}
       {question.type === 'text' && (
         <>
-          <TextInput
-            style={styles.input}
-            value={typeof value === 'string' ? inputValue : ''}
-            onChangeText={text => handleTextChange(text)}
-            placeholder="Type your answer..."
-            placeholderTextColor="#aaa"
-            multiline={true}
-            numberOfLines={4}
-            textAlignVertical="top" // Aligns text to the top
-          />
+          <View style={{ flex: 1 }}>
+            <TextInput
+              style={styles.input}
+              value={typeof value === 'string' ? inputValue : ''}
+              onChangeText={text => handleTextChange(text)}
+              placeholder="Type your answer..."
+              placeholderTextColor="#aaa"
+              multiline
+              numberOfLines={4} // Ensure enough lines for visibility
+              textAlignVertical="top"
+            />
+          </View>
 
           <ActionButton
             label={'Continue'}

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGES_KEYS } from './appConstants';
 import { mapExerciseElementToExercise } from './helper';
 import { ExerciseElement } from '@/services/interfaces';
-import { FlatList } from 'react-native';
+import { FlatList, Platform } from 'react-native';
 
 export interface WorkoutSession {
   _id: string;
@@ -397,30 +397,63 @@ export const scrollToIndex = (
   totalItems: number,
   options: { animated?: boolean; viewPosition?: number } = {},
   isLargeScreen = false,
+  exerciseData: any[],
 ) => {
-  if (flatListRef.current) {
-    const { animated = true } = options;
-    try {
-      // Ensure the index is within valid bounds
-      const validIndex = Math.max(0, Math.min(index, totalItems - 1));
+  if (Platform.OS === 'web') {
+    if (flatListRef.current) {
+      const { animated = true } = options;
+      try {
+        // Ensure the index is within valid bounds
+        const validIndex = Math.max(0, Math.min(index, totalItems - 1));
 
-      // Calculate the offset to fully show the item
-      const offset = Math.max(0, validIndex * itemHeight - containerHeight / 2 + itemHeight / 2);
-      if (isLargeScreen) {
-        flatListRef.current.scrollToOffset({
-          offset,
-          animated,
-        });
-      } else {
-        flatListRef.current.scrollToIndex({
-          index: validIndex,
-          animated,
-          viewOffset: 20,
-          viewPosition: validIndex === 0 || validIndex === totalItems - 1 ? 0 : 0.5, // Keep center for non-edge indices
-        });
+        // Calculate the offset to fully show the item
+        const offset = Math.max(0, validIndex * itemHeight - containerHeight / 2 + itemHeight / 2);
+        if (isLargeScreen) {
+          flatListRef.current.scrollToOffset({
+            offset,
+            animated,
+          });
+        } else {
+          flatListRef.current.scrollToIndex({
+            index: validIndex,
+            animated,
+            viewOffset: 20,
+            viewPosition: validIndex === 0 || validIndex === totalItems - 1 ? 0 : 0.5, // Keep center for non-edge indices
+          });
+        }
+      } catch (error) {
+        console.warn('Error scrolling to index:', error);
       }
-    } catch (error) {
-      console.warn('Error scrolling to index:', error);
     }
+  } else {
+    console.log('Scrolling to index: ${plaform}', { index, exerciseData });
+    smartScrollToIndex(index, exerciseData, flatListRef);
   }
+};
+
+export const smartScrollToIndex = (
+  index: number,
+  exerciseData: any[],
+  flatListRef: React.RefObject<FlatList<any>>,
+) => {
+  if (!flatListRef.current || index < 0 || index >= exerciseData.length) return;
+
+  const scrollParams = {
+    animated: true,
+    viewPosition: 0.5,
+  };
+
+  // Edge cases handling
+  if (index === 0) {
+    scrollParams.viewPosition = 0;
+  } else if (index === exerciseData.length - 1) {
+    scrollParams.viewPosition = 1;
+  }
+
+  setTimeout(() => {
+    flatListRef.current?.scrollToIndex({
+      index,
+      ...scrollParams,
+    });
+  }, 100);
 };

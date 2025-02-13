@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, Platform } from 'react-native';
+import { FlatList, Platform, View } from 'react-native';
 
 import { tailwind } from '@/utils/tailwind';
 import StartWorkoutExerciseCardWrapper from './StartWorkoutExerciseCardWrapper';
@@ -16,6 +16,7 @@ import useModal from '@/hooks/useModal';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import {
   scrollToIndex,
+  smartScrollToIndex,
   updateWorkoutSessionStatus,
   WorkoutSession,
 } from '@/utils/workoutSessionHelper';
@@ -39,6 +40,19 @@ const StartWorkoutExercisesList = (props: any) => {
   const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const muted = interactionStore(state => state.muted);
+  const itemHeights = useRef<{ [key: string]: number }>({});
+
+  // Modify your onItemLayout to handle missing heights
+  const onItemLayout = (event: any, index: number, itemId: string) => {
+    const height = event.nativeEvent.layout.height;
+    if (!itemHeights.current[itemId]) {
+      itemHeights.current[itemId] = height;
+      // Trigger re-render if height changed significantly
+      if (Math.abs(height - ITEM_HEIGHT) > 10) {
+        smartScrollToIndex(selectedIndex, exerciseData, flatListRef);
+      }
+    }
+  };
   const {
     updateRemainingTime,
     updateWorkoutTimer,
@@ -50,6 +64,8 @@ const StartWorkoutExercisesList = (props: any) => {
   const flatListRef = useRef<FlatList>(null); // Add ref for the FlatList
   const [selectedIndex, setSelectedIndex] = useState<number>(0); // State to track selected index
   const [showModal, setShowModel] = useState(false);
+  const [containerHeight, setContainerHeight] = useState(CONTAINER_HEIGHT);
+
   const {
     openModal: openWorkoutComplete,
     showModal: showModelWorkoutComplete,
@@ -134,18 +150,7 @@ const StartWorkoutExercisesList = (props: any) => {
         hasRunInitially.current = true;
         setSelectedIndex(reqIndex);
         setTimeout(() => {
-          scrollToIndex(
-            flatListRef,
-            reqIndex,
-            ITEM_HEIGHT,
-            CONTAINER_HEIGHT,
-            workoutExercises.length,
-            {
-              animated: true,
-              viewPosition: 0.5,
-            },
-            isLargeScreen,
-          );
+          handleScrollBehaviorBasedOnPlatform(reqIndex);
         }, 100);
       }
     }
@@ -276,18 +281,7 @@ const StartWorkoutExercisesList = (props: any) => {
 
     if (nextIndex >= exerciseData.length) return; // No further scrolling if at the end
     setSelectedIndex(nextIndex);
-    scrollToIndex(
-      flatListRef,
-      nextIndex,
-      ITEM_HEIGHT,
-      CONTAINER_HEIGHT,
-      exerciseData.length,
-      {
-        animated: true,
-        viewPosition: 0.5,
-      },
-      isLargeScreen,
-    );
+    handleScrollBehaviorBasedOnPlatform(nextIndex);
   };
 
   // Scroll to a specific item by index
@@ -377,21 +371,23 @@ const StartWorkoutExercisesList = (props: any) => {
   const renderListItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
       return (
-        <StartWorkoutExerciseCardWrapper
-          key={item?._id}
-          exercise={item}
-          isLast={exerciseData?.length ? index === exerciseData?.length - 1 : false}
-          isFirst={index === 0}
-          index={index}
-          isCompleted={index < selectedIndex}
-          onIncrement={onIncrement}
-          onDecrement={onDecrement}
-          isSelectedWorkout={selectedIndex === index}
-          handleNextExercise={scrollToItem}
-          handleNextRestExercise={scrollToItem}
-          handleNextRepsExercise={handleNextRepsExercise}
-          isRestCard={item?.type === STRING_DATA.REST}
-        />
+        <View onLayout={event => onItemLayout(event, index, item.exerciseId)}>
+          <StartWorkoutExerciseCardWrapper
+            key={item?._id}
+            exercise={item}
+            isLast={exerciseData?.length ? index === exerciseData?.length - 1 : false}
+            isFirst={index === 0}
+            index={index}
+            isCompleted={index < selectedIndex}
+            onIncrement={onIncrement}
+            onDecrement={onDecrement}
+            isSelectedWorkout={selectedIndex === index}
+            handleNextExercise={scrollToItem}
+            handleNextRestExercise={scrollToItem}
+            handleNextRepsExercise={handleNextRepsExercise}
+            isRestCard={item?.type === STRING_DATA.REST}
+          />
+        </View>
       );
     },
     [selectedIndex, exerciseData],
@@ -399,13 +395,32 @@ const StartWorkoutExercisesList = (props: any) => {
 
   // Layout optimization for FlatList
   const getItemLayout = useCallback(
-    (_: any, index: number) => ({
-      length: 200,
-      offset: 200 * index,
-      index,
-    }),
-    [],
+    (data: ArrayLike<ExerciseElement> | null | undefined, index: number) => {
+      if (isWeb) {
+        return { length: 200, offset: 200 * index, index };
+      }
+      let offset = 0;
+      for (let i = 0; i < index; i++) {
+        const itemId = exerciseData?.[i]?.exerciseId;
+        offset += itemHeights.current[itemId ?? ''] || ITEM_HEIGHT;
+      }
+
+      return {
+        length: itemHeights.current[exerciseData?.[index]?.exerciseId ?? ''] || ITEM_HEIGHT,
+        offset,
+        index,
+      };
+    },
+    [exerciseData],
   );
+
+  useEffect(() => {
+    if (selectedIndex >= 0 && selectedIndex < exerciseData.length && flatListRef.current) {
+      if (!isWeb) {
+        handleScrollBehaviorBasedOnPlatform(selectedIndex);
+      }
+    }
+  }, [containerHeight, selectedIndex, exerciseData]);
 
   const renderButtonInWeb = () => {
     if (isWeb) {
@@ -422,12 +437,29 @@ const StartWorkoutExercisesList = (props: any) => {
     }
   };
 
+  function handleScrollBehaviorBasedOnPlatform(nextIndex: number) {
+    scrollToIndex(
+      flatListRef,
+      nextIndex,
+      ITEM_HEIGHT,
+      CONTAINER_HEIGHT,
+      exerciseData.length,
+      {
+        animated: true,
+        viewPosition: 0.5,
+      },
+      isLargeScreen,
+      exerciseData,
+    );
+  }
+
   return (
     <>
       {renderButtonInWeb()}
       <FlatList
         ref={flatListRef} // Attach the ref
         data={exerciseData}
+        onLayout={e => setContainerHeight(e.nativeEvent.layout.height)}
         initialNumToRender={7}
         maxToRenderPerBatch={7}
         updateCellsBatchingPeriod={50}
