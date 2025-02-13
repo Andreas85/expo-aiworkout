@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { formatTime } from '@/utils/helper';
+import useBreakPoints from '@/hooks/useBreakPoints';
 
 type ExerciseProps = {
   remainingTime: number; // Remaining time in seconds
@@ -15,6 +16,7 @@ const ExerciseDuration: React.FC<ExerciseProps> = ({
   elapsedTime,
   totalWorkoutTime,
 }) => {
+  const { isExtraSmallDevice } = useBreakPoints();
   const showRemainingTime = () => {
     if (remainingTime > 0) {
       return formatTime(remainingTime);
@@ -24,10 +26,12 @@ const ExerciseDuration: React.FC<ExerciseProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.remainingText}>{showRemainingTime()}</Text>
+      <Text style={{ ...styles.remainingText, fontSize: isExtraSmallDevice ? 24 : 30 }}>
+        {showRemainingTime()}
+      </Text>
       <View style={{ borderColor: Colors.gray, borderWidth: 1, width: '100%' }} />
       <View>
-        <Text style={styles.text}>
+        <Text style={{ ...styles.text, fontSize: isExtraSmallDevice ? 14 : 16 }}>
           {formatTime(elapsedTime)} / {formatTime(totalWorkoutTime)}
         </Text>
       </View>
@@ -45,13 +49,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   remainingText: {
-    fontSize: 30,
     fontWeight: 'bold',
     color: Colors.white,
     textAlign: 'center',
   },
   text: {
-    fontSize: 16,
     fontWeight: 'bold',
     color: Colors.gray,
     textAlign: 'center',

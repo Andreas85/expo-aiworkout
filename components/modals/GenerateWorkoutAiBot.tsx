@@ -136,7 +136,9 @@ export default GenerateWorkoutAiBot;
 const styles = StyleSheet.create({
   closeButton: {
     alignSelf: 'flex-end',
-    padding: 8,
+    position: 'absolute',
+    top: 16,
+    right: 10,
   },
   header: {
     fontSize: 20,
