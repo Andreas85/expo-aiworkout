@@ -444,10 +444,9 @@ export const smartScrollToIndex = (
   };
 
   // Edge cases handling
-  if (index === 0) {
+
+  if (index === 0 || index === exerciseData.length - 1) {
     scrollParams.viewPosition = 0;
-  } else if (index === exerciseData.length - 1) {
-    scrollParams.viewPosition = 1;
   }
 
   setTimeout(() => {
