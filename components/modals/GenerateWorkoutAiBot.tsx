@@ -23,6 +23,7 @@ import Container from '../atoms/Container';
 import { ActionButton } from '../atoms/ActionButton';
 import { router } from 'expo-router';
 import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 const GenerateWorkoutAiBot = ({
   isVisible,
@@ -32,12 +33,13 @@ const GenerateWorkoutAiBot = ({
   toggleModal: () => void;
 }) => {
   const { isExtraSmallDevice, isMobileDevice } = useBreakPoints();
+  const { isLargeScreen } = useWebBreakPoints();
   const isKeyboardVisible = useKeyboardVisibility();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const { height } = useWindowDimensions();
 
   const getScrollHeight = () => {
-    if (Platform.OS === 'web') return 500; // Fixed max height for web
+    if (Platform.OS === 'web') return isLargeScreen ? 500 : height * 0.9; // Fixed max height for web
 
     if (isExtraSmallDevice) {
       return isKeyboardVisible ? 340 : height * 0.9;
@@ -82,13 +84,16 @@ const GenerateWorkoutAiBot = ({
       animationIn="fadeIn"
       animationOut="fadeOut"
       style={Platform.select({
-        web: tailwind(''),
+        // web: tailwind(''),
+        web: isLargeScreen ? { margin: 0, justifyContent: 'flex-end' } : {},
         native: { margin: 0, justifyContent: 'flex-end' }, // Full-screen modal
       })}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View
           style={Platform.select({
-            web: tailwind('mx-auto rounded-lg bg-NAVBAR_BACKGROUND p-4'),
+            web: isLargeScreen
+              ? styles.modalContainer
+              : tailwind('mx-auto rounded-lg bg-NAVBAR_BACKGROUND p-4'),
             native: styles.modalContainer,
           })}>
           {/* Close Button */}

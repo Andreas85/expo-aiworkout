@@ -8,9 +8,11 @@ import { WorkoutPlanView } from './WorkoutPlan';
 import { STRING_DATA } from '@/utils/appConstants';
 import { useChatBot } from '@/hooks/useChatBot';
 import { WorkoutFeedbackView } from './WorkoutFeedback.web';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 function InitializeChatBot(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
+  const { isLargeScreen } = useWebBreakPoints();
   const {
     currentQuestionId,
     responses,
@@ -31,14 +33,13 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
   } = useChatBot(toggleModal);
 
   return (
-    <div className=" overflow-y-auto bg-NAVBAR_BACKGROUND">
+    <div
+      className={` ${isLargeScreen ? 'h-full max-h-full min-h-[80vh]' : 'max-h-[60vh]'} overflow-y-auto rounded-xl border border-gray-800 bg-black `}>
       <div className=" max-w-2xl ">
-        <div className="rounded-xl border border-gray-800 bg-black p-4 sm:p-6">
-          <div className="space-y-6">
+        <div className="p-4 sm:p-6">
+          <div className=" space-y-6">
             <ChatMessage isBot={true}>
-              <p className="text-lg font-medium text-white">
-                {STRING_DATA.BOT_DEFAULT_MESSAGE}1321
-              </p>
+              <p className="text-lg font-medium text-white">{STRING_DATA.BOT_DEFAULT_MESSAGE}</p>
             </ChatMessage>
 
             {responses.map((response, index) => (
