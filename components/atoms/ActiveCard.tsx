@@ -42,6 +42,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
   const hasReps = !!item?.reps;
   const repsValue = item?.reps ?? 0;
   const durationValue = item?.duration ?? 0;
+  const weightValue = item?.weight ?? 0;
 
   const { mutate: mutateUpdateExerciseToWorkoutRequest } = useMutation({
     mutationFn: updateExerciseToWorkoutRequest,
@@ -58,7 +59,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
     },
   });
 
-  // For Reps newDuration is (no of reps) / For Rest newDuration is (no. of seconds
+  // For Reps newDuration is (no of reps) / For Rest newDuration is (no. of seconds) /  (no. of weights)
   const handlePress = async (newDuration: number) => {
     if (isAuthenticated) {
       console.log('Active-card', { item, newDuration });
@@ -87,7 +88,42 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
     updateExercisePropertyZustand(item.order, 'reps', newDuration);
   };
 
-  const onPressMinusHandler = async () => {
+  // For Reps newDuration is (no of reps) / For Rest newDuration is (no. of seconds) /  (no. of weights)
+  const handlePressWeight = async (newWeight: number) => {
+    if (isAuthenticated) {
+      console.log('Active-card', { item, newWeight });
+      // Modify 'reps' based on 'isEnabled'
+      const payload = {
+        formData: {
+          index: item?.order,
+          exercise: {
+            weight: newWeight ?? 0,
+            ...(hasReps && { weight: newWeight }),
+          },
+        },
+        queryParams: { id: workoutSessionDetails?.workoutId },
+      };
+      debouncedMutate(mutateUpdateExerciseToWorkoutRequest, payload);
+    } else {
+      console.log('Normal exercise-Active-card', { item });
+      await updateExerciseProperty(slug ?? '', item?._id ?? '', 'weight', newWeight);
+      updateExercisePropertyOfWorkout(
+        workoutSessionDetails?.workoutId ?? '',
+        item?._id,
+        'weight',
+        newWeight,
+      );
+    }
+    updateExercisePropertyZustand(item.order, 'weight', newWeight);
+  };
+
+  const onPressMinusHandler = async (isWeightActionButton?: boolean) => {
+    if (isWeightActionButton) {
+      console.log('Weight action button clicked');
+      const newWeight = weightValue - 1;
+      handlePressWeight(newWeight);
+      return;
+    }
     if (item.reps && item.reps > 0) {
       if (repsValue > 0) {
         const newDuration = repsValue - 1;
@@ -98,7 +134,13 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
     }
   };
 
-  const onPressPlusHandler = () => {
+  const onPressPlusHandler = (isWeightActionButton?: boolean) => {
+    if (isWeightActionButton) {
+      console.log('Weight action button clicked');
+      const newWeight = weightValue + 1;
+      handlePressWeight(newWeight);
+      return;
+    }
     if (item.reps !== undefined) {
       const newDuration = repsValue + 1;
       handlePress(newDuration);
@@ -108,12 +150,13 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
     // onIncrementHandler?.(item.reps + 1);
   };
 
-  const renderActionButtons = () => {
+  const renderActionButtons = (props: { isWeightActionButton?: boolean } = {}) => {
+    const { isWeightActionButton = false } = props;
     if (hasReps && isWorkoutOwner) {
       return (
         <>
-          <MinusActionButton onPressMinus={onPressMinusHandler} />
-          <PlusActionButton onPressPlus={onPressPlusHandler} />
+          <MinusActionButton onPressMinus={() => onPressMinusHandler(isWeightActionButton)} />
+          <PlusActionButton onPressPlus={() => onPressPlusHandler(isWeightActionButton)} />
         </>
       );
     }
@@ -121,52 +164,101 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
 
   const renderExerciseInfo = () => {
     return (
-      <Container
-        style={Platform.select({
-          web: tailwind(
-            `flex-1 ${isLargeScreen ? '' : 'gap-12'} flex-row  items-center justify-center  `,
-          ),
-          native: tailwind('flex-1 flex-row items-center justify-center self-center '),
-        })}>
+      <>
         <Container
           style={Platform.select({
-            web: tailwind(`flex-1 items-center justify-center gap-[0.75rem]`),
-            native: tailwind(
-              `${hasReps ? 'w-full flex-1' : 'w-full flex-1  '} self-center'  items-center justify-start gap-[0.75rem]`,
+            web: tailwind(
+              `flex-1 ${isLargeScreen ? '' : 'gap-12'} flex-row  items-center justify-center  `,
             ),
+            native: tailwind('flex-1 flex-row items-center justify-center self-center '),
           })}>
-          <ShowLabelValue
-            label={hasReps ? 'No. of Reps ' : 'Duration'}
-            value={
-              hasReps
-                ? `${repsValue}`
-                : `${durationValue ? `${pluralise(durationValue, `${durationValue} second`)}` : '-'}`
-            }
-            container={{
-              web: `  flex-1  items-start justify-center `,
-              native: 'flex-1  flex-row items-start justify-center',
-            }}
-            labelContainer={{
-              web: `flex-1`,
-              native: `${hasReps ? 'flex-none' : 'flex-1'} text-[0.8175rem]`,
-            }}
-            valueContainer={{
-              web: `flex-1 text-[0.8175rem]`,
-              native: hasReps ? 'flex-1 text-center' : 'flex-3',
-            }}
-            // noOfLinesValue={1}
-          />
+          <Container
+            style={Platform.select({
+              web: tailwind(`flex-1 items-center justify-center gap-[0.75rem]`),
+              native: tailwind(
+                `${hasReps ? 'w-full flex-1' : 'w-full flex-1  '} self-center'  items-center justify-start gap-[0.75rem]`,
+              ),
+            })}>
+            <ShowLabelValue
+              label={hasReps ? 'No. of Reps ' : 'Duration'}
+              value={
+                hasReps
+                  ? `${repsValue}`
+                  : `${durationValue ? `${pluralise(durationValue, `${durationValue} second`)}` : '-'}`
+              }
+              container={{
+                web: `  flex-1  items-start justify-center `,
+                native: 'flex-1  flex-row items-start justify-center',
+              }}
+              labelContainer={{
+                web: `flex-1`,
+                native: `${hasReps ? 'flex-none' : 'flex-1'} text-[0.8175rem]`,
+              }}
+              valueContainer={{
+                web: `flex-1 text-[0.8175rem]`,
+                native: hasReps ? 'flex-1 text-center' : 'flex-3',
+              }}
+              // noOfLinesValue={1}
+            />
+          </Container>
+          <Container
+            style={Platform.select({
+              web: tailwind(`flex-1 flex-row  justify-between gap-4`),
+              native: tailwind(
+                `${hasReps ? 'flex-1' : 'flex-0'} flex-row items-center justify-between gap-4 self-center`,
+              ),
+            })}>
+            {renderActionButtons()}
+          </Container>
         </Container>
-        <Container
-          style={Platform.select({
-            web: tailwind(`flex-1 flex-row  justify-between gap-4`),
-            native: tailwind(
-              `${hasReps ? 'flex-1' : 'flex-0'} flex-row items-center justify-between gap-4 self-center`,
-            ),
-          })}>
-          {renderActionButtons()}
-        </Container>
-      </Container>
+
+        {/* Weights for mobile / native device */}
+        {isWorkoutOwner && hasReps && (
+          <>
+            <Container
+              style={Platform.select({
+                web: tailwind(
+                  `flex-1 ${isLargeScreen ? '' : 'gap-12'} flex-row  items-center justify-center  `,
+                ),
+                native: tailwind('flex-1 flex-row items-center justify-center self-center '),
+              })}>
+              <Container
+                style={Platform.select({
+                  web: tailwind(`flex-1 items-center justify-center gap-[0.75rem]`),
+                  native: tailwind(
+                    `${hasReps ? 'w-full flex-1' : 'w-full flex-1  '} self-center'  items-center justify-start gap-[0.75rem]`,
+                  ),
+                })}>
+                <ShowLabelValue
+                  label={'Weight12  '}
+                  value={`${weightValue}`}
+                  container={{
+                    web: `${isLargeScreen ? 'gap-[0.75rem]' : 'gap-[rem]'} self-center w-full `,
+                    native: 'gap-[0.75rem]  ',
+                  }}
+                  labelContainer={{
+                    web: `flex-1`,
+                    native: `${hasReps ? 'flex-1' : 'flex-1'} text-[0.8175rem]`,
+                  }}
+                  valueContainer={{
+                    web: `flex-1 text-[0.8175rem] mr-2`,
+                    native: hasReps ? 'flex-1 text-center mr-2' : 'flex-3',
+                  }}
+                />
+              </Container>
+              <Container
+                style={Platform.select({
+                  web: tailwind(`flex-1 flex-row justify-between gap-4`),
+                  native: tailwind('mb-4 flex-1 flex-row  justify-between gap-4'),
+                })}>
+                {renderActionButtons({
+                  isWeightActionButton: true,
+                })}
+              </Container>
+            </Container>
+          </>
+        )}
+      </>
     );
   };
 
@@ -303,6 +395,51 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
               {renderActionButtons()}
             </Container>
           </Container>
+
+          {/* Weights */}
+          {isWorkoutOwner && hasReps && (
+            <>
+              <Container
+                style={Platform.select({
+                  web: tailwind(
+                    `${isLargeScreen ? 'hidden flex-col gap-4' : 'flex-row '} w-full items-center justify-center `,
+                  ),
+                  native: tailwind('hidden w-3/5 flex-col items-center justify-center gap-4'),
+                })}>
+                <Container
+                  style={Platform.select({
+                    web: tailwind(`${isLargeScreen ? 'gap-[0.75rem]' : 'gap-[4.5rem]'} w-full `),
+                    native: tailwind('flex-1 gap-[0.75rem]'),
+                  })}>
+                  <ShowLabelValue
+                    label={'Weight'}
+                    value={`${weightValue}`}
+                    container={{
+                      web: `${isLargeScreen ? 'gap-[0.75rem]' : 'gap-[rem]'} self-center w-full `,
+                      native: 'gap-[0.75rem]  ',
+                    }}
+                    labelContainer={{
+                      web: `flex-1`,
+                      native: 'text-center',
+                    }}
+                    valueContainer={{
+                      web: `flex-1`,
+                      native: 'text-center',
+                    }}
+                  />
+                </Container>
+                <Container
+                  style={Platform.select({
+                    web: tailwind(`flex-1 flex-row justify-end gap-4`),
+                    native: tailwind('mb-4 flex-1 flex-row  gap-4'),
+                  })}>
+                  {renderActionButtons({
+                    isWeightActionButton: true,
+                  })}
+                </Container>
+              </Container>
+            </>
+          )}
         </Container>
       </Container>
       {isLargeScreen && renderExerciseInfo()}

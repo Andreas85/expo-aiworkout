@@ -30,6 +30,7 @@ interface StartWorkoutExerciseCardWrapperProps {
   isFirst?: boolean;
   isCompleted?: boolean;
   index: number;
+  onItemLayoutWrapper: (event: any) => void;
 }
 
 const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperProps) => {
@@ -46,6 +47,7 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
     isFirst = false,
     isCompleted = false,
     index,
+    onItemLayoutWrapper,
   } = props;
   const { isLargeScreen } = useWebBreakPoints();
 
@@ -87,16 +89,19 @@ const StartWorkoutExerciseCardWrapper = (props: StartWorkoutExerciseCardWrapperP
           onDecrementHandler={onDecrementHandler}
           isExerciseTimeFinished={handleExerciseTimeFinished}
           isRepsWorkoutFinished={handleRepsWorkoutFinished}
+          onItemLayoutWrapperActiveCard={onItemLayoutWrapper}
         />
       );
     } else {
       return (
-        <StartWorkoutExerciseCard
-          item={exercise}
-          isRestCard={isRestCard}
-          onIncrementHandler={onIncrementHandler}
-          onDecrementHandler={onDecrementHandler}
-        />
+        <View onLayout={event => onItemLayoutWrapper(event)}>
+          <StartWorkoutExerciseCard
+            item={exercise}
+            isRestCard={isRestCard}
+            onIncrementHandler={onIncrementHandler}
+            onDecrementHandler={onDecrementHandler}
+          />
+        </View>
       );
     }
   };

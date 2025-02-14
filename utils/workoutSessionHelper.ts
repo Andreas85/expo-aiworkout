@@ -426,7 +426,7 @@ export const scrollToIndex = (
       }
     }
   } else {
-    console.log('Scrolling to index: ${plaform}', { index, exerciseData });
+    console.log('Scrolling to index: ${plaform}');
     smartScrollToIndex(index, exerciseData, flatListRef);
   }
 };

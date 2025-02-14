@@ -5,6 +5,7 @@ import pauseable from 'pauseable';
 import ActiveRestCard from './ActiveRestCard';
 import ActiveCard from './ActiveCard';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { View } from 'react-native';
 
 interface StartWorkoutExerciseCardActiveProps {
   index: number;
@@ -18,10 +19,18 @@ interface StartWorkoutExerciseCardActiveProps {
     currentExerciseCompleted: boolean,
   ) => void;
   isRepsWorkoutFinished: (totalElapsedTime: number) => void;
+  onItemLayoutWrapperActiveCard: (event: any) => void;
 }
 
 const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActiveProps) => {
-  const { item, index, isExerciseTimeFinished, isRepsWorkoutFinished, isRestCard } = props;
+  const {
+    item,
+    index,
+    isExerciseTimeFinished,
+    isRepsWorkoutFinished,
+    isRestCard,
+    onItemLayoutWrapperActiveCard,
+  } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const timerRef = useRef<any>(null);
   const [totalElapsedTime, setTotalElapsedTime] = useState<number>(1);
@@ -89,10 +98,22 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
   }, [item, isWorkoutTimerRunning, isWorkoutSessionDetailScreenTimerPaused]);
 
   if (isRestCard) {
-    return <ActiveRestCard item={item} index={index} />;
+    return (
+      <View onLayout={event => onItemLayoutWrapperActiveCard(event)}>
+        <ActiveRestCard item={item} index={index} />
+      </View>
+    );
   }
 
-  return <ActiveCard item={item} index={index} handleFinish={handleFinish} />;
+  return (
+    <View
+      onLayout={event => {
+        console.log('Active card layout', event);
+        onItemLayoutWrapperActiveCard(event);
+      }}>
+      <ActiveCard item={item} index={index} handleFinish={handleFinish} />
+    </View>
+  );
 };
 
 export default memo(StartWorkoutExerciseCardActive);

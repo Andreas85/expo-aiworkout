@@ -45,6 +45,7 @@ const StartWorkoutExercisesList = (props: any) => {
   // Modify your onItemLayout to handle missing heights
   const onItemLayout = (event: any, index: number, itemId: string) => {
     const height = event.nativeEvent.layout.height;
+    console.log('onItemLayout', { height, index, itemId });
     if (!itemHeights.current[itemId]) {
       itemHeights.current[itemId] = height;
       // Trigger re-render if height changed significantly
@@ -371,7 +372,7 @@ const StartWorkoutExercisesList = (props: any) => {
   const renderListItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
       return (
-        <View onLayout={event => onItemLayout(event, index, item.exerciseId)}>
+        <>
           <StartWorkoutExerciseCardWrapper
             key={item?._id}
             exercise={item}
@@ -386,8 +387,9 @@ const StartWorkoutExercisesList = (props: any) => {
             handleNextRestExercise={scrollToItem}
             handleNextRepsExercise={handleNextRepsExercise}
             isRestCard={item?.type === STRING_DATA.REST}
+            onItemLayoutWrapper={event => onItemLayout(event, index, item.exerciseId)}
           />
-        </View>
+        </>
       );
     },
     [selectedIndex, exerciseData],
