@@ -324,16 +324,12 @@ export const fetchPublicExerciseService = async () => {
   }
 };
 
-export const generateWorkoutService = async (payload: {
-  prompt?: string;
-  workoutPlanResponse?: any;
-}) => {
+export const generateWorkoutService = async (payload: { prompt?: any }) => {
   try {
     const URL = API_ENPOINTS.WORKOUT_GENERATE;
     const { data } = await postRequest({
       API: URL,
       DATA: { prompt: payload.prompt },
-      // DATA: payload.workoutPlanResponse,
     });
     return data;
   } catch (error: any) {

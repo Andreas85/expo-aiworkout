@@ -1,5 +1,5 @@
 import { Question } from '@/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActionButton } from '../atoms/ActionButton';
 import { tailwind } from '@/utils/tailwind';
 
@@ -26,6 +26,10 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
     onChange(tempValue);
     onSubmit(tempValue);
   };
+
+  useEffect(() => {
+    setTempValue(value);
+  }, [question]);
 
   switch (question.type) {
     case 'single-select':

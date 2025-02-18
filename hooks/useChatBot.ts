@@ -119,11 +119,7 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
   const handleGenerateWorkout = (hasFeedback?: boolean, feedback?: string) => {
     const payload = formatFitnessData(responses, workoutPlan ?? null, feedback);
     console.log(payload);
-    // mutateGenerateWorkout({ workoutPlanResponse: payload });
-
-    mutateGenerateWorkout({
-      prompt: 'Make me the most fit person on earth in 5 days',
-    });
+    mutateGenerateWorkout({ prompt: payload });
   };
 
   const generateWorkout = () => {

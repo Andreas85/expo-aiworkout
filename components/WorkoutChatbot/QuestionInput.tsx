@@ -1,5 +1,5 @@
 import { Question } from '@/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 
 import { ActionButton } from '../atoms/ActionButton';
@@ -50,6 +50,10 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
     onChange(tempValue);
     onSubmit(tempValue);
   };
+
+  useEffect(() => {
+    setTempValue(value);
+  }, [question]);
 
   return (
     <View style={styles.container}>

@@ -4,20 +4,17 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { ActionButton } from '../atoms/ActionButton';
 import { tailwind } from '@/utils/tailwind';
 
-interface Exercise {
-  exercise_name: string;
-  duration: number;
-  reps: number;
-  rest: number;
-  weight: number;
-}
-
 interface WorkoutPlanProps {
   plan: {
-    workout?: Exercise[];
+    exercises?: {
+      name: string;
+      sets: number;
+      reps: string;
+      rest: string;
+      duration?: string;
+      weight?: string;
+    }[];
     name?: string;
-    frequency?: string;
-    duration?: string;
     notes?: string;
   };
   onSave: () => void;
@@ -50,9 +47,9 @@ export function WorkoutPlanView({ plan, onSave, showSaveButton }: WorkoutPlanPro
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Exercises</Text>
-        {plan?.workout?.map((exercise, index) => (
+        {plan?.exercises?.map((exercise, index) => (
           <View key={index} style={styles.exerciseCard}>
-            <Text style={styles.exerciseName}>{exercise.exercise_name}</Text>
+            <Text style={styles.exerciseName}>{exercise.name}</Text>
             <View style={styles.exerciseDetails}>
               {/* <Text style={styles.exerciseText}>Duration: {exercise.duration}</Text> */}
               <Text style={styles.exerciseText}>Reps: {exercise.reps}</Text>
