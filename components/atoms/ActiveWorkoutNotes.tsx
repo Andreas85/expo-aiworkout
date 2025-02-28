@@ -1,20 +1,20 @@
-import { Image, Platform, TouchableOpacity } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { IMAGES } from '@/utils/images';
 import { tailwind } from '@/utils/tailwind';
 import Container from './Container';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import useTimer from '@/hooks/useTimer';
-import ExerciseInstructionModal from '../modals/ExerciseInstructionModal';
-import useModal from '@/hooks/useModal';
+import { Foundation } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import ExerciseNotesModal from '../modals/ExerciseNotesModal';
+import useModal from '@/hooks/useModal';
 
-const ActiveWorkoutIcon = () => {
-  const { hideModal, showModal, openModal } = useModal();
+const ActiveWorkoutNotes = () => {
   const { isLargeScreen } = useWebBreakPoints();
-  const isActiveRepExerciseCard = useWorkoutSessionStore(state => state.isActiveRepExerciseCard);
-
+  const { hideModal, showModal, openModal } = useModal();
   const { elapsedTime, remainingTime, handlePlay, handlePause, handleStop } = useTimer();
+  const isActiveRepExerciseCard = useWorkoutSessionStore(state => state.isActiveRepExerciseCard);
 
   const handleActiveWorkoutIconClick = () => {
     console.log('Active Workout Icon Clicked');
@@ -24,16 +24,16 @@ const ActiveWorkoutIcon = () => {
 
   const getContainerWebStyle = () => {
     if (isActiveRepExerciseCard) {
-      return isLargeScreen ? 'bottom-4 right-[12px]' : `bottom-4 right-11`;
+      return isLargeScreen ? 'bottom-4 right-[75px]' : `bottom-4 right-28`;
     }
-    return isLargeScreen ? 'right-[12px] bottom-4' : `right-[160px] bottom-4`;
+    return isLargeScreen ? 'bottom-4 right-[75px]' : `bottom-4 right-[218px]`;
   };
 
   const getContainerNativeStyle = () => {
     if (isActiveRepExerciseCard) {
-      return isLargeScreen ? 'bottom-4 right-[12px]' : `bottom-4 right-11`;
+      return 'bottom-4 right-[60px]';
     }
-    return isLargeScreen ? 'right-[12px] bottom-4' : `right-[160px] bottom-4`;
+    return 'bottom-4 right-[60px]';
   };
   return (
     <>
@@ -43,21 +43,20 @@ const ActiveWorkoutIcon = () => {
           native: tailwind(`absolute  ${getContainerNativeStyle()} z-50 `),
         })}>
         <TouchableOpacity activeOpacity={1} onPress={handleActiveWorkoutIconClick}>
-          <Image
-            source={IMAGES.workoutactive}
-            resizeMode="contain"
+          <Foundation
+            name="clipboard-notes"
+            size={38}
+            color={Colors.brandColor}
             style={Platform.select({
-              web: tailwind(
-                `aspect-square ${isLargeScreen ? 'h-[2.5rem] w-[2.5rem]' : 'h-[2.5rem] w-[2.5rem] '} `,
-              ),
-              native: tailwind('aspect-square h-10 w-10'),
+              web: tailwind(`aspect-square  `),
+              native: tailwind('aspect-square'),
             })}
           />
         </TouchableOpacity>
       </Container>
-      {openModal && <ExerciseInstructionModal isVisible={openModal} toggleModal={hideModal} />}
+      {openModal && <ExerciseNotesModal isVisible={openModal} toggleModal={hideModal} />}
     </>
   );
 };
 
-export default ActiveWorkoutIcon;
+export default ActiveWorkoutNotes;

@@ -22,6 +22,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateExerciseToWorkoutRequest } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { updateExercisePropertyOfWorkout } from '@/utils/workoutStorageOperationHelper';
+import ActiveWorkoutNotes from './ActiveWorkoutNotes';
 
 interface ActiveCardProps {
   item: ExerciseElement;
@@ -230,7 +231,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
                   ),
                 })}>
                 <ShowLabelValue
-                  label={'Weight12  '}
+                  label={'Weight  '}
                   value={`${weightValue}`}
                   container={{
                     web: `${isLargeScreen ? 'gap-[0.75rem]' : 'gap-[rem]'} self-center w-full `,
@@ -319,12 +320,15 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
         ],
       })}>
       <ActiveWorkoutIcon />
+      <ActiveWorkoutNotes />
       <Container
         style={[
           Platform.select({
             web: [
               { height: isLargeScreen ? '' : '183px' },
-              tailwind(`flex-row items-end justify-center ${isLargeScreen ? 'gap-4' : ' gap-12'}`),
+              tailwind(
+                `flex-row items-center justify-center ${isLargeScreen ? 'gap-4' : ' gap-12'}`,
+              ),
             ] as any,
             native: tailwind('flex-row items-end gap-4'),
           }),

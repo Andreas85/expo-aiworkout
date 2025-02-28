@@ -125,7 +125,6 @@ const ActiveRestCard = ({ item, index }: ActiveRestCardProps) => {
           webStyles.container,
         ],
       })}>
-      <ActiveWorkoutIcon />
       <Container
         style={[
           Platform.select({

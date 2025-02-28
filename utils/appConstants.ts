@@ -1,4 +1,3 @@
-import { ICommonPromts } from '@/components/modals/GenerateWorkoutModal';
 import { INavbarTabs, ITabItem } from './interfaces';
 
 export const ICON_SIZE = 20;
@@ -103,55 +102,3 @@ export const STATUS_COLORS = {
   COMPLETED: { text: 'text-[#fff', background: 'bg-[#A27DE1]' },
   FINISHED: { text: 'text-[#fff', background: 'bg-[#A27DE1]' },
 };
-
-export const COMMON_PROMTPS: ICommonPromts[] = [
-  {
-    id: 1,
-    name: 'Upper Body Strength Builder',
-    workout: [
-      { exercise_name: 'Push-Ups', reps: 15, duration: 0, weight: 0, rest: 30 },
-      { exercise_name: 'Push-Ups', reps: 15, duration: 0, weight: 0, rest: 30 },
-      { exercise_name: 'Push-Ups', reps: 15, duration: 0, weight: 0, rest: 30 },
-      { exercise_name: 'Pull-Ups', reps: 10, duration: 0, weight: 0, rest: 45 },
-      { exercise_name: 'Pull-Ups', reps: 10, duration: 0, weight: 0, rest: 45 },
-      { exercise_name: 'Dumbbell Bench Press', reps: 12, duration: 0, weight: 20, rest: 60 },
-      { exercise_name: 'Dumbbell Bench Press', reps: 12, duration: 0, weight: 20, rest: 60 },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Full Body HIIT Blast',
-    workout: [
-      { exercise_name: 'Burpees', reps: 20, duration: 0, weight: 0, rest: 30 },
-      { exercise_name: 'Burpees', reps: 20, duration: 0, weight: 0, rest: 30 },
-      { exercise_name: 'Mountain Climbers', reps: 30, duration: 0, weight: 0, rest: 30 },
-      { exercise_name: 'Mountain Climbers', reps: 30, duration: 0, weight: 0, rest: 30 },
-      { exercise_name: 'Jump Squats', reps: 15, duration: 0, weight: 0, rest: 45 },
-      { exercise_name: 'Jump Squats', reps: 15, duration: 0, weight: 0, rest: 45 },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Core Strength & Abs Sculptor',
-    workout: [
-      { exercise_name: 'Plank Hold', reps: 0, duration: 60, weight: 0, rest: 30 },
-      { exercise_name: 'Plank Hold', reps: 0, duration: 60, weight: 0, rest: 30 },
-      { exercise_name: 'Russian Twists', reps: 20, duration: 0, weight: 5, rest: 30 },
-      { exercise_name: 'Russian Twists', reps: 20, duration: 0, weight: 5, rest: 30 },
-      { exercise_name: 'Hanging Leg Raises', reps: 15, duration: 0, weight: 0, rest: 45 },
-      { exercise_name: 'Hanging Leg Raises', reps: 15, duration: 0, weight: 0, rest: 45 },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Lower Body Power & Strength',
-    workout: [
-      { exercise_name: 'Barbell Squats', reps: 15, duration: 0, weight: 50, rest: 60 },
-      { exercise_name: 'Barbell Squats', reps: 15, duration: 0, weight: 50, rest: 60 },
-      { exercise_name: 'Walking Lunges', reps: 12, duration: 0, weight: 10, rest: 45 },
-      { exercise_name: 'Walking Lunges', reps: 12, duration: 0, weight: 10, rest: 45 },
-      { exercise_name: 'Romanian Deadlifts', reps: 10, duration: 0, weight: 40, rest: 90 },
-      { exercise_name: 'Romanian Deadlifts', reps: 10, duration: 0, weight: 40, rest: 90 },
-    ],
-  },
-];

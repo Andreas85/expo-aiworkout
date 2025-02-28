@@ -23,7 +23,6 @@ import NoDataFallbackContainer from '../atoms/NoDataFallbackContainer';
 import { useAuthStore } from '@/store/authStore';
 import MyWorkoutNotLoggedInList from '../molecules/MyWorkoutNotLoggedInList';
 import { Workout } from '@/services/interfaces';
-import GenerateWorkoutModal from '../modals/GenerateWorkoutModal';
 import StarsIcon from '../atoms/AiStarsIcon';
 import GenerateWorkoutAiBot from '../modals/GenerateWorkoutAiBot';
 
@@ -249,11 +248,7 @@ export default function MyWorkout() {
           refetch={refetch}
         />
       )}
-      {/* <GenerateWorkoutModal
-        isVisible={openGenerateModal}
-        toggleModal={hideGenerateModal}
-        onComplete={() => console.log('Generate Workout')}
-      /> */}
+
       <GenerateWorkoutAiBot isVisible={openGenerateModal} toggleModal={hideGenerateModal} />
     </>
   );
