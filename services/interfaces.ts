@@ -133,6 +133,7 @@ export interface ExerciseElement {
   duration: number;
   order: number;
   type?: string;
+  notes?: string;
   isCompleted?: boolean;
   exerciseId?: string;
   durationTaken?: number;

@@ -298,6 +298,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
               web: tailwind(
                 `mx-auto ${isLargeScreen ? 'w-[8.75rem]' : 'w-[23.0625rem]'} cursor-pointer rounded-lg`,
               ),
+              native: tailwind('rounded-lg '),
             }),
           ]}
         />
@@ -320,7 +321,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
         ],
       })}>
       <ActiveWorkoutIcon />
-      <ActiveWorkoutNotes />
+      <ActiveWorkoutNotes item={item} />
       <Container
         style={[
           Platform.select({

@@ -9,11 +9,13 @@ import Colors from '@/constants/Colors';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import ExerciseNotesModal from '../modals/ExerciseNotesModal';
 import useModal from '@/hooks/useModal';
+import { ExerciseElement } from '@/services/interfaces';
 
-const ActiveWorkoutNotes = () => {
+const ActiveWorkoutNotes = (props: { item: ExerciseElement }) => {
+  const { item } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
-  const { elapsedTime, remainingTime, handlePlay, handlePause, handleStop } = useTimer();
+  const { handlePause } = useTimer();
   const isActiveRepExerciseCard = useWorkoutSessionStore(state => state.isActiveRepExerciseCard);
 
   const handleActiveWorkoutIconClick = () => {
@@ -24,14 +26,14 @@ const ActiveWorkoutNotes = () => {
 
   const getContainerWebStyle = () => {
     if (isActiveRepExerciseCard) {
-      return isLargeScreen ? 'bottom-4 right-[75px]' : `bottom-4 right-28`;
+      return isLargeScreen ? 'bottom-4 right-[65px]' : `bottom-4 right-28`;
     }
     return isLargeScreen ? 'bottom-4 right-[75px]' : `bottom-4 right-[218px]`;
   };
 
   const getContainerNativeStyle = () => {
     if (isActiveRepExerciseCard) {
-      return 'bottom-4 right-[60px]';
+      return 'bottom-4 right-[45px]';
     }
     return 'bottom-4 right-[60px]';
   };
@@ -54,7 +56,9 @@ const ActiveWorkoutNotes = () => {
           />
         </TouchableOpacity>
       </Container>
-      {openModal && <ExerciseNotesModal isVisible={openModal} toggleModal={hideModal} />}
+      {openModal && (
+        <ExerciseNotesModal item={item} isVisible={openModal} toggleModal={hideModal} />
+      )}
     </>
   );
 };

@@ -117,9 +117,7 @@ const ExerciseStartAndPause = (props: IExerciseStartAndPause) => {
             web: tailwind('flex flex-row items-center justify-end gap-2  '),
           })}>
           {/* Play / Pause Button */}
-          <TouchableOpacity
-            onPress={isTimerRunning ? onPause : onPlay}
-            disabled={disableControls || isActiveRepExerciseCard}>
+          <TouchableOpacity onPress={isTimerRunning ? onPause : onPlay} disabled={disableControls}>
             {renderIcon()}
           </TouchableOpacity>
           {/* Sound Icon render */}

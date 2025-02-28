@@ -16,7 +16,7 @@ import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstan
 import * as yup from 'yup';
 import { useLocalSearchParams } from 'expo-router';
 import CustomSwitch from '../atoms/CustomSwitch';
-import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 
 import { ExerciseElement } from '@/services/interfaces';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
@@ -37,6 +37,7 @@ const ERROR_MESSAGE = {
   EXERCISE_REQ: 'Exercise name is required if less than 3 characters.',
   REPS_REQ: 'Reps are required when duration is not specified.',
   DURATION_REQ: 'Duration is required.',
+  EXERCISE_ERROR_MESSAGE: 'Exercise is required.',
 };
 
 interface IFormValues {
@@ -56,6 +57,10 @@ const validationSchema = yup.object().shape({
     then: schema => schema.required(ERROR_MESSAGE.REPS_REQ),
   }),
   duration: yup.string().required(ERROR_MESSAGE.DURATION_REQ),
+  //  can you add exercise validation here
+  exercise: yup.object().shape({
+    _id: yup.string().required(ERROR_MESSAGE.EXERCISE_ERROR_MESSAGE),
+  }),
 });
 
 const initialValues = {
@@ -155,7 +160,7 @@ function AddExercise(props: {
     if (isValidUUID(exercise?._id) && isAuthenticated) {
       delete exerciseData.exerciseId;
     }
-    console.log('(exerciseData)INFO:: ', { exerciseData });
+    console.log('(exerciseData)INFO:: ', { exerciseData, exercise });
 
     const payload = {
       queryParams: { id: slug },
@@ -226,30 +231,37 @@ function AddExercise(props: {
                     {/* <Text>{JSON.stringify(values?.exercise)}</Text> */}
                     <FieldArray name="exercise">
                       {() => (
-                        <CustomDropdown
-                          open={true}
-                          search={true}
-                          // searchQuery={values?.exercise}
-                          selectedItem={values?.exercise}
-                          items={filteredExercises}
-                          onchange={(value: IWorkoutExercisesHelper) => {
-                            const isNewsExercise =
-                              filteredExercises.findIndex(
-                                (item: IWorkoutExercisesHelper) => item._id === value?._id,
-                              ) === -1;
+                        <>
+                          <CustomDropdown
+                            open={true}
+                            search={true}
+                            // searchQuery={values?.exercise}
+                            selectedItem={values?.exercise}
+                            items={filteredExercises}
+                            onchange={(value: IWorkoutExercisesHelper) => {
+                              const isNewsExercise =
+                                filteredExercises.findIndex(
+                                  (item: IWorkoutExercisesHelper) => item._id === value?._id,
+                                ) === -1;
 
-                            // console.log('INFO:: isLabelValueObject', {
-                            //   value,
-                            //   isLabelValueObject: isLabelValueObject(value),
-                            //   isNewsExercise,
-                            // });
-                            setFieldValue('exercise', value, false);
-                            if (isNewsExercise) {
-                              addNewExerciseInAsyncStorage(value);
-                            }
-                          }}
-                          placeholder="Select"
-                        />
+                              // console.log('INFO:: isLabelValueObject', {
+                              //   value,
+                              //   isLabelValueObject: isLabelValueObject(value),
+                              //   isNewsExercise,
+                              // });
+                              setFieldValue('exercise', value, false);
+                              if (isNewsExercise) {
+                                addNewExerciseInAsyncStorage(value);
+                              }
+                            }}
+                            placeholder="Select"
+                          />
+                          {errors?.exercise?._id && (
+                            <Text style={tailwind('text-3 text-red-400')}>
+                              {errors?.exercise?._id ?? ' '}
+                            </Text>
+                          )}
+                        </>
                       )}
                     </FieldArray>
                     <View

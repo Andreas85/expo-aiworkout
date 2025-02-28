@@ -29,4 +29,5 @@ export interface IAddAndEditWorkoutModalProps {
   closeModal: () => void;
   children: React.ReactNode;
   footerChildren?: React.ReactNode;
+  isCrossIconVisible?: boolean;
 }

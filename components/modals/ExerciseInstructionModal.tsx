@@ -1,19 +1,8 @@
-import {
-  Platform,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import { Platform, StyleSheet, View, ScrollView } from 'react-native';
 import React from 'react';
-import Modal from 'react-native-modal';
 import { tailwind } from '@/utils/tailwind';
-import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { Ionicons } from '@expo/vector-icons';
-import LabelContainer from '../atoms/LabelContainer';
 import RenderHTML from 'react-native-render-html';
+import ModalWrapper from './ModalWrapper';
 
 interface IExerciseInstructionModal {
   isVisible: boolean;
@@ -48,62 +37,42 @@ export interface ICommonPromts {
 
 const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
   const { isVisible, toggleModal } = props;
-  const { isLargeScreen } = useWebBreakPoints();
 
   return (
-    <Modal
-      isVisible={isVisible}
-      backdropColor="white"
-      useNativeDriver={true}
-      animationIn="fadeIn"
-      animationOut="fadeOut">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{
-          height: '100%',
-          width: '100%',
-        }}>
-        <TouchableWithoutFeedback>
-          <View
-            style={Platform.select({
-              web: tailwind(
-                `rounded-lg bg-NAVBAR_BACKGROUND p-4 ${isLargeScreen ? '' : 'mx-auto w-[55rem]'}`,
-              ),
-              native: tailwind('rounded-lg bg-NAVBAR_BACKGROUND p-4'),
-            })}>
-            <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-
-            <LabelContainer label={`Instructions`} labelStyle={styles.header} />
-
-            {/* Common Prompts Section */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.commonPromptContainer}>
-              <RenderHTML
-                contentWidth={500}
-                source={{ html: htmlString }}
-                tagsStyles={{
-                  h2: { color: '#fff', fontSize: 18, marginBottom: 10 },
-                  ol: { listStyleType: 'none' },
-                  div: {
-                    marginBottom: 8,
-                    fontSize: 14,
-                    lineHeight: 24,
-                    color: '#fff',
-                    flexDirection: 'column',
-                  },
-                  strong: { fontWeight: 'bold' },
-                  p: { fontSize: 14, marginTop: 10, color: '#fff' },
-                }}
-              />
-            </ScrollView>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </Modal>
+    <ModalWrapper
+      isModalVisible={isVisible}
+      isCrossIconVisible={true}
+      headerTitle={'Instructions'}
+      closeModal={toggleModal}>
+      <View
+        style={Platform.select({
+          web: tailwind(``),
+          native: tailwind(''),
+        })}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.commonPromptContainer}>
+          <RenderHTML
+            contentWidth={500}
+            source={{ html: htmlString }}
+            tagsStyles={{
+              h2: { color: '#fff', fontSize: 18, marginBottom: 10 },
+              ol: { listStyleType: 'none' },
+              div: {
+                marginBottom: 8,
+                fontSize: 14,
+                lineHeight: 24,
+                color: '#fff',
+                flexDirection: 'column',
+              },
+              strong: { fontWeight: 'bold' },
+              p: { fontSize: 14, marginTop: 10, color: '#fff' },
+            }}
+          />
+        </ScrollView>
+      </View>
+    </ModalWrapper>
   );
 };
 

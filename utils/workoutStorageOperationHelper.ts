@@ -121,7 +121,8 @@ export const addExerciseToWorkout = async (
     ...exercise,
     _id: generateBigNumberId(), // Unique ID for the exercise
     order: workout.exercises?.length || 0, // Start from 0
-    exerciseId: generateBigNumberId(), // Unique ID for the exercise
+    // exerciseId: generateBigNumberId(), // Unique ID for the exercise  (We don't need this it is handle in Add Exercise Modal)
+    notes: '',
   };
 
   workout?.exercises?.push(newExercise); // Add the exercise to the workout

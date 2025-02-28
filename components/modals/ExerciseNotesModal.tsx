@@ -1,109 +1,104 @@
-import {
-  Platform,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import React from 'react';
-import Modal from 'react-native-modal';
+import { Platform, StyleSheet, View, TextInput } from 'react-native';
+import React, { useState } from 'react';
 import { tailwind } from '@/utils/tailwind';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { Ionicons } from '@expo/vector-icons';
-import LabelContainer from '../atoms/LabelContainer';
-import RenderHTML from 'react-native-render-html';
+import { ActionButton } from '../atoms/ActionButton';
+import ModalWrapper from './ModalWrapper';
+import Container from '../atoms/Container';
+import { Formik } from 'formik';
+import { useAuthStore } from '@/store/authStore';
+import { updateExercisePropertyOfWorkout } from '@/utils/workoutStorageOperationHelper';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
+import { useLocalSearchParams } from 'expo-router';
+import { ExerciseElement } from '@/services/interfaces';
 
 interface IExerciseNotesModal {
   isVisible: boolean;
   toggleModal: () => void;
   onComplete?: () => void;
-}
-
-interface PromptExercise {
-  exercise_name: string;
-  reps: number;
-  duration: number;
-  weight: number;
-  rest: number;
-}
-
-const htmlString = `
-  <h2>Knee Rolls Exercise</h2>
-  <div>
-    <div><strong>Lie on your back</strong> with knees bent, feet flat...</div>
-    <div><strong>Slowly lower</strong> both knees to one side...</div>
-    <div><strong>Hold briefly</strong>, then return to center.</div>
-    <div><strong>Repeat</strong> on the other side for 8-12 reps per side.</div>
-  </div>
-  <p>Move gently and keep the core engaged.</p>
-`;
-
-export interface ICommonPromts {
-  id: number;
-  name: string;
-  workout: PromptExercise[];
+  item: ExerciseElement;
 }
 
 const ExerciseNotesModal = (props: IExerciseNotesModal) => {
-  const { isVisible, toggleModal } = props;
-  const { isLargeScreen } = useWebBreakPoints();
+  const { isVisible, toggleModal, item } = props;
+  const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
+  const { isExtraSmallScreenOnly } = useWebBreakPoints();
+  const { updateExercisePropertyZustand } = useWorkoutSessionStore();
+  const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const [notes, setNotes] = useState<string>(item.notes ?? '');
+
+  const handleAddNotes = async () => {
+    console.log('Add Notes', {
+      notes,
+    });
+    if (isAuthenticated) {
+      // Add notes to the workout
+    } else {
+      await updateExerciseProperty(slug ?? '', item?._id ?? '', 'notes', notes);
+      updateExercisePropertyOfWorkout(
+        workoutSessionDetails?.workoutId ?? '',
+        item?._id,
+        'notes',
+        notes,
+      );
+    }
+    updateExercisePropertyZustand(item.order, 'notes', notes);
+    toggleModal();
+  };
 
   return (
-    <Modal
-      isVisible={isVisible}
-      backdropColor="white"
-      useNativeDriver={true}
-      animationIn="fadeIn"
-      animationOut="fadeOut">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{
-          height: '100%',
-          width: '100%',
-        }}>
-        <TouchableWithoutFeedback>
-          <View
-            style={Platform.select({
-              web: tailwind(
-                `rounded-lg bg-NAVBAR_BACKGROUND p-4 ${isLargeScreen ? '' : 'mx-auto w-[55rem]'}`,
-              ),
-              native: tailwind('rounded-lg bg-NAVBAR_BACKGROUND p-4'),
-            })}>
-            <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
+    <>
+      <ModalWrapper
+        isModalVisible={isVisible}
+        isCrossIconVisible={true}
+        headerTitle={'Notes'}
+        closeModal={toggleModal}>
+        <Container>
+          <Formik
+            initialValues={{
+              notes: '',
+            }}
+            validateOnChange={false} // Disable validation on field change
+            validateOnBlur={true} // Enable validation on blur
+            onSubmit={handleAddNotes}>
+            {({ handleSubmit }: any) => (
+              <View
+                style={Platform.select({
+                  web: tailwind(``),
+                  native: tailwind(''),
+                })}>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    value={notes}
+                    onChangeText={setNotes}
+                    placeholder="Add exercise notes (e.g., Plank, 3 sets, 60s hold, 15s rest)"
+                    placeholderTextColor="#aaa"
+                    multiline={true} // Makes it behave like a textarea
+                    numberOfLines={4} // Optional: Adjusts the height
+                    textAlignVertical="top" // Aligns text to the top
+                  />
+                </View>
 
-            <LabelContainer label={`Notes`} labelStyle={styles.header} />
-
-            {/* Common Prompts Section */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.commonPromptContainer}>
-              <RenderHTML
-                contentWidth={500}
-                source={{ html: htmlString }}
-                tagsStyles={{
-                  h2: { color: '#fff', fontSize: 18, marginBottom: 10 },
-                  ol: { listStyleType: 'none' },
-                  div: {
-                    marginBottom: 8,
-                    fontSize: 14,
-                    lineHeight: 24,
-                    color: '#fff',
-                    flexDirection: 'column',
-                  },
-                  strong: { fontWeight: 'bold' },
-                  p: { fontSize: 14, marginTop: 10, color: '#fff' },
-                }}
-              />
-            </ScrollView>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </Modal>
+                <Container
+                  style={tailwind('mt-4  flex-row flex-wrap items-center justify-center gap-2')}>
+                  <ActionButton
+                    uppercase={true}
+                    disabled={!notes}
+                    // isLoading={isPending || isPendingSort}
+                    label={'Add'}
+                    onPress={handleSubmit}
+                    style={tailwind(' grow rounded-md')}
+                  />
+                </Container>
+              </View>
+            )}
+          </Formik>
+        </Container>
+      </ModalWrapper>
+    </>
   );
 };
 
