@@ -127,7 +127,10 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
         <ScrollView
           contentContainerStyle={{
             width: '100%',
+            minHeight: 400,
+            height: 400,
           }}
+          showsVerticalScrollIndicator={false}
           style={styles.commonPromptContainer}>
           <View
             style={{
@@ -136,6 +139,7 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
               flexWrap: 'wrap',
               flexGrow: 1, // Allow it to take full space
               flex: 1,
+              height: 500,
             }}>
             <RenderHTML
               contentWidth={500}
@@ -168,6 +172,7 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
                   flexDirection: 'column',
                   width: '100%',
                   // flexWrap: 'wrap',
+
                   padding: 8,
                   borderRadius: 6,
                   backgroundColor: '#2D2D44', // Slight contrast for sectioning
