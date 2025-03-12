@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { UserResponse, WorkoutFeedback, WorkoutPlan } from '@/types';
-import { generateWorkoutService } from '@/services/workouts';
+import { generateSaveGeneratedWorkoutService, generateWorkoutService } from '@/services/workouts';
 import { questions } from '@/components/WorkoutChatbot/questions';
 import usePlatform from './usePlatform';
 import { formatFitnessData } from '@/utils/AiWorkoutPlanHelper';
 import { ScrollView } from 'react-native';
+import { router } from 'expo-router';
 
-export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void) => {
+export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void) => {
   const { isWeb } = usePlatform();
   const [currentQuestionId, setCurrentQuestionId] = useState('entry');
 
@@ -16,7 +17,7 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
   const [showSummary, setShowSummary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const nativeListRef = useRef<ScrollView>(null);
-  const [responseError, setResponseError] = useState<string>();
+  const [responseError, setResponseError] = useState<string>('');
   const [showFeedback, setShowFeedback] = useState(false);
   const [isWorkoutApproved, setIsWorkoutApproved] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState<WorkoutFeedback>({
@@ -128,12 +129,6 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
     setShowFeedback(true);
   };
 
-  const saveWorkout = async () => {
-    // console.log('saveWorkout', responses);
-    alert('Workout plan will be saved soon!');
-    toggleModal();
-  };
-
   const handleFeedback = async (feedback: WorkoutFeedback) => {
     if (feedback.rating === 'good') {
       setIsWorkoutApproved(true);
@@ -167,6 +162,5 @@ export const useChatBot = (toggleModal: () => void, scrollToBottom?: () => void)
     getCurrentResponse,
     goBack,
     generateWorkout,
-    saveWorkout,
   };
 };

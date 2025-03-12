@@ -29,7 +29,6 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
     getCurrentResponse,
     goBack,
     generateWorkout,
-    saveWorkout,
   } = useChatBot(toggleModal);
 
   return (
@@ -105,8 +104,8 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                 <ChatMessage isBot={true}>
                   <WorkoutPlanView
                     plan={workoutPlan}
-                    onSave={saveWorkout}
                     showSaveButton={isWorkoutApproved}
+                    toggleModal={toggleModal}
                   />
                 </ChatMessage>
 

@@ -109,7 +109,7 @@ export const useWorkoutSessionStore = create<IWorkoutSessionStore>()(
     // Function to update exercise properties in the session store
     updateExercisePropertyZustand: (exerciseIndex, property, value) =>
       set((state: any) => {
-        const updatedExercises = [...state.workoutSessionDetails.exercises];
+        const updatedExercises = [...(state.workoutSessionDetails?.exercises ?? [])];
         if (updatedExercises[exerciseIndex]) {
           updatedExercises[exerciseIndex] = {
             ...updatedExercises[exerciseIndex],

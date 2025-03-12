@@ -8,8 +8,10 @@ import useTimer from '@/hooks/useTimer';
 import ExerciseInstructionModal from '../modals/ExerciseInstructionModal';
 import useModal from '@/hooks/useModal';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { ExerciseElement } from '@/services/interfaces';
 
-const ActiveWorkoutIcon = () => {
+const ActiveWorkoutIcon = (props: { item: ExerciseElement; isDraggableExerciseCard?: boolean }) => {
+  const { item, isDraggableExerciseCard = false } = props;
   const { hideModal, showModal, openModal } = useModal();
   const { isLargeScreen } = useWebBreakPoints();
   const isActiveRepExerciseCard = useWorkoutSessionStore(state => state.isActiveRepExerciseCard);
@@ -39,8 +41,12 @@ const ActiveWorkoutIcon = () => {
     <>
       <Container
         style={Platform.select({
-          web: tailwind(`absolute  ${getContainerWebStyle()} z-50 `),
-          native: tailwind(`absolute  ${getContainerNativeStyle()} z-50 `),
+          web: tailwind(
+            isDraggableExerciseCard ? `z-50 ` : `absolute  ${getContainerWebStyle()} z-50 `,
+          ),
+          native: tailwind(
+            isDraggableExerciseCard ? `z-50` : `absolute  ${getContainerNativeStyle()} z-50 `,
+          ),
         })}>
         <TouchableOpacity activeOpacity={1} onPress={handleActiveWorkoutIconClick}>
           <Image
@@ -48,14 +54,18 @@ const ActiveWorkoutIcon = () => {
             resizeMode="contain"
             style={Platform.select({
               web: tailwind(
-                `aspect-square ${isLargeScreen ? 'h-[2.5rem] w-[2.5rem]' : 'h-[2.5rem] w-[2.5rem] '} `,
+                isDraggableExerciseCard
+                  ? `aspect-square h-[2.5rem] w-[2.5rem]`
+                  : `aspect-square ${isLargeScreen ? 'h-[2.5rem] w-[2.5rem]' : 'h-[2.5rem] w-[2.5rem] '} `,
               ),
               native: tailwind('aspect-square h-10 w-10'),
             })}
           />
         </TouchableOpacity>
       </Container>
-      {openModal && <ExerciseInstructionModal isVisible={openModal} toggleModal={hideModal} />}
+      {openModal && (
+        <ExerciseInstructionModal item={item} isVisible={openModal} toggleModal={hideModal} />
+      )}
     </>
   );
 };

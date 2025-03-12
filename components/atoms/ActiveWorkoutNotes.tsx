@@ -1,4 +1,4 @@
-import { Platform, TouchableOpacity } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { tailwind } from '@/utils/tailwind';
 import Container from './Container';
@@ -11,8 +11,11 @@ import ExerciseNotesModal from '../modals/ExerciseNotesModal';
 import useModal from '@/hooks/useModal';
 import { ExerciseElement } from '@/services/interfaces';
 
-const ActiveWorkoutNotes = (props: { item: ExerciseElement }) => {
-  const { item } = props;
+const ActiveWorkoutNotes = (props: {
+  item: ExerciseElement;
+  isDraggableExerciseCard?: boolean;
+}) => {
+  const { item, isDraggableExerciseCard = false } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
   const { handlePause } = useTimer();
@@ -41,18 +44,18 @@ const ActiveWorkoutNotes = (props: { item: ExerciseElement }) => {
     <>
       <Container
         style={Platform.select({
-          web: tailwind(`absolute  ${getContainerWebStyle()} z-50 `),
-          native: tailwind(`absolute  ${getContainerNativeStyle()} z-50 `),
+          web: tailwind(
+            isDraggableExerciseCard ? `z-50` : `absolute  ${getContainerWebStyle()} z-50 `,
+          ),
+          native: tailwind(
+            isDraggableExerciseCard ? `z-50` : `absolute  ${getContainerNativeStyle()} z-50 `,
+          ),
         })}>
         <TouchableOpacity activeOpacity={1} onPress={handleActiveWorkoutIconClick}>
           <Foundation
             name="clipboard-notes"
-            size={38}
+            size={isDraggableExerciseCard ? 28 : 38}
             color={Colors.brandColor}
-            style={Platform.select({
-              web: tailwind(`aspect-square  `),
-              native: tailwind('aspect-square'),
-            })}
           />
         </TouchableOpacity>
       </Container>

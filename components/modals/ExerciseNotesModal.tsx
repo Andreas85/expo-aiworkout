@@ -1,17 +1,26 @@
 import { Platform, StyleSheet, View, TextInput } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { tailwind } from '@/utils/tailwind';
-import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { ActionButton } from '../atoms/ActionButton';
 import ModalWrapper from './ModalWrapper';
 import Container from '../atoms/Container';
 import { Formik } from 'formik';
 import { useAuthStore } from '@/store/authStore';
-import { updateExercisePropertyOfWorkout } from '@/utils/workoutStorageOperationHelper';
+import {
+  editExerciseInWorkout,
+  editWorkoutExerciseProperty,
+  updateExercisePropertyOfWorkout,
+} from '@/utils/workoutStorageOperationHelper';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, usePathname } from 'expo-router';
 import { ExerciseElement } from '@/services/interfaces';
+import { debouncedMutate } from '@/utils/helper';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateExerciseNotesOfWorkoutRequest } from '@/services/workouts';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { ActionButton } from '../atoms/ActionButton';
+import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 
 interface IExerciseNotesModal {
   isVisible: boolean;
@@ -22,31 +31,81 @@ interface IExerciseNotesModal {
 
 const ExerciseNotesModal = (props: IExerciseNotesModal) => {
   const { isVisible, toggleModal, item } = props;
+  const queryClient = useQueryClient();
+  const pathname = usePathname();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
-  const { isExtraSmallScreenOnly } = useWebBreakPoints();
   const { updateExercisePropertyZustand } = useWorkoutSessionStore();
+  const { handleEditExerciseForNonLoggedInUser } = useWorkoutNonLoggedInUser();
+  const { updateWorkoutExercises } = useWorkoutDetailStore();
   const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const [notes, setNotes] = useState<string>(item.notes ?? '');
+  const [notes, setNotes] = useState<string>('');
+
+  const { mutate: mutateUpdateExerciseToWorkoutRequest, isPending } = useMutation({
+    mutationFn: updateExerciseNotesOfWorkoutRequest,
+    onSuccess: async data => {
+      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      updateWorkoutExercises(data?.data?.exercises);
+      toggleModal();
+    },
+    onError: (error: any) => {
+      console.log('error', error);
+      // toast.show(error, { type: 'danger' });
+    },
+    onSettled: () => {
+      console.log('onSettled');
+    },
+  });
 
   const handleAddNotes = async () => {
+    const pathSegements = pathname.split('/');
     console.log('Add Notes', {
       notes,
     });
     if (isAuthenticated) {
-      // Add notes to the workout
+      // Modify 'reps' based on 'isEnabled'
+      let payload = {
+        formData: {
+          index: item?.order,
+          notes,
+        },
+        queryParams: { id: workoutSessionDetails?.workoutId },
+      };
+      if (pathSegements?.[1] === 'workout-session') {
+        console.log('Api call', payload);
+        payload.queryParams = { id: workoutSessionDetails?.workoutId };
+      } else if (pathSegements?.[1] === 'workout') {
+        payload.queryParams = { id: slug };
+      }
+      // console.log('Api call', payload);
+      debouncedMutate(mutateUpdateExerciseToWorkoutRequest, payload);
     } else {
-      await updateExerciseProperty(slug ?? '', item?._id ?? '', 'notes', notes);
-      updateExercisePropertyOfWorkout(
-        workoutSessionDetails?.workoutId ?? '',
-        item?._id,
-        'notes',
-        notes,
-      );
+      if (pathSegements?.[1] === 'workout-session') {
+        await updateExerciseProperty(slug ?? '', item?._id ?? '', 'notes', notes);
+        updateExercisePropertyOfWorkout(
+          workoutSessionDetails?.workoutId ?? '',
+          item?._id,
+          'notes',
+          notes,
+        );
+      } else if (pathSegements?.[1] === 'workout') {
+        editWorkoutExerciseProperty(slug, item?._id, 'notes', notes);
+      }
+
+      toggleModal();
     }
     updateExercisePropertyZustand(item.order, 'notes', notes);
+  };
+
+  const handleCloseModal = () => {
     toggleModal();
   };
+
+  useEffect(() => {
+    if (item?.notes) {
+      setNotes(item?.notes);
+    }
+  }, [item]);
 
   return (
     <>
@@ -54,14 +113,15 @@ const ExerciseNotesModal = (props: IExerciseNotesModal) => {
         isModalVisible={isVisible}
         isCrossIconVisible={true}
         headerTitle={'Notes'}
-        closeModal={toggleModal}>
+        closeModal={handleCloseModal}>
         <Container>
           <Formik
             initialValues={{
-              notes: '',
+              notes: item.notes ?? '',
             }}
             validateOnChange={false} // Disable validation on field change
             validateOnBlur={true} // Enable validation on blur
+            enableReinitialize={true}
             onSubmit={handleAddNotes}>
             {({ handleSubmit }: any) => (
               <View
@@ -74,7 +134,7 @@ const ExerciseNotesModal = (props: IExerciseNotesModal) => {
                     style={styles.input}
                     value={notes}
                     onChangeText={setNotes}
-                    placeholder="Add exercise notes (e.g., Plank, 3 sets, 60s hold, 15s rest)"
+                    placeholder="Add exercise notes"
                     placeholderTextColor="#aaa"
                     multiline={true} // Makes it behave like a textarea
                     numberOfLines={4} // Optional: Adjusts the height
@@ -87,8 +147,8 @@ const ExerciseNotesModal = (props: IExerciseNotesModal) => {
                   <ActionButton
                     uppercase={true}
                     disabled={!notes}
-                    // isLoading={isPending || isPendingSort}
-                    label={'Add'}
+                    isLoading={isPending}
+                    label={'Update Notes'}
                     onPress={handleSubmit}
                     style={tailwind(' grow rounded-md')}
                   />

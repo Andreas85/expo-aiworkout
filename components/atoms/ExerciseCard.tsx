@@ -25,6 +25,10 @@ import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { debounce } from 'lodash';
 import { useAuthStore } from '@/store/authStore';
 import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
+import ActiveWorkoutIcon from './ActiveWorkoutIcon';
+import ActiveWorkoutNotes from './ActiveWorkoutNotes';
+import { View } from 'react-native';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 interface IExerciseCard {
   data: ExerciseElement;
@@ -43,6 +47,7 @@ const ExerciseCard = (props: IExerciseCard) => {
     handleAddExerciseForNonLoggedInUser,
     handleDeleteExerciseForNonLoggedInUser,
   } = useWorkoutNonLoggedInUser();
+  const isWorkoutOwner = useWorkoutSessionStore(state => state.isWorkoutOwner);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const workoutDetails = useWorkoutDetailStore(state => state.workoutDetail) ?? [];
   const workoutDetailExercises =
@@ -425,6 +430,17 @@ const ExerciseCard = (props: IExerciseCard) => {
             <Container
               style={[
                 Platform.select({
+                  web: tailwind('w-full flex-row items-center justify-between gap-4'),
+                  native: tailwind('flex-1 flex-row items-center justify-between gap-4'),
+                }),
+              ]}>
+              <ActiveWorkoutIcon item={data} isDraggableExerciseCard={true} />
+              <ActiveWorkoutNotes item={data} isDraggableExerciseCard={true} />
+            </Container>
+
+            <Container
+              style={[
+                Platform.select({
                   web: tailwind('flex-1 flex-row items-center justify-between gap-2'),
                   native: tailwind('flex-1 flex-row items-center justify-between gap-2'),
                 }),
@@ -437,7 +453,7 @@ const ExerciseCard = (props: IExerciseCard) => {
                   }),
                 ]}>
                 <TextContainer
-                  data={`Weight (kg)`}
+                  data={`Weight (kg) `}
                   style={[
                     Platform.select({
                       web: tailwind(' text-center text-xs'),
@@ -694,7 +710,7 @@ const ExerciseCard = (props: IExerciseCard) => {
               </Container>
             )}
           </Container>
-          <Container style={tailwind(' flex-col items-start justify-start gap-5')}>
+          <Container style={tailwind(' flex-col items-start justify-start gap-3')}>
             <LabelContainer
               label={'Add New'}
               labelStyle={[
@@ -760,6 +776,14 @@ const ExerciseCard = (props: IExerciseCard) => {
               ]}
               left={<FontAwesome6 name="trash-can" color="#A27DE1" size={ICON_SIZE} />}
             />
+            <Container style={tailwind('w-full flex-row items-center justify-between  ')}>
+              <View>
+                <ActiveWorkoutIcon item={data} isDraggableExerciseCard={true} />
+              </View>
+              <View>
+                <ActiveWorkoutNotes item={data} isDraggableExerciseCard={true} />
+              </View>
+            </Container>
           </Container>
         </Container>
       );

@@ -108,7 +108,7 @@ const StartWorkoutExerciseCardActive = (props: StartWorkoutExerciseCardActivePro
   return (
     <View
       onLayout={event => {
-        console.log('Active card layout', event);
+        // console.log('Active card layout', event);
         onItemLayoutWrapperActiveCard(event);
       }}>
       <ActiveCard item={item} index={index} handleFinish={handleFinish} />

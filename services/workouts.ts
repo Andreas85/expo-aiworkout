@@ -12,6 +12,7 @@ import {
   IPayloadWorkoutSessionUserData,
   IPayloadWorkoutSessionsUpdateFinished,
   ICreateWorkoutCopy,
+  ExerciseElement,
 } from './interfaces';
 import { deleteRequest, getRequest, postRequest, putRequest } from '@/utils/axios';
 import { expandRestAsExercises, extractedErrorMessage } from '@/utils/helper';
@@ -330,6 +331,54 @@ export const generateWorkoutService = async (payload: { prompt?: any }) => {
     const { data } = await postRequest({
       API: URL,
       DATA: { prompt: payload.prompt },
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const generateWorkoutInstructionService = async (payload: {
+  formData: { index: number; exercise: ExerciseElement };
+  queryParams: { id: string };
+}) => {
+  const { formData, queryParams } = payload;
+  try {
+    const URL = API_ENPOINTS.MY_WORKOUT + `/${queryParams.id}` + '/generate-instructions';
+    const { data } = await putRequest({
+      API: URL,
+      DATA: formData,
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const updateExerciseNotesOfWorkoutRequest = async (
+  payload: IPayloadUpdateExerciseToWorkout,
+) => {
+  try {
+    const { queryParams, formData } = payload;
+    const { id } = queryParams;
+    const params = `/${id}` + `/update-notes`;
+    const URL = API_ENPOINTS.MY_WORKOUT + params;
+    const { data } = await putRequest({
+      API: URL,
+      DATA: formData,
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const generateSaveGeneratedWorkoutService = async (payload: any) => {
+  try {
+    const URL = API_ENPOINTS.SAVE_WORKOUT_GENERATE;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: { ...payload },
     });
     return data;
   } catch (error: any) {

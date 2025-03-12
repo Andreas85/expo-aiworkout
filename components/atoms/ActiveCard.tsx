@@ -320,8 +320,12 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
           webStyles.container, // Apply native shadow styles here,
         ],
       })}>
-      <ActiveWorkoutIcon />
-      <ActiveWorkoutNotes item={item} />
+      {isWorkoutOwner && (
+        <>
+          <ActiveWorkoutIcon item={item} />
+          <ActiveWorkoutNotes item={item} />
+        </>
+      )}
       <Container
         style={[
           Platform.select({

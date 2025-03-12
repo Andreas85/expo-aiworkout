@@ -15,4 +15,5 @@ export const API_ENPOINTS = {
   WORKOUT_SESSION: '/workout-sessions',
   ME: '/me',
   WORKOUT_GENERATE: '/workouts/generate',
+  SAVE_WORKOUT_GENERATE: '/workouts/save-generated',
 };

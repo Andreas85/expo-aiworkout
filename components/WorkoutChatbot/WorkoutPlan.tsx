@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { ActionButton } from '../atoms/ActionButton';
 import { tailwind } from '@/utils/tailwind';
+import TextContainer from '../atoms/TextContainer';
+import { generateSaveGeneratedWorkoutService } from '@/services/workouts';
+import { useMutation } from '@tanstack/react-query';
+import { router } from 'expo-router';
 
 interface WorkoutPlanProps {
   plan: {
@@ -17,11 +21,32 @@ interface WorkoutPlanProps {
     name?: string;
     notes?: string;
   };
-  onSave: () => void;
   showSaveButton: boolean;
+  toggleModal: () => void;
 }
 
-export function WorkoutPlanView({ plan, onSave, showSaveButton }: WorkoutPlanProps) {
+export function WorkoutPlanView({ plan, showSaveButton, toggleModal }: WorkoutPlanProps) {
+  const [responseError, setResponseError] = useState<string>('');
+  const { mutate: mutateSaveGenerateWorkout, isPending: isPendingSaveGenerateWorkout } =
+    useMutation({
+      mutationFn: generateSaveGeneratedWorkoutService,
+      onSuccess: data => {
+        console.log('Workout saved', data);
+        setResponseError('');
+        toggleModal?.();
+        const workoutId = data?.data?._id;
+        router.push(`/workout/${workoutId}`);
+      },
+      onError: (error: string) => {
+        console.log('Workout Save Generated workout error:', error);
+        setResponseError(error);
+      },
+    });
+
+  const handleSaveWorkout = async () => {
+    console.log('Save workout plan');
+    mutateSaveGenerateWorkout(plan);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -69,11 +94,19 @@ export function WorkoutPlanView({ plan, onSave, showSaveButton }: WorkoutPlanPro
           <Text style={styles.notesText}>{plan.notes}</Text>
         </View>
       )}
+      {responseError && (
+        <TextContainer
+          style={tailwind('text-3 text-center text-red-400')}
+          className="text-center text-sm !text-red-400"
+          data={responseError}
+        />
+      )}
 
       {showSaveButton && (
         <ActionButton
-          label={'Save Workout Plan '}
-          onPress={onSave}
+          label={'Save Workout Plan'}
+          onPress={handleSaveWorkout}
+          isLoading={isPendingSaveGenerateWorkout}
           style={tailwind('rounded-lg')}
         />
       )}

@@ -62,6 +62,47 @@ export const editWorkout = async (
   await saveWorkouts(workouts); // Save the updated array to AsyncStorage
 };
 
+export const editWorkoutExerciseProperty = async (
+  workoutId: string,
+  exerciseId: string,
+  property: keyof ExerciseElement, // Ensure the property exists on the Exercise type
+  value: any, // The new value for the property
+): Promise<void> => {
+  try {
+    const workouts = await getWorkouts();
+    // Find the workout by ID
+    const workout = workouts?.find(workout => workout._id === workoutId);
+    if (!workout) throw new Error('Workout not found');
+
+    if (workout) {
+      const updatedExercises = workout.exercises.map((exercise: ExerciseElement) => {
+        if (exercise?._id === exerciseId) {
+          return {
+            ...exercise,
+            [property]: value, // Dynamically update the property
+          };
+        }
+        return exercise;
+      });
+
+      workout.exercises = updatedExercises;
+
+      workout.updatedAt = new Date().toISOString();
+      console.log('editWorkoutExercisePropertyworkout', workout);
+      await saveWorkouts(workouts); // Save the updated session
+      // Emit event after successful operation
+      DeviceEventEmitter.emit(STORAGE_EMITTER_KEYS.REFRESH_WORKOUT_DETAILS, {
+        action: 'updateExercisePropertyOfWorkout',
+        workoutId,
+      });
+    } else {
+      console.error('Workout session not found');
+    }
+  } catch (error) {
+    console.error(`Error updating exercise ${property}:`, error);
+  }
+};
+
 // Duplicate workout to the array of workouts in AsyncStorage
 export const duplicateWorkout = async (
   workout: Pick<Workout, 'name'>,
