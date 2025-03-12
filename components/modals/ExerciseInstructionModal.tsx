@@ -127,7 +127,7 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
         <ScrollView
           contentContainerStyle={{
             width: '100%',
-            minHeight: 400,
+            maxHeight: 400,
             height: 400,
           }}
           showsVerticalScrollIndicator={false}
@@ -141,59 +141,61 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
               flex: 1,
               height: 500,
             }}>
-            <RenderHTML
-              contentWidth={500}
-              htmlParserOptions={{ decodeEntities: true }}
-              source={{ html: instructions ?? htmlString }}
-              tagsStyles={{
-                html: {
-                  width: '100%',
-                  backgroundColor: '#1E1E2E', // Dark modern background
-                  padding: 16,
-                  borderRadius: 8,
-                },
-                h2: {
-                  color: '#E2E8F0', // Light text for contrast
-                  fontSize: 20,
-                  fontWeight: '600',
-                  marginBottom: 12,
-                  textTransform: 'capitalize',
-                },
-                ol: {
-                  listStyleType: 'none',
-                  paddingLeft: 0,
-                  marginLeft: 0,
-                },
-                div: {
-                  fontSize: 15,
-                  marginBottom: 10,
-                  lineHeight: 26,
-                  color: '#CBD5E1', // Softer color for readability
-                  flexDirection: 'column',
-                  width: '100%',
-                  // flexWrap: 'wrap',
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <RenderHTML
+                contentWidth={500}
+                htmlParserOptions={{ decodeEntities: true }}
+                source={{ html: instructions ?? htmlString }}
+                tagsStyles={{
+                  html: {
+                    width: '100%',
+                    // backgroundColor: '#1E1E2E', // Dark modern background
+                    padding: 16,
+                    borderRadius: 8,
+                  },
+                  h2: {
+                    color: '#E2E8F0', // Light text for contrast
+                    fontSize: 20,
+                    fontWeight: '600',
+                    marginBottom: 12,
+                    textTransform: 'capitalize',
+                  },
+                  ol: {
+                    listStyleType: 'none',
+                    paddingLeft: 0,
+                    marginLeft: 0,
+                  },
+                  div: {
+                    fontSize: 15,
+                    marginBottom: 10,
+                    lineHeight: 26,
+                    color: '#CBD5E1', // Softer color for readability
+                    flexDirection: 'column',
+                    width: '100%',
+                    // flexWrap: 'wrap',
 
-                  padding: 8,
-                  borderRadius: 6,
-                  backgroundColor: '#2D2D44', // Slight contrast for sectioning
-                },
-                span: {
-                  width: '100%',
-                  flexWrap: 'wrap',
-                  color: '#A5B4FC', // Soft blue for emphasis
-                },
-                strong: {
-                  fontWeight: 'bold',
-                  color: Colors.brandColor, // A modern golden-yellow for highlights
-                },
-                p: {
-                  fontSize: 15,
-                  marginTop: 12,
-                  color: '#E2E8F0',
-                  lineHeight: 26,
-                },
-              }}
-            />
+                    padding: 8,
+                    borderRadius: 6,
+                    backgroundColor: '#2D2D44', // Slight contrast for sectioning
+                  },
+                  span: {
+                    width: '100%',
+                    flexWrap: 'wrap',
+                    color: '#A5B4FC', // Soft blue for emphasis
+                  },
+                  strong: {
+                    fontWeight: 'bold',
+                    color: Colors.brandColor, // A modern golden-yellow for highlights
+                  },
+                  p: {
+                    fontSize: 15,
+                    marginTop: 12,
+                    color: '#E2E8F0',
+                    lineHeight: 26,
+                  },
+                }}
+              />
+            </ScrollView>
           </View>
         </ScrollView>
       );
