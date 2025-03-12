@@ -431,11 +431,15 @@ const ExerciseCard = (props: IExerciseCard) => {
               style={[
                 Platform.select({
                   web: tailwind('w-full flex-row items-center justify-between gap-4'),
-                  native: tailwind('flex-1 flex-row items-center justify-between gap-4'),
+                  native: tailwind('mx-1 flex-1 flex-row items-center justify-between gap-4'),
                 }),
               ]}>
-              <ActiveWorkoutIcon item={data} isDraggableExerciseCard={true} />
-              <ActiveWorkoutNotes item={data} isDraggableExerciseCard={true} />
+              <View>
+                <ActiveWorkoutIcon item={data} isDraggableExerciseCard={true} />
+              </View>
+              <View>
+                <ActiveWorkoutNotes item={data} isDraggableExerciseCard={true} />
+              </View>
             </Container>
 
             <Container
