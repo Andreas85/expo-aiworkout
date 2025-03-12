@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
 import {
   type TouchableWithoutFeedbackProps,
-  View,
   StyleProp,
   Pressable,
   ViewStyle,
   ActivityIndicator,
+  GestureResponderEvent,
 } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { Text } from '../Themed';
+import Container from './Container';
 
 export function ActionButton({
   label,
@@ -19,39 +20,44 @@ export function ActionButton({
   uppercase = false,
   onPress,
   disabled,
+  isOutline = false,
   ...rest
 }: {
   label: string;
   left?: ReactNode;
+  type?: 'button' | 'submit' | 'reset';
   isLoading?: boolean;
   uppercase?: boolean;
   labelStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
-  onPress?(): void;
+  isOutline?: boolean;
+  onPress?: (event?: GestureResponderEvent) => void | any;
 } & TouchableWithoutFeedbackProps) {
   return (
     <Pressable
       {...rest}
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       style={hovered => [
         tailwind(
-          `bg-WORKOUT_PURPLE h-10 flex-row items-center justify-center rounded-full px-6 py-3 ${disabled ? 'bg-gray-500' : ''}`,
+          `min-h-10 flex-row items-center justify-center rounded-full ${isOutline ? 'border border-WORKOUT_PURPLE ' : 'bg-WORKOUT_PURPLE '} px-6 py-2 ${disabled ? 'bg-gray-500' : ''}`,
         ),
         hovered && tailwind(''),
         style,
       ]}>
-      <View style={tailwind('flex-row items-center')}>
+      <Container style={tailwind('flex-row items-center gap-x-2 self-center')}>
         {left}
-        <Text
-          style={[
-            tailwind('text-4 font-bold leading-6 text-white'),
-            labelStyle,
-            { textTransform: uppercase ? 'uppercase' : 'capitalize' },
-          ]}>
-          {isLoading ? <ActivityIndicator /> : label}
-        </Text>
-      </View>
+        {label && (
+          <Text
+            style={[
+              tailwind('text-4  leading-6 text-white'),
+              labelStyle,
+              { textTransform: uppercase ? 'uppercase' : 'capitalize' },
+            ]}>
+            {isLoading ? <ActivityIndicator /> : label}
+          </Text>
+        )}
+      </Container>
     </Pressable>
   );
 }
