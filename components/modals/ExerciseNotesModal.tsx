@@ -146,7 +146,6 @@ const ExerciseNotesModal = (props: IExerciseNotesModal) => {
                   style={tailwind('mt-4  flex-row flex-wrap items-center justify-center gap-2')}>
                   <ActionButton
                     uppercase={true}
-                    disabled={!notes}
                     isLoading={isPending}
                     label={'Update Notes'}
                     onPress={handleSubmit}
