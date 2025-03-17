@@ -228,3 +228,19 @@ export function navigateToWorkoutDetail(isPrivate: boolean, workoutId: string) {
 export const debouncedMutate = debounce((mutateFn, payload) => {
   mutateFn(payload);
 }, 500);
+
+export const updateExerciseDataInWorkoutSession = (
+  updatedExerciseList: ExerciseElement[],
+  exerciseId: string,
+): ExerciseElement | undefined => {
+  const updatedExercise = updatedExerciseList.find(
+    (exercise: ExerciseElement) => exercise._id === exerciseId,
+  );
+
+  //  Please do error handling
+  if (!updatedExercise) {
+    console.log('Exercise not found in updated list');
+    return;
+  }
+  return updatedExercise;
+};

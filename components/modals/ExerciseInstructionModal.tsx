@@ -9,7 +9,7 @@ import { generateWorkoutInstructionService } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { router, useLocalSearchParams, usePathname } from 'expo-router';
-import { debouncedMutate } from '@/utils/helper';
+import { debouncedMutate, updateExerciseDataInWorkoutSession } from '@/utils/helper';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import Colors from '@/constants/Colors';
 import { useAuthStore } from '@/store/authStore';
@@ -54,10 +54,14 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
   const pathname = usePathname();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { updateWorkoutExercises } = useWorkoutDetailStore();
+  const isWorkoutSessionDetailScreen = useWorkoutSessionStore(
+    state => state.isWorkoutSessionDetailScreen,
+  );
+  const { updateExercisePropertyZustand } = useWorkoutSessionStore();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
   const [instructions, setInstructions] = useState<string>('');
-  console.log('item-instruction', instructions);
+
   const {
     mutate: mutateUpdateExerciseToWorkoutRequest,
     isPending,
@@ -65,7 +69,17 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
   } = useMutation({
     mutationFn: generateWorkoutInstructionService,
     onSuccess: async data => {
-      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      if (isWorkoutSessionDetailScreen) {
+        const result = updateExerciseDataInWorkoutSession(
+          data?.data?.exercises,
+          item.exerciseId ?? '',
+        );
+        updateExercisePropertyZustand(item.order, 'instructions', result?.instructions);
+      } else {
+        queryClient.invalidateQueries({
+          queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+        });
+      }
       updateWorkoutExercises(data?.data?.exercises);
     },
     onError: (error: any) => {
