@@ -124,6 +124,7 @@ export interface Workout {
 }
 
 export interface ExerciseElement {
+  sets?: string;
   name?: string;
   _id: string;
   exercise: ExerciseExercise;

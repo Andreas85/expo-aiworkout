@@ -7,10 +7,12 @@ import usePlatform from './usePlatform';
 import { formatFitnessData } from '@/utils/AiWorkoutPlanHelper';
 import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
+import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
 
 export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void) => {
   const { isWeb } = usePlatform();
   const [currentQuestionId, setCurrentQuestionId] = useState('entry');
+  const { setGeneratedWorkoutPlan } = useGenerateWorkoutPlanStore();
 
   const [responses, setResponses] = useState<UserResponse[]>([]);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
@@ -29,6 +31,7 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     mutationFn: generateWorkoutService,
     onSuccess: data => {
       setWorkoutPlan(data?.data);
+      setGeneratedWorkoutPlan(data?.data);
       setResponseError('');
     },
     onError: (error: string) => {
@@ -136,6 +139,7 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
       setCurrentFeedback(feedback);
       // Reset workout and regenerate with feedback
       setWorkoutPlan(null);
+      setGeneratedWorkoutPlan(null);
       setShowFeedback(false);
 
       handleGenerateWorkout(true, feedback.feedback); // Regenerate workout with feedback

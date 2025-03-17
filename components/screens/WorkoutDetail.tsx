@@ -31,16 +31,28 @@ import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 import RenderWorkoutDetailController from '../atoms/RenderWorkoutDetailController';
 import RenderWorkoutDetailExercises from '../atoms/RenderWorkoutDetailExercises';
 import RenderWorkoutDetailStartWorkoutContainer from '../atoms/RenderWorkoutDetailStartWorkoutContainer';
+import EditGenerateWorkout from '../modals/EditGenerateWorkout';
+import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
+import Colors from '@/constants/Colors';
+import StarsIcon from '../atoms/AiStarsIcon';
+import { ExerciseElement, Workout } from '@/services/interfaces';
+import { WorkoutPlan } from '@/types';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams() as any;
+  const { setGeneratedWorkoutPlan } = useGenerateWorkoutPlanStore();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const { handleDeleteWorkoutForNonLoggedInUser, handleDuplicateWorkoutForNonLoggedInUser } =
     useWorkoutNonLoggedInUser();
   const { hideModal, showModal, openModal } = useModal();
+  const {
+    hideModal: hideEditGeneratedWorkoutModal,
+    openModal: openEditGeneratedWorkoutModal,
+    showModal: showEditGeneratedWorkoutModal,
+  } = useModal();
   const {
     hideModal: hideModalAddExercise,
     openModal: openModalAddExercise,
@@ -143,10 +155,17 @@ const WorkoutDetail = () => {
     }
   }, [workoutDetail]);
 
+  const handleEditGeneratedWorkoutClick = () => {
+    if (workoutDetail) {
+      setGeneratedWorkoutPlan(workoutDetail as unknown as WorkoutPlan);
+      showEditGeneratedWorkoutModal();
+    }
+  };
   const renderExcerciseLabel = () => {
     return (
       <>
-        <Container style={[tailwind('mb-2 flex-row items-center justify-between gap-2 ')]}>
+        <Container
+          style={[tailwind(`mb-2 flex-row flex-wrap items-center justify-between gap-2  `)]}>
           <Container style={[tailwind(``)]}>
             <TextContainer
               data={`Exercises `}
@@ -189,17 +208,35 @@ const WorkoutDetail = () => {
               />
             </Container>
           )}
-          <ActionButton
-            label={'Add Exercise'}
-            onPress={showModalAddExercise}
+          <Container
             style={[
-              Platform.select({
-                web: tailwind('rounded-xl px-3'),
-                native: tailwind('rounded-xl px-3'),
-              }),
-            ]}
-            left={<AntDesign name="pluscircleo" size={20} color="white" />}
-          />
+              tailwind(
+                `relative ${isExtraSmallScreenOnly ? 'w-full' : 'w-auto'} flex-row flex-wrap items-center gap-2 self-center`,
+              ),
+            ]}>
+            <ActionButton
+              label={'Regenerated Workout'}
+              onPress={handleEditGeneratedWorkoutClick}
+              style={[
+                Platform.select({
+                  web: tailwind('rounded-xl px-3'),
+                  native: tailwind('rounded-xl px-3'),
+                }),
+              ]}
+              left={<StarsIcon brandColor={Colors.white} />}
+            />
+            <ActionButton
+              label={'Add Exercise'}
+              onPress={showModalAddExercise}
+              style={[
+                Platform.select({
+                  web: tailwind('rounded-xl px-3'),
+                  native: tailwind('rounded-xl px-3'),
+                }),
+              ]}
+              left={<AntDesign name="pluscircleo" size={20} color="white" />}
+            />
+          </Container>
         </Container>
         <Container
           style={[
@@ -325,6 +362,10 @@ const WorkoutDetail = () => {
       {openModalAddExercise && (
         <AddExercise isModalVisible={openModalAddExercise} closeModal={hideModalAddExercise} />
       )}
+      <EditGenerateWorkout
+        isVisible={openEditGeneratedWorkoutModal}
+        toggleModal={hideEditGeneratedWorkoutModal}
+      />
     </Container>
   );
 };

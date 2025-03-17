@@ -96,7 +96,7 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
     const pathSegements = pathname.split('/');
     // console.log('iteminstruction-useEffect', item?.instructions, item?.instructions === undefined);
     if (isVisible && item?.instructions === undefined && isAuthenticated) {
-      let payload = {
+      let payload: any = {
         formData: {
           index: item?.order,
           exercise: item,
@@ -107,6 +107,12 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
       if (pathSegements?.[1] === 'workout-session') {
         console.log('Api call', payload);
         payload.queryParams = { id: workoutSessionDetails?.workoutId };
+        payload.formData.exercise = {
+          ...item,
+          exercise: {
+            name: item?.name ?? '',
+          } as { name: string },
+        };
       } else if (pathSegements?.[1] === 'workout') {
         payload.queryParams = { id: slug };
       }

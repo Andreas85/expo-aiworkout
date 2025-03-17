@@ -1,3 +1,5 @@
+import { ExerciseElement } from './services/interfaces';
+
 export type QuestionType = 'single-select' | 'multi-select' | 'yes-no' | 'text';
 
 export interface QuestionOption {
@@ -26,13 +28,15 @@ export interface UserResponse {
 export interface WorkoutPlan {
   exercises: {
     name: string;
-    sets: number;
+    sets?: number;
     reps: string;
     rest: string;
+    duration?: string;
+    exercise?: ExerciseElement;
+    weight?: string;
   }[];
-  frequency: string;
-  duration: string;
-  notes: string;
+  name?: string;
+  notes?: string;
 }
 
 export interface WorkoutFeedback {

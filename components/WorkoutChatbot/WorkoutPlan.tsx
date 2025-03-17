@@ -7,20 +7,10 @@ import TextContainer from '../atoms/TextContainer';
 import { generateSaveGeneratedWorkoutService } from '@/services/workouts';
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { WorkoutPlan } from '@/types';
 
 interface WorkoutPlanProps {
-  plan: {
-    exercises?: {
-      name: string;
-      sets: number;
-      reps: string;
-      rest: string;
-      duration?: string;
-      weight?: string;
-    }[];
-    name?: string;
-    notes?: string;
-  };
+  plan: WorkoutPlan;
   showSaveButton: boolean;
   toggleModal: () => void;
 }
@@ -51,47 +41,41 @@ export function WorkoutPlanView({ plan, showSaveButton, toggleModal }: WorkoutPl
     <View style={styles.container}>
       <View style={styles.header}>
         <FontAwesome5 name="dumbbell" size={24} color="#6b46c1" />
-        <Text style={styles.title}>Your Personalized Workout Plan</Text>
+        <Text style={styles.title}>Your Personalized Workout Plan </Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Workout Details</Text>
         <View style={styles.detailsRow}>
           <Text style={styles.detailLabel}>Name:</Text>
-          <Text style={styles.detailText}>{plan.name}</Text>
+          <Text style={styles.detailText}>{plan?.name}</Text>
         </View>
-        {/* <View style={styles.detailsRow}>
-          <Text style={styles.detailLabel}>Frequency:</Text>
-          <Text style={styles.detailText}>{plan.frequency}</Text>
-        </View>
-        <View style={styles.detailsRow}>
-          <Text style={styles.detailLabel}>Duration:</Text>
-          <Text style={styles.detailText}>{plan.duration}</Text>
-        </View> */}
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Exercises</Text>
+        <Text style={styles.sectionTitle}>Exercises </Text>
         {plan?.exercises?.map((exercise, index) => (
           <View key={index} style={styles.exerciseCard}>
-            <Text style={styles.exerciseName}>{exercise.name}</Text>
+            <Text style={styles.exerciseName}>
+              {exercise.name || exercise?.exercise?.name || ''}
+            </Text>
             <View style={styles.exerciseDetails}>
               {exercise.reps ? (
-                <Text style={styles.exerciseText}>Reps: {exercise.reps}</Text>
+                <Text style={styles.exerciseText}>Reps: {exercise.reps || 0}</Text>
               ) : (
-                <Text style={styles.exerciseText}>Duration: {exercise.duration}</Text>
+                <Text style={styles.exerciseText}>Duration: {exercise.duration || 0}</Text>
               )}
-              <Text style={styles.exerciseText}>Rest: {exercise.rest}</Text>
-              <Text style={styles.exerciseText}>Weight: {exercise.weight}</Text>
+              <Text style={styles.exerciseText}>Rest: {exercise.rest || 0}</Text>
+              <Text style={styles.exerciseText}>Weight: {exercise.weight || 0}</Text>
             </View>
           </View>
         ))}
       </View>
 
-      {plan.notes && (
+      {plan?.notes && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Additional Notes</Text>
-          <Text style={styles.notesText}>{plan.notes}</Text>
+          <Text style={styles.notesText}>{plan?.notes}</Text>
         </View>
       )}
       {responseError && (
