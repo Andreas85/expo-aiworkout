@@ -215,7 +215,7 @@ const WorkoutDetail = () => {
               ),
             ]}>
             <ActionButton
-              label={'Regenerated Workout'}
+              label={'Regenerate Workout'}
               onPress={handleEditGeneratedWorkoutClick}
               style={[
                 Platform.select({

@@ -103,7 +103,7 @@ const EditGenerateWorkout = ({
 
           {/* Header */}
           <LabelContainer
-            label="Regenerated Workout"
+            label="Regenerate Workout"
             labelStyle={styles.header}
             right={<StarsIcon brandColor={Colors.brandColor} />}
           />

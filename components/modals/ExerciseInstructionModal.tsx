@@ -69,7 +69,8 @@ const ExerciseInstructionModal = (props: IExerciseInstructionModal) => {
   } = useMutation({
     mutationFn: generateWorkoutInstructionService,
     onSuccess: async data => {
-      if (isWorkoutSessionDetailScreen) {
+      const pathSegements = pathname.split('/');
+      if (pathSegements?.[1] === 'workout-session') {
         const result = updateExerciseDataInWorkoutSession(
           data?.data?.exercises,
           item.exerciseId ?? '',
