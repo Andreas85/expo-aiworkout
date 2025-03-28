@@ -338,6 +338,37 @@ export const generateWorkoutService = async (payload: { prompt?: any }) => {
   }
 };
 
+export const reGenerateWorkoutService = async (payload: { prompt: string; id: string }) => {
+  try {
+    const { id, prompt } = payload;
+    const URL = `/workouts/${id}/re-generate`;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: { prompt },
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const updateGenerateWorkoutService = async (payload: {
+  exercises: ExerciseElement[];
+  id: string;
+}) => {
+  try {
+    const { id, exercises } = payload;
+    const URL = `/workouts/${id}/update-generated`;
+    const { data } = await putRequest({
+      API: URL,
+      DATA: { exercises },
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
 export const generateWorkoutInstructionService = async (payload: {
   formData: { index: number; exercise: ExerciseElement };
   queryParams: { id: string };

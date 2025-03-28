@@ -1,18 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { UserResponse, WorkoutFeedback, WorkoutPlan } from '@/types';
-import { generateSaveGeneratedWorkoutService, generateWorkoutService } from '@/services/workouts';
+import {
+  generateWorkoutService,
+  reGenerateWorkoutService,
+  updateGenerateWorkoutService,
+} from '@/services/workouts';
 import { questions } from '@/components/WorkoutChatbot/questions';
 import usePlatform from './usePlatform';
 import { formatFitnessData } from '@/utils/AiWorkoutPlanHelper';
 import { ScrollView } from 'react-native';
-import { router } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
 export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void) => {
   const { isWeb } = usePlatform();
+  const { slug } = useLocalSearchParams() as { slug: string };
   const [currentQuestionId, setCurrentQuestionId] = useState('entry');
   const { setGeneratedWorkoutPlan } = useGenerateWorkoutPlanStore();
+  const { setWorkoutDetail } = useWorkoutDetailStore();
 
   const [responses, setResponses] = useState<UserResponse[]>([]);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
@@ -39,6 +46,39 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
       setResponseError(error);
     },
   });
+
+  const { mutate: mutateRegenerateWorkout, isPending: isPendingRegenerateWorkout } = useMutation({
+    mutationFn: reGenerateWorkoutService,
+    onSuccess: data => {
+      const payload = {
+        id: slug,
+        exercises: data?.data?.exercises,
+      };
+      mutateUpdateGenerateWorkout(payload);
+      setResponseError('');
+    },
+    onError: (error: string) => {
+      console.warn('Workout generation error:', error);
+      setResponseError(error);
+    },
+  });
+
+  const { mutate: mutateUpdateGenerateWorkout, isPending: isPendingUpdateGenerateWorkout } =
+    useMutation({
+      mutationFn: updateGenerateWorkoutService,
+      onSuccess: data => {
+        console.log('Workout saved', data);
+
+        setWorkoutDetail(data?.data);
+        toggleModal?.();
+        // setGeneratedWorkoutPlan(data?.data);
+        setResponseError('');
+      },
+      onError: (error: string) => {
+        console.log('Workout mutateUpdateGenerateWorkout error:', error);
+        setResponseError(error);
+      },
+    });
 
   const messageEndScrollToBottomInWeb = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -148,6 +188,10 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     }
   };
 
+  const handleRegenerateWorkout = (feedback: string) => {
+    mutateRegenerateWorkout({ prompt: feedback, id: slug });
+  };
+
   return {
     responses,
     workoutPlan,
@@ -159,6 +203,8 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     currentQuestionId,
     isWorkoutApproved,
     showFeedback,
+    isPendingRegenerateWorkout,
+    isPendingUpdateGenerateWorkout,
     handleFeedback,
     scrollToBottom,
     handleAnswer,
@@ -166,5 +212,6 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     getCurrentResponse,
     goBack,
     generateWorkout,
+    handleRegenerateWorkout,
   };
 };

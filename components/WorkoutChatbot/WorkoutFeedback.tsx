@@ -1,23 +1,39 @@
 import { WorkoutFeedback } from '@/types';
 import { FontAwesome } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import TextContainer from '../atoms/TextContainer';
+import { tailwind } from '@/utils/tailwind';
 
 interface WorkoutFeedbackProps {
   isEditGeneratedWorkout?: boolean;
+  isEditLoading?: boolean;
   onSubmit: (feedback: WorkoutFeedback) => void;
+  onSubmitRegenerate?: (data: string) => void;
+  errorMessage?: string;
 }
 
 export function WorkoutFeedbackView({
   onSubmit,
+  onSubmitRegenerate,
   isEditGeneratedWorkout = false,
+  isEditLoading = false,
+  errorMessage = '',
 }: WorkoutFeedbackProps) {
   const [feedback, setFeedback] = useState('');
   const [showTextArea, setShowTextArea] = useState(false);
 
   const handleSubmit = () => {
     if (isEditGeneratedWorkout) {
-      console.log('Feedback:', feedback);
+      console.log('Feedback:Mobile', feedback);
+      onSubmitRegenerate?.(feedback);
       return;
     }
     onSubmit({ rating: 'needs_changes', feedback });
@@ -34,8 +50,21 @@ export function WorkoutFeedbackView({
             style={styles.textArea}
             multiline
           />
-          <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-            <Text style={styles.submitText}>Submit Feedback</Text>
+
+          {errorMessage && (
+            <TextContainer
+              style={tailwind('text-3 text-center text-red-400')}
+              className="text-center text-sm !text-red-400"
+              data={errorMessage}
+            />
+          )}
+          <TouchableOpacity
+            onPress={handleSubmit}
+            style={[styles.submitButton, (!feedback || isEditLoading) && styles.submitDisabled]}
+            disabled={!feedback || isEditLoading}>
+            <Text style={styles.submitText}>
+              {isEditLoading ? <ActivityIndicator /> : 'Submit Feedback'}
+            </Text>
           </TouchableOpacity>
         </View>
       );
@@ -143,5 +172,8 @@ const styles = StyleSheet.create({
   submitText: {
     color: '#fff',
     fontWeight: '500',
+  },
+  submitDisabled: {
+    backgroundColor: '#93c5fd',
   },
 });

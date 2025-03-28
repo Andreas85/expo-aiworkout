@@ -36,10 +36,20 @@ function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   };
 
-  const { isWorkoutApproved, handleFeedback } = useChatBot(toggleModal, scrollToBottom);
+  const {
+    isWorkoutApproved,
+    handleFeedback,
+    handleRegenerateWorkout,
+    responseError,
+    isPendingRegenerateWorkout,
+    isPendingUpdateGenerateWorkout,
+  } = useChatBot(toggleModal, scrollToBottom);
 
   const generatedWorkoutPlan = useGenerateWorkoutPlanStore(state => state.generatedWorkoutPlan);
-
+  const workoutPlan = {
+    name: generatedWorkoutPlan?.name,
+    exercises: generatedWorkoutPlan?.exercises || [],
+  };
   useEffect(() => {
     if (isKeyboardVisible) {
       setTimeout(() => {
@@ -79,7 +89,13 @@ function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
               </ChatMessage>
 
               <ChatMessage isBot={true} wrapChildren={true}>
-                <WorkoutFeedbackView onSubmit={handleFeedback} isEditGeneratedWorkout={true} />
+                <WorkoutFeedbackView
+                  onSubmit={handleFeedback}
+                  onSubmitRegenerate={handleRegenerateWorkout}
+                  isEditGeneratedWorkout={true}
+                  errorMessage={responseError ?? ''}
+                  isEditLoading={isPendingRegenerateWorkout || isPendingUpdateGenerateWorkout}
+                />
               </ChatMessage>
             </TouchableOpacity>
           </ScrollView>

@@ -10,7 +10,15 @@ import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
 function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
   const { isLargeScreen } = useWebBreakPoints();
-  const { messagesEndRef, handleFeedback, isWorkoutApproved } = useChatBot(toggleModal);
+  const {
+    messagesEndRef,
+    handleFeedback,
+    isWorkoutApproved,
+    handleRegenerateWorkout,
+    isPendingRegenerateWorkout,
+    isPendingUpdateGenerateWorkout,
+    responseError,
+  } = useChatBot(toggleModal);
   const generatedWorkoutPlan = useGenerateWorkoutPlanStore(state => state.generatedWorkoutPlan);
 
   return (
@@ -30,7 +38,13 @@ function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
               />
             </ChatMessage>
             <ChatMessage isBot={true}>
-              <WorkoutFeedbackView onSubmit={handleFeedback} isEditGeneratedWorkout={true} />
+              <WorkoutFeedbackView
+                onSubmit={handleFeedback}
+                onSubmitRegenerate={handleRegenerateWorkout}
+                isEditGeneratedWorkout={true}
+                errorMessage={responseError ?? ''}
+                isEditLoading={isPendingRegenerateWorkout || isPendingUpdateGenerateWorkout}
+              />
             </ChatMessage>
             <div ref={messagesEndRef} />
           </div>
