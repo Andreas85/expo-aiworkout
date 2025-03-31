@@ -1,4 +1,4 @@
-import { Platform, TouchableOpacity, View } from 'react-native';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { tailwind } from '@/utils/tailwind';
 import Container from './Container';
@@ -10,6 +10,7 @@ import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import ExerciseNotesModal from '../modals/ExerciseNotesModal';
 import useModal from '@/hooks/useModal';
 import { ExerciseElement } from '@/services/interfaces';
+import { hasValidData } from '@/utils/helper';
 
 const ActiveWorkoutNotes = (props: {
   item: ExerciseElement;
@@ -19,6 +20,7 @@ const ActiveWorkoutNotes = (props: {
   const { isLargeScreen } = useWebBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
   const { handlePause } = useTimer();
+  const hasNotes = hasValidData(item, 'notes') ? item.notes : null;
   const isActiveRepExerciseCard = useWorkoutSessionStore(state => state.isActiveRepExerciseCard);
 
   const handleActiveWorkoutIconClick = () => {
@@ -55,7 +57,7 @@ const ActiveWorkoutNotes = (props: {
           <Foundation
             name="clipboard-notes"
             size={isDraggableExerciseCard ? 28 : 38}
-            color={Colors.brandColor}
+            color={hasNotes ? '#7431e7' : Colors.brandColor}
           />
         </TouchableOpacity>
       </Container>

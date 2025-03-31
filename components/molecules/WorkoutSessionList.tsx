@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useId } from 'react';
 import { FlatList, Platform } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import useBreakPoints from '@/hooks/useBreakPoints';
@@ -22,9 +22,10 @@ const WorkoutSessionList = ({
   data,
   isPending,
   numColumns,
-  isEnabled,
+  isEnabled = true,
   onRefresh,
 }: WorkoutListProps) => {
+  const uniqueId = useId();
   const { isMediumScreen } = useBreakPoints();
   const MemoizedWorkoutSessionCard = React.memo(WorkoutSessionCard);
   const MemoizedWorkoutSessionCardShort = React.memo(WorkoutSessionShortVersionCard);
@@ -56,12 +57,15 @@ const WorkoutSessionList = ({
     [],
   );
 
-  const renderListItemIsShortVersion = useCallback(
-    ({ item, index }: { item: WorkoutSessionResponseData; index: number }) => {
-      return <MemoizedWorkoutSessionCardShort item={item} />;
-    },
-    [],
-  );
+  const renderListItemIsShortVersion = ({
+    item,
+    index,
+  }: {
+    item: WorkoutSessionResponseData;
+    index: number;
+  }) => {
+    return <MemoizedWorkoutSessionCardShort key={uniqueId} item={item} />;
+  };
 
   if (isEnabled) {
     return (
@@ -69,7 +73,7 @@ const WorkoutSessionList = ({
         data={data}
         numColumns={!isMediumScreen ? numColumns : undefined}
         keyExtractor={(item, index) =>
-          item?._id?.toString() + 'is-workout-session-short-version' + index.toString()
+          item?._id?.toString() + 'is-workout-session-short-version' + index.toString() + uniqueId
         }
         key={`${numColumns}-${isEnabled}`}
         initialNumToRender={4}

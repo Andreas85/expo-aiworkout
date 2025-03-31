@@ -93,7 +93,7 @@ const GenerateWorkoutAiBot = ({
           style={Platform.select({
             web: isLargeScreen
               ? styles.modalContainer
-              : tailwind('mx-auto rounded-lg bg-NAVBAR_BACKGROUND p-4'),
+              : tailwind('mx-auto w-3/5 rounded-lg bg-NAVBAR_BACKGROUND p-4'),
             native: styles.modalContainer,
           })}>
           {/* Close Button */}

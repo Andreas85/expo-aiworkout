@@ -1,25 +1,24 @@
 import Container from '@/components/atoms/Container';
 import { Text } from '@/components/Themed';
 import { tailwind } from '@/utils/tailwind';
-import { useCallback, useState } from 'react';
-import CustomSwitch from '../atoms/CustomSwitch';
-import { LayoutAnimation, Platform } from 'react-native';
+import { memo } from 'react';
+import { Platform } from 'react-native';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import React from 'react';
 import WorkoutSessionList from '../molecules/WorkoutSessionList';
 import { WorkoutSession } from '@/utils/workoutSessionHelper';
 import { router } from 'expo-router';
 
-export default function WorkoutSessions(props: { workoutSessionData: any }) {
+const WorkoutSessions = (props: { workoutSessionData: any }) => {
   const { workoutSessionData } = props;
   const { isSmallScreen, isLargeScreen } = useBreakPoints();
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
-
+  // const [isEnabled, setIsEnabled] = useState<boolean>(false);
+  const isEnabled = true;
   // const toggleSwitch = () => setIsEnabled(prev => !prev);
-  const toggleSwitch = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsEnabled(prevState => !prevState);
-  }, []);
+  // const toggleSwitch = useCallback(() => {
+  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  //   setIsEnabled(prevState => !prevState);
+  // }, []);
 
   const handleCardClick = (item: WorkoutSession) => {
     router.push(`/workout-session/${item?._id}/detail` as any);
@@ -87,18 +86,20 @@ export default function WorkoutSessions(props: { workoutSessionData: any }) {
     );
   };
 
-  const renderVersionTab = () => {
-    return <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short Version" />;
-  };
+  // const renderVersionTab = () => {
+  //   return <CustomSwitch isEnabled={isEnabled} toggleSwitch={toggleSwitch} label="Short Version" />;
+  // };
 
   return (
     <>
       <Container
         style={tailwind(`h-full w-full flex-1 px-4 ${!isLargeScreen ? 'my-4 px-28' : ''} `)}>
-        {renderVersionTab()}
+        {/* {renderVersionTab()} */}
         {renderTopHeader()}
         {renderWorkingListing()}
       </Container>
     </>
   );
-}
+};
+
+export default memo(WorkoutSessions);

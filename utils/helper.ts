@@ -244,3 +244,41 @@ export const updateExerciseDataInWorkoutSession = (
   }
   return updatedExercise;
 };
+
+export const formatDateTime = (date: string | Date): string => {
+  try {
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) {
+      console.warn('Invalid date value:', date);
+      return 'Invalid Date';
+    }
+
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    }).format(d);
+
+    const formattedTime = new Intl.DateTimeFormat('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      // second: '2-digit',
+      hour12: true,
+    }).format(d);
+
+    return `${formattedDate} ${formattedTime}`;
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
+};
+
+export const hasValidData = (obj: Record<string, any>, key: string) => {
+  return (
+    Object.prototype.hasOwnProperty.call(obj, key) &&
+    obj[key] !== null &&
+    obj[key] !== undefined &&
+    obj[key] !== ''
+  );
+};

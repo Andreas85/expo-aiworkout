@@ -50,7 +50,7 @@ export const WORKOUT_TABS: ITabItem[] = [
 
 export const headerOptions: ITabItem[] = [
   { key: 'workout', value: 'Workout', path: '/(tabs)/(workout)/workouts' },
-  { key: 'my-exercise', value: 'My Exercise', path: '/(tabs)/my-exercise' },
+  // { key: 'my-exercise', value: 'My Exercise', path: '/(tabs)/my-exercise' },
   { key: 'workout-sessions', value: 'Workout Session', path: '/(tabs)/workout-sessions' },
   { key: 'profile', value: 'Profile', path: '/(tabs)/profile' },
 ];

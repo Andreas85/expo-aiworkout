@@ -79,7 +79,7 @@ export default function TabLayout() {
             title: 'My exercise',
             headerShown: false,
             tabBarItemStyle: {
-              display: isAuthenticated ? 'flex' : 'none',
+              display: 'none',
               marginBottom: 5,
             },
             tabBarIcon: ({ color, size }) => (
