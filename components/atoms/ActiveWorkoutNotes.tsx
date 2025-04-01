@@ -57,7 +57,7 @@ const ActiveWorkoutNotes = (props: {
           <Foundation
             name="clipboard-notes"
             size={isDraggableExerciseCard ? 28 : 38}
-            color={hasNotes ? '#7431e7' : Colors.brandColor}
+            color={hasNotes ? '#EBB866' : Colors.brandColor}
           />
         </TouchableOpacity>
       </Container>

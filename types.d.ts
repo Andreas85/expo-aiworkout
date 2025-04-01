@@ -43,3 +43,9 @@ export interface WorkoutFeedback {
   rating: 'good' | 'needs_changes';
   feedback?: string;
 }
+
+export interface WorkoutHistory {
+  feedback: string;
+  workoutPlan: WorkoutPlan[];
+  historyId: string;
+}

@@ -9,6 +9,7 @@ import { STRING_DATA } from '@/utils/appConstants';
 import { useChatBot } from '@/hooks/useChatBot';
 import { WorkoutFeedbackView } from './WorkoutFeedback.web';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { WorkoutHistoryView } from './WorkoutHistoryView';
 
 function InitializeChatBot(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
@@ -19,7 +20,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
     workoutPlan,
     responseError,
     isPendingGenerateWorkout,
-
+    workoutPlanHistoryList,
     messagesEndRef,
     showFeedback,
     handleFeedback,
@@ -34,7 +35,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
   return (
     <div
       className={` ${isLargeScreen ? 'h-full max-h-full min-h-[80vh]' : 'max-h-[60vh]'} overflow-y-auto rounded-xl border border-gray-800 bg-black `}>
-      <div className=" max-w-2xl ">
+      <div className="  ">
         <div className="p-4 sm:p-6">
           <div className=" space-y-6">
             <ChatMessage isBot={true}>
@@ -76,7 +77,6 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                 </div>
               </>
             )}
-
             {!workoutPlan && currentQuestionId === 'end' && (
               <>
                 <div className="mt-6 flex flex-col justify-center">
@@ -97,9 +97,24 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                 </div>
               </>
             )}
-
             {/* Workout plan and feedback */}
-            {workoutPlan && (
+            {workoutPlanHistoryList?.length > 0 && (
+              <>
+                <WorkoutHistoryView
+                  workoutHistory={workoutPlanHistoryList}
+                  toggleModal={toggleModal}
+                  showSaveButton={isWorkoutApproved}
+                  handleFeedback={handleFeedback}
+                />
+
+                {/* {showFeedback && !isWorkoutApproved && (
+                  <ChatMessage isBot={true}>
+                    <WorkoutFeedbackView onSubmit={handleFeedback} />
+                  </ChatMessage>
+                )} */}
+              </>
+            )}
+            {/* {workoutPlan && (
               <>
                 <ChatMessage isBot={true}>
                   <WorkoutPlanView
@@ -115,7 +130,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                   </ChatMessage>
                 )}
               </>
-            )}
+            )} */}
 
             <div ref={messagesEndRef} />
           </div>
