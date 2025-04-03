@@ -13,9 +13,15 @@ interface WorkoutPlanProps {
   plan: WorkoutPlan;
   showSaveButton: boolean;
   toggleModal: () => void;
+  isLastItem?: boolean;
 }
 
-export function WorkoutPlanView({ plan, showSaveButton, toggleModal }: WorkoutPlanProps) {
+export function WorkoutPlanView({
+  plan,
+  showSaveButton,
+  toggleModal,
+  isLastItem = false,
+}: WorkoutPlanProps) {
   const [responseError, setResponseError] = useState<string>('');
   const { mutate: mutateSaveGenerateWorkout, isPending: isPendingSaveGenerateWorkout } =
     useMutation({
@@ -86,7 +92,7 @@ export function WorkoutPlanView({ plan, showSaveButton, toggleModal }: WorkoutPl
         />
       )}
 
-      {showSaveButton && (
+      {isLastItem && showSaveButton && (
         <ActionButton
           label={'Save Workout Plan'}
           onPress={handleSaveWorkout}

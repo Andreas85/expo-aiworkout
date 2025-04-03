@@ -46,6 +46,6 @@ export interface WorkoutFeedback {
 
 export interface WorkoutHistory {
   feedback: string;
-  workoutPlan: WorkoutPlan[];
+  workoutPlan: WorkoutPlan;
   historyId: string;
 }

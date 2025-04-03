@@ -1,11 +1,13 @@
 // @/components/WorkoutHistoryView.tsx
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { ChatMessage } from './ChatMessage';
 import { WorkoutPlanView } from './WorkoutPlan';
 import { WorkoutFeedbackView } from './WorkoutFeedback';
-import { WorkoutFeedback, WorkoutHistory } from '@/types';
+import { WorkoutFeedback, WorkoutHistory, WorkoutPlan } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { ActionButton } from '../atoms/ActionButton';
+import { tailwind } from '@/utils/tailwind';
 
 export function WorkoutHistoryView({
   workoutHistory,
@@ -34,7 +36,7 @@ export function WorkoutHistoryView({
 
   return (
     <>
-      {workoutHistory?.map((workout, index) => {
+      {workoutHistory?.map((workout: WorkoutHistory, index) => {
         const isLastItem = index === workoutHistory.length - 1;
 
         return (
@@ -44,14 +46,17 @@ export function WorkoutHistoryView({
                 plan={workout.workoutPlan}
                 showSaveButton={showSaveButton}
                 toggleModal={toggleModal}
+                isLastItem={isLastItem}
               />
             </ChatMessage>
             {renderer(workout, showSaveButton)}
+
             {isLastItem && isPendingGenerateWorkout ? (
-              <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-500 px-6 py-3 text-white transition-colors hover:bg-purple-600 disabled:opacity-50 sm:w-auto">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Updating your workout plan...
-              </div>
+              <ActionButton
+                label={'Updating your workout plan...'}
+                isLoading={isPendingGenerateWorkout}
+                style={tailwind('rounded-lg')}
+              />
             ) : null}
           </React.Fragment>
         );

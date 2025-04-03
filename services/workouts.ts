@@ -334,6 +334,7 @@ export const generateWorkoutService = async (payload: { prompt?: any }) => {
     });
     return data;
   } catch (error: any) {
+    console.log('Error:', error);
     throw extractedErrorMessage(error?.response);
   }
 };
