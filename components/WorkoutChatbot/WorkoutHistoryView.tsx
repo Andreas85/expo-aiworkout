@@ -5,17 +5,20 @@ import { ChatMessage } from './ChatMessage';
 import { WorkoutPlanView } from './WorkoutPlan';
 import { WorkoutFeedbackView } from './WorkoutFeedback';
 import { WorkoutFeedback, WorkoutHistory } from '@/types';
+import { Loader2 } from 'lucide-react';
 
 export function WorkoutHistoryView({
   workoutHistory,
   showSaveButton = false,
   handleFeedback,
   toggleModal,
+  isPendingGenerateWorkout = false,
 }: {
   workoutHistory: any[];
   showSaveButton?: boolean;
   toggleModal: () => void;
   handleFeedback: (feedback: WorkoutFeedback, workoutHistoryId: string) => void;
+  isPendingGenerateWorkout?: boolean;
 }) {
   const renderer = (workout: WorkoutHistory, visiblility?: boolean) => {
     if (visiblility) return;
@@ -31,7 +34,9 @@ export function WorkoutHistoryView({
 
   return (
     <>
-      {workoutHistory?.slice(0, workoutHistory?.length)?.map(workout => {
+      {workoutHistory?.map((workout, index) => {
+        const isLastItem = index === workoutHistory.length - 1;
+
         return (
           <React.Fragment key={workout?.historyId}>
             <ChatMessage isBot={true}>
@@ -42,6 +47,12 @@ export function WorkoutHistoryView({
               />
             </ChatMessage>
             {renderer(workout, showSaveButton)}
+            {isLastItem && isPendingGenerateWorkout ? (
+              <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-500 px-6 py-3 text-white transition-colors hover:bg-purple-600 disabled:opacity-50 sm:w-auto">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Updating your workout plan...
+              </div>
+            ) : null}
           </React.Fragment>
         );
       })}

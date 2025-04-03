@@ -36,7 +36,6 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
   });
 
   const [workoutPlanHistoryList, setWorkoutPlanHistoryList] = useState<WorkoutHistory[]>([]);
-  const [showWorkoutHistory, setShowWorkoutHistory] = useState(false);
 
   const { mutate: mutateGenerateWorkout, isPending: isPendingGenerateWorkout } = useMutation({
     mutationFn: generateWorkoutService,
@@ -202,7 +201,7 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
       setShowFeedback(false);
       setWorkoutPlanHistoryList((prev: any) => {
         // Find the existing workout history entry based on workoutHistoryId
-        const updatedHistory = prev.map(item =>
+        const updatedHistory = prev.map((item: any) =>
           item.historyId === workoutHistoryId
             ? { ...item, feedback: feedback.feedback, workoutPlan: item?.workoutPlan } // Update the feedback
             : item,
@@ -233,7 +232,6 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     isPendingRegenerateWorkout,
     isPendingUpdateGenerateWorkout,
     workoutPlanHistoryList,
-    showWorkoutHistory,
     handleFeedback,
     scrollToBottom,
     handleAnswer,

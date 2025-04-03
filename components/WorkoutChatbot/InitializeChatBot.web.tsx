@@ -77,26 +77,30 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                 </div>
               </>
             )}
-            {!workoutPlan && currentQuestionId === 'end' && (
-              <>
-                <div className="mt-6 flex flex-col justify-center">
-                  {responseError && <div className="text-center text-red-500">{responseError}</div>}
-                  <button
-                    onClick={generateWorkout}
-                    disabled={isPendingGenerateWorkout}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-500 px-6 py-3 text-white transition-colors hover:bg-purple-600 disabled:opacity-50 sm:w-auto">
-                    {isPendingGenerateWorkout ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        Generating your workout plan...
-                      </>
-                    ) : (
-                      'Generate Workout Plan'
+            {!workoutPlan &&
+              currentQuestionId === 'end' &&
+              workoutPlanHistoryList?.length === 0 && (
+                <>
+                  <div className="mt-6 flex flex-col justify-center">
+                    {responseError && (
+                      <div className="text-center text-red-500">{responseError}</div>
                     )}
-                  </button>
-                </div>
-              </>
-            )}
+                    <button
+                      onClick={generateWorkout}
+                      disabled={isPendingGenerateWorkout}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-500 px-6 py-3 text-white transition-colors hover:bg-purple-600 disabled:opacity-50 sm:w-auto">
+                      {isPendingGenerateWorkout ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          Generating your workout plan...
+                        </>
+                      ) : (
+                        'Generate Workout Plan'
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             {/* Workout plan and feedback */}
             {workoutPlanHistoryList?.length > 0 && (
               <>
@@ -105,32 +109,10 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                   toggleModal={toggleModal}
                   showSaveButton={isWorkoutApproved}
                   handleFeedback={handleFeedback}
+                  isPendingGenerateWorkout={isPendingGenerateWorkout}
                 />
-
-                {/* {showFeedback && !isWorkoutApproved && (
-                  <ChatMessage isBot={true}>
-                    <WorkoutFeedbackView onSubmit={handleFeedback} />
-                  </ChatMessage>
-                )} */}
               </>
             )}
-            {/* {workoutPlan && (
-              <>
-                <ChatMessage isBot={true}>
-                  <WorkoutPlanView
-                    plan={workoutPlan}
-                    showSaveButton={isWorkoutApproved}
-                    toggleModal={toggleModal}
-                  />
-                </ChatMessage>
-
-                {showFeedback && !isWorkoutApproved && (
-                  <ChatMessage isBot={true}>
-                    <WorkoutFeedbackView onSubmit={handleFeedback} />
-                  </ChatMessage>
-                )}
-              </>
-            )} */}
 
             <div ref={messagesEndRef} />
           </div>
