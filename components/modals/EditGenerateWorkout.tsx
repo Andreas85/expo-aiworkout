@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Platform,
   StyleSheet,
@@ -24,12 +24,15 @@ import { router } from 'expo-router';
 import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import UpdateGeneratedWorkout from '../WorkoutChatbot/UpdateGeneratedWorkout';
+import { Workout } from '@/services/interfaces';
 
 const EditGenerateWorkout = ({
   isVisible,
   toggleModal,
+  workoutDetail,
 }: {
   isVisible: boolean;
+  workoutDetail: Workout;
   toggleModal: () => void;
 }) => {
   const { isExtraSmallDevice, isMobileDevice } = useBreakPoints();
@@ -64,7 +67,7 @@ const EditGenerateWorkout = ({
 
   const renderWorkoutContainer = () => {
     if (isAuthenticated) {
-      return <UpdateGeneratedWorkout toggleModal={toggleModal} />;
+      return <UpdateGeneratedWorkout toggleModal={toggleModal} workoutDetail={workoutDetail} />;
     }
     return (
       <Container style={tailwind('w-full items-center justify-center gap-y-4 self-center p-8')}>

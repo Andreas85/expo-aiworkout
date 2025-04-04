@@ -14,6 +14,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { generateBigNumberId } from '@/utils/helper';
+import { ExerciseElement } from '@/services/interfaces';
 
 export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void) => {
   const { isWeb } = usePlatform();
@@ -66,12 +67,15 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
 
   const { mutate: mutateRegenerateWorkout, isPending: isPendingRegenerateWorkout } = useMutation({
     mutationFn: reGenerateWorkoutService,
-    onSuccess: data => {
-      const payload = {
-        id: slug,
-        exercises: data?.data?.exercises,
-      };
-      mutateUpdateGenerateWorkout(payload);
+    onSuccess: (data, variables) => {
+      setWorkoutPlanHistoryList(() => {
+        const existingHistory = workoutPlanHistoryList || [];
+        return [
+          ...existingHistory,
+          { historyId: generateBigNumberId(), feedback: '', workoutPlan: data?.data },
+        ]; // Append the new workout to the history
+      }); // Set the workout plan history to the newly generated workout
+
       setResponseError('');
     },
     onError: (error: string) => {
@@ -214,8 +218,32 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     }
   };
 
-  const handleRegenerateWorkout = (feedback: string) => {
+  const handleRegenerateWorkout = (feedback: string, workoutHistoryId?: string) => {
+    setWorkoutPlanHistoryList((prev: any) => {
+      // Find the existing workout history entry based on workoutHistoryId
+      const updatedHistory = prev.map((item: any) =>
+        item.historyId === workoutHistoryId
+          ? { ...item, feedback: feedback, workoutPlan: item?.workoutPlan } // Update the feedback
+          : item,
+      );
+      return updatedHistory;
+    });
     mutateRegenerateWorkout({ prompt: feedback, id: slug });
+  };
+
+  const handleUpdateWorkout = () => {
+    const workoutHistory = workoutPlanHistoryList?.at(-1);
+    if (!workoutHistory?.workoutPlan.exercises) {
+      console.error('Exercises are undefined. Cannot update workout.');
+      return;
+    }
+
+    const payload = {
+      id: slug,
+      exercises: workoutHistory.workoutPlan.exercises as unknown as ExerciseElement[],
+    };
+    // console.log('handleUpdateWorkout', { payload });
+    mutateUpdateGenerateWorkout(payload);
   };
 
   return {
@@ -240,5 +268,7 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     goBack,
     generateWorkout,
     handleRegenerateWorkout,
+    setWorkoutPlanHistoryList,
+    handleUpdateWorkout,
   };
 };

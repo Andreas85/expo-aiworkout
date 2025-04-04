@@ -15,23 +15,38 @@ export function WorkoutHistoryView({
   handleFeedback,
   toggleModal,
   isPendingGenerateWorkout = false,
+  handleRegenerateWorkout,
+  isRegenerateWorkout = false,
+  handleUpdateWorkout,
+  errorMessage = '',
 }: {
   workoutHistory: any[];
   showSaveButton?: boolean;
   toggleModal: () => void;
-  handleFeedback: (feedback: WorkoutFeedback, workoutHistoryId: string) => void;
+  handleUpdateWorkout?: () => void;
+  handleRegenerateWorkout?: (feedback: string, workoutHistoryId: string) => void;
+  handleFeedback?: (feedback: WorkoutFeedback, workoutHistoryId: string) => void;
   isPendingGenerateWorkout?: boolean;
+  isRegenerateWorkout?: boolean;
+  errorMessage?: string;
 }) {
-  const renderer = (workout: WorkoutHistory, visiblility?: boolean) => {
-    if (visiblility) return;
+  const renderer = (workout: WorkoutHistory, index: number, visiblility?: boolean) => {
     if (workout?.feedback) {
       return <ChatMessage isBot={false}>{workout?.feedback} </ChatMessage>;
     }
-    return (
-      <ChatMessage isBot={true}>
-        <WorkoutFeedbackView onSubmit={feedback => handleFeedback(feedback, workout?.historyId)} />
-      </ChatMessage>
-    );
+    if (!visiblility) {
+      return (
+        <ChatMessage isBot={true}>
+          <WorkoutFeedbackView
+            onSubmit={feedback => handleFeedback?.(feedback, workout?.historyId)}
+            onSubmitRegenerate={feedback => handleRegenerateWorkout?.(feedback, workout?.historyId)}
+            isEditGeneratedWorkout={isRegenerateWorkout}
+            isEditLoading={isPendingGenerateWorkout}
+            isFirstItem={isRegenerateWorkout ? index === 0 : false}
+          />
+        </ChatMessage>
+      );
+    }
   };
 
   return (
@@ -46,12 +61,16 @@ export function WorkoutHistoryView({
                 plan={workout.workoutPlan}
                 showSaveButton={showSaveButton}
                 toggleModal={toggleModal}
+                isRegenerateWorkout={isRegenerateWorkout}
+                isPendingGenerateWorkout={isPendingGenerateWorkout}
+                handleUpdateWorkout={handleUpdateWorkout}
                 isLastItem={isLastItem}
+                errorMessage={errorMessage}
               />
             </ChatMessage>
-            {renderer(workout, showSaveButton)}
+            {renderer(workout, index, showSaveButton)}
 
-            {isLastItem && isPendingGenerateWorkout ? (
+            {isLastItem && isPendingGenerateWorkout && !showSaveButton ? (
               <ActionButton
                 label={'Updating your workout plan...'}
                 isLoading={isPendingGenerateWorkout}

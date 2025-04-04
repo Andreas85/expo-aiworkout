@@ -362,10 +362,13 @@ const WorkoutDetail = () => {
       {openModalAddExercise && (
         <AddExercise isModalVisible={openModalAddExercise} closeModal={hideModalAddExercise} />
       )}
-      <EditGenerateWorkout
-        isVisible={openEditGeneratedWorkoutModal}
-        toggleModal={hideEditGeneratedWorkoutModal}
-      />
+      {openEditGeneratedWorkoutModal && (
+        <EditGenerateWorkout
+          isVisible={openEditGeneratedWorkoutModal}
+          toggleModal={hideEditGeneratedWorkoutModal}
+          workoutDetail={workoutDetail as Workout}
+        />
+      )}
     </Container>
   );
 };
