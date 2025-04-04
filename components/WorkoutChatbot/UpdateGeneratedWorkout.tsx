@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -7,20 +7,23 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
-import { ChatMessage } from './ChatMessage';
-import { WorkoutPlanView } from './WorkoutPlan';
 import { useChatBot } from '@/hooks/useChatBot';
 
-import { WorkoutFeedbackView } from './WorkoutFeedback';
 import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
 import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
+import { Workout } from '@/services/interfaces';
+import { generateBigNumberId } from '@/utils/helper';
+import { WorkoutHistoryView } from './WorkoutHistoryView';
+import useBreakPoints from '@/hooks/useBreakPoints';
 
-function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
-  const { toggleModal } = props;
+function UpdateGeneratedWorkout(props: { toggleModal: () => void; workoutDetail: Workout }) {
+  const { toggleModal, workoutDetail } = props;
   const isKeyboardVisible = useKeyboardVisibility();
-
+  const { height } = useWindowDimensions();
   const scrollViewRef = useRef<ScrollView>(null);
+  const { isExtraSmallDevice } = useBreakPoints();
 
   useEffect(() => {
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
@@ -43,6 +46,9 @@ function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
     responseError,
     isPendingRegenerateWorkout,
     isPendingUpdateGenerateWorkout,
+    setWorkoutPlanHistoryList,
+    workoutPlanHistoryList,
+    handleUpdateWorkout,
   } = useChatBot(toggleModal, scrollToBottom);
 
   const generatedWorkoutPlan = useGenerateWorkoutPlanStore(state => state.generatedWorkoutPlan);
@@ -58,6 +64,26 @@ function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
     }
   }, [isKeyboardVisible]);
 
+  // Dynamic height calculation similar to InitializeChatBot
+  const getDynamicHeight = useCallback(() => {
+    if (isKeyboardVisible) {
+      return isExtraSmallDevice ? height * 0.5 : height * 0.75;
+    }
+    return isExtraSmallDevice ? height * 0.9 - 50 : height * 0.9 - 50;
+  }, [isKeyboardVisible, isExtraSmallDevice, height]);
+
+  useEffect(() => {
+    if (workoutDetail) {
+      const historyPlan: any = {
+        historyId: generateBigNumberId(),
+        feedback: '',
+        workoutPlan: workoutDetail,
+      };
+
+      setWorkoutPlanHistoryList([historyPlan]);
+    }
+  }, [workoutDetail]);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={{ flex: 1 }}>
@@ -66,38 +92,35 @@ function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
           // keyboardVerticalOffset={0}
           style={{ flex: 1 }}>
           <ScrollView
+            showsVerticalScrollIndicator={false}
             ref={scrollViewRef}
-            style={
-              [
-                // isKeyboardVisible && isExtraSmallDevice ? { height: 200 } : scrollHeightStyle(),
-              ]
-            }
+            // contentContainerStyle={{ paddingBottom: 20 }}
+            style={{
+              height: getDynamicHeight(),
+            }}
             keyboardShouldPersistTaps="handled"
             onContentSizeChange={() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
             }}>
-            <TouchableOpacity activeOpacity={1}>
-              <ChatMessage isBot={true} wrapChildren={true}>
-                <WorkoutPlanView
-                  plan={{
-                    name: generatedWorkoutPlan?.name,
-                    exercises: generatedWorkoutPlan?.exercises || [],
-                  }}
-                  showSaveButton={isWorkoutApproved}
-                  toggleModal={toggleModal}
-                />
-              </ChatMessage>
-
-              <ChatMessage isBot={true} wrapChildren={true}>
-                <WorkoutFeedbackView
-                  onSubmit={handleFeedback}
-                  onSubmitRegenerate={handleRegenerateWorkout}
-                  isEditGeneratedWorkout={true}
-                  errorMessage={responseError ?? ''}
-                  isEditLoading={isPendingRegenerateWorkout || isPendingUpdateGenerateWorkout}
-                />
-              </ChatMessage>
-            </TouchableOpacity>
+            <>
+              {workoutPlanHistoryList?.length > 0 && (
+                <TouchableOpacity activeOpacity={1}>
+                  <WorkoutHistoryView
+                    workoutHistory={workoutPlanHistoryList}
+                    toggleModal={toggleModal}
+                    showSaveButton={isWorkoutApproved}
+                    handleFeedback={handleFeedback}
+                    handleRegenerateWorkout={handleRegenerateWorkout}
+                    handleUpdateWorkout={handleUpdateWorkout}
+                    isRegenerateWorkout={true}
+                    errorMessage={responseError ?? ''}
+                    isPendingGenerateWorkout={
+                      isPendingRegenerateWorkout || isPendingUpdateGenerateWorkout
+                    }
+                  />
+                </TouchableOpacity>
+              )}
+            </>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>

@@ -9,6 +9,7 @@ interface WorkoutFeedbackProps {
   onSubmit: (feedback: WorkoutFeedback) => void;
   onSubmitRegenerate?: (data: string) => void;
   errorMessage?: string;
+  isFirstItem?: boolean;
 }
 
 export function WorkoutFeedbackView({
@@ -17,6 +18,7 @@ export function WorkoutFeedbackView({
   isEditLoading = false,
   onSubmitRegenerate,
   errorMessage = '',
+  isFirstItem = false,
 }: WorkoutFeedbackProps) {
   const [feedback, setFeedback] = useState<string>('');
   const [showTextArea, setShowTextArea] = useState(false);
@@ -30,8 +32,15 @@ export function WorkoutFeedbackView({
     onSubmit({ rating: 'needs_changes', feedback });
   };
 
-  const renderContainer = () => {
+  const getButtonStyle = () => {
     if (isEditGeneratedWorkout) {
+      return `min-h-12 w-full min-w-[150px] rounded-lg p-3 ${!feedback || isEditLoading ? 'cursor-not-allowed bg-blue-300 text-white' : ' bg-blue-600  text-white'} transition-colors `;
+    }
+    return `w-full rounded-lg bg-blue-600 p-3 text-white transition-colors hover:bg-blue-700 `;
+  };
+
+  const renderContainer = () => {
+    if (isFirstItem) {
       return (
         <div className="w-full min-w-[300px] space-y-3">
           <textarea
@@ -80,10 +89,9 @@ export function WorkoutFeedbackView({
               className="w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               rows={3}
             />
-            <button
-              onClick={handleSubmit}
-              className={`w-full rounded-lg bg-blue-600 p-3 text-white transition-colors hover:bg-blue-700 `}>
-              Submit Feedback
+            <button onClick={handleSubmit} className={`${getButtonStyle()}`}>
+              {/* Submit Feedback Web */}
+              {isEditLoading ? <ActivityIndicator /> : 'Submit Feedback'}
             </button>
           </div>
         )}

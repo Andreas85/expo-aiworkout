@@ -313,7 +313,7 @@ const WorkoutDetail = () => {
           style={[
             Platform.select({
               web: tailwind(`
-                web:h-[100%] web:pb-[180px] mx-auto h-full w-full 
+                web:h-[100%] web:pb-[210px] mx-auto h-full w-full 
             `),
               native: tailwind('flex-1'),
             }),

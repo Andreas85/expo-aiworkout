@@ -18,6 +18,7 @@ interface WorkoutFeedbackProps {
   onSubmit: (feedback: WorkoutFeedback) => void;
   onSubmitRegenerate?: (data: string) => void;
   errorMessage?: string;
+  isFirstItem?: boolean;
 }
 
 export function WorkoutFeedbackView({
@@ -26,6 +27,7 @@ export function WorkoutFeedbackView({
   isEditGeneratedWorkout = false,
   isEditLoading = false,
   errorMessage = '',
+  isFirstItem = false,
 }: WorkoutFeedbackProps) {
   const [feedback, setFeedback] = useState('');
   const [showTextArea, setShowTextArea] = useState(false);
@@ -40,7 +42,7 @@ export function WorkoutFeedbackView({
   };
 
   const renderContainer = () => {
-    if (isEditGeneratedWorkout) {
+    if (isFirstItem) {
       return (
         <View style={styles.feedbackContainer}>
           <TextInput

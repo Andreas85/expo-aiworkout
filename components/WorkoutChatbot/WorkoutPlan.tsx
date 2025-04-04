@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { ActionButton } from '../atoms/ActionButton';
@@ -14,6 +14,10 @@ interface WorkoutPlanProps {
   showSaveButton: boolean;
   toggleModal: () => void;
   isLastItem?: boolean;
+  isRegenerateWorkout?: boolean;
+  handleUpdateWorkout?: () => void;
+  errorMessage?: string;
+  isPendingGenerateWorkout?: boolean;
 }
 
 export function WorkoutPlanView({
@@ -21,6 +25,10 @@ export function WorkoutPlanView({
   showSaveButton,
   toggleModal,
   isLastItem = false,
+  isRegenerateWorkout = false,
+  isPendingGenerateWorkout = false,
+  handleUpdateWorkout,
+  errorMessage,
 }: WorkoutPlanProps) {
   const [responseError, setResponseError] = useState<string>('');
   const { mutate: mutateSaveGenerateWorkout, isPending: isPendingSaveGenerateWorkout } =
@@ -39,8 +47,19 @@ export function WorkoutPlanView({
       },
     });
 
+  useEffect(() => {
+    if (errorMessage) {
+      setResponseError(errorMessage);
+    }
+  }, [errorMessage]);
+
   const handleSaveWorkout = async () => {
     console.log('Save workout plan');
+    if (isRegenerateWorkout) {
+      console.log('Regenerate workout plan:', plan);
+      handleUpdateWorkout?.();
+      return;
+    }
     mutateSaveGenerateWorkout(plan);
   };
   return (
@@ -84,7 +103,7 @@ export function WorkoutPlanView({
           <Text style={styles.notesText}>{plan?.notes}</Text>
         </View>
       )}
-      {responseError && (
+      {isLastItem && responseError && (
         <TextContainer
           style={tailwind('text-3 text-center text-red-400')}
           className="text-center text-sm !text-red-400"
@@ -96,7 +115,7 @@ export function WorkoutPlanView({
         <ActionButton
           label={'Save Workout Plan'}
           onPress={handleSaveWorkout}
-          isLoading={isPendingSaveGenerateWorkout}
+          isLoading={isPendingSaveGenerateWorkout || isPendingGenerateWorkout}
           style={tailwind('rounded-lg')}
         />
       )}

@@ -1,51 +1,62 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import { ChatMessage } from './ChatMessage';
-import { WorkoutPlanView } from './WorkoutPlan';
 import { useChatBot } from '@/hooks/useChatBot';
-import { WorkoutFeedbackView } from './WorkoutFeedback.web';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
+import { WorkoutHistoryView } from './WorkoutHistoryView';
+import { Workout } from '@/services/interfaces';
+import { generateBigNumberId } from '@/utils/helper';
 
-function UpdateGeneratedWorkout(props: { toggleModal: () => void }) {
-  const { toggleModal } = props;
+function UpdateGeneratedWorkout(props: { toggleModal: () => void; workoutDetail: Workout }) {
+  const { toggleModal, workoutDetail } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const {
     messagesEndRef,
-    handleFeedback,
-    isWorkoutApproved,
     handleRegenerateWorkout,
+    isWorkoutApproved,
+    setWorkoutPlanHistoryList,
     isPendingRegenerateWorkout,
     isPendingUpdateGenerateWorkout,
+    workoutPlanHistoryList,
     responseError,
+    handleFeedback,
+    handleUpdateWorkout,
   } = useChatBot(toggleModal);
-  const generatedWorkoutPlan = useGenerateWorkoutPlanStore(state => state.generatedWorkoutPlan);
+
+  useEffect(() => {
+    if (workoutDetail) {
+      const historyPlan: any = {
+        historyId: generateBigNumberId(),
+        feedback: '',
+        workoutPlan: workoutDetail,
+      };
+
+      setWorkoutPlanHistoryList([historyPlan]);
+    }
+  }, [workoutDetail]);
 
   return (
     <div
       className={` ${isLargeScreen ? 'h-full max-h-full min-h-[80vh]' : 'max-h-[60vh]'} overflow-y-auto rounded-xl border border-gray-800 bg-black `}>
-      <div className=" max-w-2xl ">
+      <div className="">
         <div className="p-4 sm:p-6">
           <div className=" space-y-6">
-            <ChatMessage isBot={true}>
-              <WorkoutPlanView
-                plan={{
-                  name: generatedWorkoutPlan?.name,
-                  exercises: generatedWorkoutPlan?.exercises || [],
-                }}
-                showSaveButton={isWorkoutApproved}
-                toggleModal={toggleModal}
-              />
-            </ChatMessage>
-            <ChatMessage isBot={true}>
-              <WorkoutFeedbackView
-                onSubmit={handleFeedback}
-                onSubmitRegenerate={handleRegenerateWorkout}
-                isEditGeneratedWorkout={true}
-                errorMessage={responseError ?? ''}
-                isEditLoading={isPendingRegenerateWorkout || isPendingUpdateGenerateWorkout}
-              />
-            </ChatMessage>
+            {workoutPlanHistoryList?.length > 0 && (
+              <>
+                <WorkoutHistoryView
+                  workoutHistory={workoutPlanHistoryList}
+                  toggleModal={toggleModal}
+                  showSaveButton={isWorkoutApproved}
+                  handleFeedback={handleFeedback}
+                  handleRegenerateWorkout={handleRegenerateWorkout}
+                  handleUpdateWorkout={handleUpdateWorkout}
+                  isRegenerateWorkout={true}
+                  errorMessage={responseError ?? ''}
+                  isPendingGenerateWorkout={
+                    isPendingRegenerateWorkout || isPendingUpdateGenerateWorkout
+                  }
+                />
+              </>
+            )}
             <div ref={messagesEndRef} />
           </div>
         </div>
