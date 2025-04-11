@@ -1,13 +1,26 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  ActivityIndicator,
+} from 'react-native';
 
 interface ModalFooterProps {
   onCancel: () => void;
   onFinish: () => void;
   finishDisabled?: boolean;
+  isLoading?: boolean;
 }
 
-export default function ModalFooter({ onCancel, onFinish, finishDisabled }: ModalFooterProps) {
+export default function ModalFooter({
+  onCancel,
+  onFinish,
+  finishDisabled,
+  isLoading,
+}: ModalFooterProps) {
   return (
     <View style={styles.footer}>
       <TouchableOpacity
@@ -23,17 +36,21 @@ export default function ModalFooter({ onCancel, onFinish, finishDisabled }: Moda
       </TouchableOpacity>
       <TouchableOpacity
         onPress={onFinish}
-        disabled={finishDisabled}
+        disabled={finishDisabled || isLoading}
         style={[
           styles.button,
           styles.finishButton,
-          finishDisabled && styles.finishButtonDisabled,
+          (finishDisabled || isLoading) && styles.finishButtonDisabled,
           Platform.select({
             web: { cursor: 'pointer' },
           }),
         ]}>
-        <Text style={[styles.finishButtonText, finishDisabled && styles.finishButtonTextDisabled]}>
-          Finish
+        <Text
+          style={[
+            styles.finishButtonText,
+            (finishDisabled || isLoading) && styles.finishButtonTextDisabled,
+          ]}>
+          {isLoading ? <ActivityIndicator /> : 'Finish'}
         </Text>
       </TouchableOpacity>
     </View>

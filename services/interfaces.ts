@@ -3,6 +3,7 @@ export interface ICreateWorkoutFormData {
   isPublic?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  image?: string;
 }
 
 export interface IAddExerciseToWorkout {
@@ -39,7 +40,7 @@ export interface IRemoveExerciseToWorkout {
 
 export interface IPayloadUpdateWorkoutData {
   formData: ICreateWorkoutFormData;
-  queryParams: { id: any };
+  queryParams: { id: string };
 }
 
 export interface IPayloadAddExerciseToWorkout {
@@ -113,6 +114,7 @@ export interface Workout {
   totalExercises: number;
   isPublic: boolean;
   createdBy: string;
+  image?: string;
   exercises: ExerciseElement[];
   createdAt: Date;
   updatedAt: Date;
@@ -187,4 +189,13 @@ export interface WorkoutSessionResponseData {
   createdAt: Date;
   updatedAt: Date;
   __v: number;
+}
+
+export interface IGeneratedWorkoutImage {
+  _id: string;
+  deleted: false;
+  url: string;
+  entityType: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

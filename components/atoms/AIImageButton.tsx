@@ -1,60 +1,36 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import ImageGenerationModal from './ImageGenerationModal';
 import { Feather } from '@expo/vector-icons';
-import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import { ActionButton } from './ActionButton';
+import { tailwind } from '@/utils/tailwind';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
 
-interface AIImageButtonProps {
-  exerciseName: string;
-}
-
-export default function AIImageButton({ exerciseName }: AIImageButtonProps) {
+export default function AIImageButton() {
   const [modalVisible, setModalVisible] = useState(false);
-  const { isLargeScreen } = useWebBreakPoints();
+  const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
+
   return (
     <>
-      <TouchableOpacity
+      <ActionButton
+        onPress={() => setModalVisible(true)}
+        left={<Feather name="image" size={18} color="#FFFFFF" />}
+        label={workoutDetail?.image ? 'Update Image ' : 'Add Image'}
         style={[
-          styles.button,
           Platform.select({
-            web: { cursor: 'pointer' },
+            web: tailwind('rounded-xl px-3'),
+            native: tailwind('rounded-xl px-3'),
           }),
         ]}
-        onPress={() => setModalVisible(true)}>
-        <Feather name="image" size={18} color="#FFFFFF" />
-        <Text
-          style={{
-            ...styles.buttonText,
-            fontSize: isLargeScreen ? 12 : 14, // Replace with appropriate numeric values
-          }}>
-          Add Image
-        </Text>
-      </TouchableOpacity>
+      />
 
       {modalVisible && (
         <ImageGenerationModal
           isVisible={modalVisible}
           onClose={() => setModalVisible(false)}
-          exerciseName={exerciseName}
+          workoutName={workoutDetail?.name || ''}
         />
       )}
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#8B5CF6',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    gap: 8,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});

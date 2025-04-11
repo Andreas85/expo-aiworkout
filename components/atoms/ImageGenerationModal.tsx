@@ -18,88 +18,87 @@ import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
-// Dummy data for Asset Library
-const dummyAssets = [
-  {
-    id: '1',
-    url: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=500&q=80',
-    title: 'Push-ups',
-  },
-  {
-    id: '2',
-    url: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=500&q=80',
-    title: 'Squats',
-  },
-  {
-    id: '3',
-    url: 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=500&q=80',
-    title: 'Plank',
-  },
-  {
-    id: '4',
-    url: 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=500&q=80',
-    title: 'Lunges',
-  },
-  {
-    id: '5',
-    url: 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=500&q=80',
-    title: 'Plank',
-  },
-  {
-    id: '6',
-    url: 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=500&q=80',
-    title: 'Lunges',
-  },
-  {
-    id: '7',
-    url: 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=500&q=80',
-    title: 'Plank',
-  },
-  {
-    id: '8',
-    url: 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=500&q=80',
-    title: 'Lunges',
-  },
-];
+import { useFetchData } from '@/hooks/useFetchData';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import {
+  generateWorkoutImageService,
+  getImageService,
+  updateWorkoutDataRequest,
+} from '@/services/workouts';
+import Loading from './Loading';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import TextContainer from './TextContainer';
+import { IGeneratedWorkoutImage } from '@/services/interfaces';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { useLocalSearchParams } from 'expo-router';
 
 interface ImageGenerationModalProps {
   isVisible: boolean;
   onClose: () => void;
-  exerciseName: string;
+  workoutName: string;
 }
 
 export default function ImageGenerationModal({
   isVisible,
   onClose,
-  exerciseName,
+  workoutName,
 }: ImageGenerationModalProps) {
+  const { slug } = useLocalSearchParams() as { slug: string };
+  const queryClient = useQueryClient();
+  const { setWorkoutDetail } = useWorkoutDetailStore();
+  const [errorMessage, setErrorMessage] = useState('');
+  const { data: imageData, isLoading } = useFetchData({
+    queryFn: getImageService,
+    queryKey: [REACT_QUERY_API_KEYS.FETCHED_IMAGE],
+    staleTime: 0,
+  });
+
+  const { mutate: mutateGenerateWorkoutImage, isPending: isGenerating } = useMutation({
+    mutationFn: generateWorkoutImageService,
+    onSuccess: async data => {
+      const newImage = data?.data?.url || '';
+      console.log(newImage, 'newImage');
+      setGeneratedImages(prev => [...prev, newImage]);
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.FETCHED_IMAGE],
+      });
+    },
+    onError: (error: string) => {
+      setErrorMessage(error || 'Something went wrong');
+    },
+  });
+
+  const { mutate: mutateUpdatedWorkout, isPending: isPendingUpdateWorkout } = useMutation({
+    mutationFn: updateWorkoutDataRequest,
+    onSuccess: data => {
+      // alert('HERE---');
+      console.log(data, 'datamutateUpdatedWorkout');
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      });
+      setWorkoutDetail(data?.data);
+      onClose();
+    },
+    onError: (error: string) => {
+      console.log(error);
+    },
+  });
+
   const [activeTab, setActiveTab] = useState<'library' | 'generate'>('library');
   const { isLargeScreen } = useWebBreakPoints();
   const { isExtraSmallDevice, isMobileDevice } = useBreakPoints();
   const isKeyboardVisible = useKeyboardVisibility();
-  const [isGenerating, setIsGenerating] = useState(false);
+  // const [isGenerating, setIsGenerating] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const { height } = useWindowDimensions();
   const handleGenerate = async () => {
-    setSelectedImageId(null); // Reset selected image ID when generating new images
+    setSelectedImageUrl(null); // Reset selected image ID when generating new images
     if (!prompt.trim()) return;
-
-    setIsGenerating(true);
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // For demo, add a random image from dummy assets
-      const newImage = dummyAssets[Math.floor(Math.random() * dummyAssets.length)].url;
-      setGeneratedImages(prev => [...prev, newImage]);
-      setPrompt(''); // Clear the prompt after generating
-    } catch (error) {
-      console.error('Failed to generate image:', error);
-    } finally {
-      setIsGenerating(false);
-    }
+    mutateGenerateWorkoutImage({
+      prompt,
+    });
   };
 
   const getScrollHeight = () => {
@@ -123,7 +122,12 @@ export default function ImageGenerationModal({
   }, [isKeyboardVisible, isMobileDevice, isExtraSmallDevice, height]);
 
   const handleFinish = () => {
-    onClose();
+    mutateUpdatedWorkout({
+      formData: {
+        image: selectedImageUrl || '',
+      },
+      queryParams: { id: slug },
+    });
   };
 
   const TabButton = ({
@@ -149,25 +153,50 @@ export default function ImageGenerationModal({
   );
 
   const renderModalFooter = () => {
-    if (activeTab === 'library') {
-      return (
-        <ModalFooter onCancel={onClose} onFinish={handleFinish} finishDisabled={!selectedImageId} />
-      );
-    }
+    const shouldShowFooter =
+      activeTab === 'library' || (activeTab === 'generate' && generatedImages.length > 0);
 
-    if (activeTab === 'generate' && generatedImages.length > 0) {
-      return (
-        <ModalFooter onCancel={onClose} onFinish={handleFinish} finishDisabled={!selectedImageId} />
-      );
-    }
-
-    return null;
+    return shouldShowFooter ? (
+      <ModalFooter
+        onCancel={onClose}
+        onFinish={handleFinish}
+        finishDisabled={!selectedImageUrl}
+        isLoading={isPendingUpdateWorkout}
+      />
+    ) : null;
   };
 
   const handleTabClick = (tab: 'library' | 'generate') => {
     setActiveTab(tab);
-    setSelectedImageId(null); // Reset selected image ID when switching tabs
+    setSelectedImageUrl(null); // Reset selected image ID when switching tabs
   };
+
+  const renderAssetLibraryContainer = useCallback(() => {
+    if (isLoading) {
+      return <Loading />;
+    }
+    if (!imageData || imageData.length === 0) {
+      return (
+        <View style={styles.libraryContainer}>
+          <Text style={{ color: '#fff' }}>No images found</Text>
+        </View>
+      );
+    }
+    return (
+      <View style={styles.libraryContainer}>
+        <View style={styles.imageGrid}>
+          {imageData.map((asset: IGeneratedWorkoutImage) => (
+            <SelectableImage
+              key={asset._id}
+              url={asset.url}
+              isSelected={selectedImageUrl === asset.url}
+              onSelect={() => setSelectedImageUrl(asset.url)}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  }, [imageData, isLoading, selectedImageUrl]);
 
   return (
     <Modal
@@ -189,7 +218,7 @@ export default function ImageGenerationModal({
         })}>
         <View style={styles.modalContent}>
           <View style={styles.header}>
-            <Text style={styles.title}>Exercise Images - {exerciseName}</Text>
+            <Text style={styles.title}>Exercise Images - {workoutName}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
@@ -210,17 +239,7 @@ export default function ImageGenerationModal({
 
           <ScrollView style={[scrollContainerStyle(), styles.libraryContainer]}>
             {activeTab === 'library' ? (
-              <View style={styles.imageGrid}>
-                {dummyAssets.map(asset => (
-                  <SelectableImage
-                    key={asset.id}
-                    url={asset.url}
-                    title={asset.title}
-                    isSelected={selectedImageId === asset.id}
-                    onSelect={() => setSelectedImageId(asset.id)}
-                  />
-                ))}
-              </View>
+              renderAssetLibraryContainer()
             ) : (
               <View style={styles.contentContainer}>
                 <View style={styles.generateContainer}>
@@ -239,12 +258,16 @@ export default function ImageGenerationModal({
                     Describe the exercise, equipment, colors, style, and background. Faces and
                     people aren’t supported.
                   </Text>
-
+                  {errorMessage && (
+                    <TextContainer
+                      style={tailwind('text-3 mb-4 text-center text-red-400')}
+                      data={errorMessage}
+                    />
+                  )}
                   <ActionButton
-                    label="Generate"
+                    label={isGenerating ? 'Generating...' : 'Generate'}
                     onPress={handleGenerate}
                     disabled={!prompt.trim() || isGenerating}
-                    isLoading={isGenerating}
                     style={[
                       styles.generateButton,
                       (!prompt.trim() || isGenerating) && styles.generateButtonDisabled,
@@ -254,19 +277,15 @@ export default function ImageGenerationModal({
                   {generatedImages.length > 0 && (
                     <View style={styles.generatedImagesContainer}>
                       <Text style={styles.generatedTitle}>Generated images</Text>
-                      <Text style={styles.generatedHelper}>
-                        These images are stored for 14 days, then removed. To keep one, select it
-                        and save it for later.
-                      </Text>
+
                       <View style={styles.grid}>
                         {generatedImages.map((url, index) => (
                           <SelectableImage
                             key={index}
                             url={url}
-                            title={`Generated ${index + 1}`}
-                            isSelected={selectedImageId === url}
+                            isSelected={selectedImageUrl === url}
                             onSelect={() => {
-                              setSelectedImageId(url);
+                              setSelectedImageUrl(url);
                               // Handle selection of generated images
                             }}
                           />

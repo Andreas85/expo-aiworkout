@@ -1,22 +1,18 @@
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import { AntDesign } from '@expo/vector-icons';
 import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 
 interface SelectableImageProps {
   url: string;
-  title: string;
   isSelected: boolean;
   onSelect: () => void;
 }
 
-export default function SelectableImage({
-  url,
-  title,
-  isSelected,
-  onSelect,
-}: SelectableImageProps) {
+export default function SelectableImage({ url, isSelected, onSelect }: SelectableImageProps) {
+  const { isLargeScreen } = useWebBreakPoints();
   return (
-    <View style={styles.container}>
+    <View style={{ ...styles.container, width: isLargeScreen ? '50%' : '33%' }}>
       <TouchableOpacity
         onPress={onSelect}
         style={[
@@ -32,14 +28,12 @@ export default function SelectableImage({
           </View>
         </View>
       </TouchableOpacity>
-      {/* <Text style={styles.title}>{title}</Text> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: '50%',
     padding: 8,
   },
   imageContainer: {
@@ -49,7 +43,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    aspectRatio: 2,
+    aspectRatio: 1,
     borderRadius: 8,
   },
   overlay: {

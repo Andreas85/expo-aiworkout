@@ -13,6 +13,7 @@ import {
   IPayloadWorkoutSessionsUpdateFinished,
   ICreateWorkoutCopy,
   ExerciseElement,
+  IGeneratedWorkoutImage,
 } from './interfaces';
 import { deleteRequest, getRequest, postRequest, putRequest } from '@/utils/axios';
 import { expandRestAsExercises, extractedErrorMessage } from '@/utils/helper';
@@ -411,6 +412,31 @@ export const generateSaveGeneratedWorkoutService = async (payload: any) => {
     const { data } = await postRequest({
       API: URL,
       DATA: { ...payload },
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const getImageService = async () => {
+  try {
+    const URL = API_ENPOINTS.IMAGES + `?entityType=workout`;
+    const { data } = await getRequest({
+      API: URL,
+    });
+    return data?.data as IGeneratedWorkoutImage[];
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const generateWorkoutImageService = async (payload: { prompt: string }) => {
+  try {
+    const URL = API_ENPOINTS.GENERATED_IMAGES;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: { prompt: payload.prompt },
     });
     return data;
   } catch (error: any) {

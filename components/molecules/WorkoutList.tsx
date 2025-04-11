@@ -70,7 +70,7 @@ const WorkoutList = ({
             ]}>
             {!isEnabled && (
               <ImageContainer
-                source={IMAGES.fitness}
+                source={item?.image || IMAGES.fitness}
                 styleNative={[tailwind(`aspect-square w-full self-center rounded-2xl`)]}
                 contentFit="fill"
               />

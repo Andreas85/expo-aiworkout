@@ -37,6 +37,7 @@ import Colors from '@/constants/Colors';
 import StarsIcon from '../atoms/AiStarsIcon';
 import { ExerciseElement, Workout } from '@/services/interfaces';
 import { WorkoutPlan } from '@/types';
+import AIImageButton from '../atoms/AIImageButton';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
@@ -214,6 +215,7 @@ const WorkoutDetail = () => {
                 `relative ${isExtraSmallScreenOnly ? 'w-full' : 'w-auto'} flex-row flex-wrap items-center gap-2 self-center`,
               ),
             ]}>
+            <AIImageButton />
             <ActionButton
               label={'Regenerate Workout'}
               onPress={handleEditGeneratedWorkoutClick}

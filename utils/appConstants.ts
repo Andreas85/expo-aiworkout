@@ -19,7 +19,7 @@ export const NAVBAR_TABS: INavbarTabs[] = [
 ];
 
 export const ERROR_MESSAGE = {
-  SOMETHING_WENT_WRONG: 'Something went wront',
+  SOMETHING_WENT_WRONG: 'Something went wrong',
 };
 
 export const USER_ROLE = {
@@ -65,6 +65,7 @@ export const REACT_QUERY_API_KEYS = {
   WORKOUT_SESSION_USER: 'workout-session-user',
   WORKOUT_SESSION_USER_DETAILS: 'workout-session-user-details',
   ME: 'me',
+  FETCHED_IMAGE: 'fetched-image',
 };
 
 export const REACT_QUERY_STALE_TIME = {
