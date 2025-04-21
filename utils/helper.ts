@@ -282,3 +282,15 @@ export const hasValidData = (obj: Record<string, any>, key: string) => {
     obj[key] !== ''
   );
 };
+
+export const base64ToBlob = (base64Data: string, contentType: string): Blob => {
+  const byteCharacters = atob(base64Data.split(',')[1]);
+  const byteArrays = [];
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArrays.push(byteCharacters.charCodeAt(i));
+  }
+
+  const byteArray = new Uint8Array(byteArrays);
+  return new Blob([byteArray], { type: contentType });
+};

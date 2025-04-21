@@ -31,11 +31,22 @@ import TextContainer from './TextContainer';
 import { IGeneratedWorkoutImage } from '@/services/interfaces';
 import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { useLocalSearchParams } from 'expo-router';
+import useImageUpload from '@/hooks/useImageUpload';
+import usePlatform from '@/hooks/usePlatform';
+import UploadButton from './UploadButton';
 
 interface ImageGenerationModalProps {
   isVisible: boolean;
   onClose: () => void;
   workoutName: string;
+}
+
+interface UploadedImage {
+  id: string;
+  url: string;
+  title: string;
+  type: string;
+  name: string;
 }
 
 export default function ImageGenerationModal({
@@ -45,6 +56,8 @@ export default function ImageGenerationModal({
 }: ImageGenerationModalProps) {
   const { slug } = useLocalSearchParams() as { slug: string };
   const queryClient = useQueryClient();
+  const { isWeb } = usePlatform();
+  const { awsPreSignedURLUploadNative, awsPreSignedURLUploadWeb } = useImageUpload();
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const [errorMessage, setErrorMessage] = useState('');
   const { data: imageData, isLoading } = useFetchData({
@@ -84,15 +97,42 @@ export default function ImageGenerationModal({
     },
   });
 
-  const [activeTab, setActiveTab] = useState<'library' | 'generate'>('library');
+  const [activeTab, setActiveTab] = useState<'library' | 'generate' | 'upload'>('library');
   const { isLargeScreen } = useWebBreakPoints();
   const { isExtraSmallDevice, isMobileDevice } = useBreakPoints();
   const isKeyboardVisible = useKeyboardVisibility();
-  // const [isGenerating, setIsGenerating] = useState(false);
+  const [loader, setLoader] = useState<boolean>(false);
   const [prompt, setPrompt] = useState('');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const { height } = useWindowDimensions();
+
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+
+  const imageUploadRequest = async (file: UploadedImage) => {
+    try {
+      setLoader(true);
+      let res: string = '';
+
+      if (isWeb) {
+        res = await awsPreSignedURLUploadWeb(file);
+      } else {
+        res = await awsPreSignedURLUploadNative(file);
+      }
+      // console.log(res, 'res');
+      setUploadedImages(prev => [...prev, { ...file, url: res }]);
+    } catch (error: any) {
+      console.log(error, 'error');
+    } finally {
+      setLoader(false);
+      console.log('finally');
+    }
+  };
+
+  const handleFileUpdateChange = async (data: UploadedImage) => {
+    await imageUploadRequest(data);
+  };
+
   const handleGenerate = async () => {
     setSelectedImageUrl(null); // Reset selected image ID when generating new images
     if (!prompt.trim()) return;
@@ -122,12 +162,15 @@ export default function ImageGenerationModal({
   }, [isKeyboardVisible, isMobileDevice, isExtraSmallDevice, height]);
 
   const handleFinish = () => {
-    mutateUpdatedWorkout({
+    let payload = {
       formData: {
         image: selectedImageUrl || '',
       },
       queryParams: { id: slug },
-    });
+    };
+
+    console.log(payload, 'handleFinishpayload');
+    mutateUpdatedWorkout(payload);
   };
 
   const TabButton = ({
@@ -154,7 +197,9 @@ export default function ImageGenerationModal({
 
   const renderModalFooter = () => {
     const shouldShowFooter =
-      activeTab === 'library' || (activeTab === 'generate' && generatedImages.length > 0);
+      activeTab === 'library' ||
+      (activeTab === 'generate' && generatedImages.length > 0) ||
+      (activeTab === 'upload' && uploadedImages.length > 0);
 
     return shouldShowFooter ? (
       <ModalFooter
@@ -235,12 +280,16 @@ export default function ImageGenerationModal({
               isActive={activeTab === 'generate'}
               onPress={() => handleTabClick('generate')}
             />
+            <TabButton
+              title="Upload"
+              isActive={activeTab === 'upload'}
+              onPress={() => setActiveTab('upload')}
+            />
           </View>
 
           <ScrollView style={[scrollContainerStyle(), styles.libraryContainer]}>
-            {activeTab === 'library' ? (
-              renderAssetLibraryContainer()
-            ) : (
+            {activeTab === 'library' && renderAssetLibraryContainer()}
+            {activeTab === 'generate' && (
               <View style={styles.contentContainer}>
                 <View style={styles.generateContainer}>
                   <Text style={styles.generateTitle}>Generate images with AI</Text>
@@ -294,6 +343,41 @@ export default function ImageGenerationModal({
                     </View>
                   )}
                 </View>
+              </View>
+            )}
+
+            {activeTab === 'upload' && (
+              <View style={styles.uploadContainer}>
+                <Text style={styles.uploadTitle}>Upload your own image</Text>
+                <Text style={styles.uploadHelper}>
+                  Select an image from your device to use as the workout image
+                </Text>
+
+                <UploadButton
+                  loader={loader}
+                  uploadedImages={uploadedImages}
+                  imageUploadRequest={handleFileUpdateChange}
+                />
+                {uploadedImages.length > 0 && (
+                  <View style={styles.generatedImagesContainer}>
+                    <Text style={styles.generatedTitle}>Uploaded images</Text>
+                    <Text style={styles.generatedHelper}>
+                      Select an image to use it for your exercise.
+                    </Text>
+                    <View style={styles.grid}>
+                      {uploadedImages.map(image => (
+                        <SelectableImage
+                          key={image.id}
+                          url={image.url}
+                          isSelected={selectedImageUrl === image.url}
+                          onSelect={() => {
+                            setSelectedImageUrl(image.url);
+                          }}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                )}
               </View>
             )}
           </ScrollView>
@@ -424,5 +508,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     padding: 8,
+  },
+  uploadContainer: {
+    padding: 16,
+  },
+  uploadTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  uploadHelper: {
+    fontSize: 12,
+    color: '#888888',
+    marginBottom: 24,
+  },
+  uploadButton: {
+    backgroundColor: '#8B5CF6',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  uploadButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
