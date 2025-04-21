@@ -121,6 +121,7 @@ export default function ImageGenerationModal({
       }
       // console.log(res, 'res');
       setUploadedImages(prev => [...prev, { ...file, url: res }]);
+      setSelectedImageUrl(res); // Set the selected image URL to the uploaded image URL
     } catch (error: any) {
       console.log(error, 'error');
     } finally {

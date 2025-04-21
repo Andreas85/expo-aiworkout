@@ -338,7 +338,7 @@ const ActiveCard = ({ item, handleFinish }: ActiveCardProps) => {
             native: tailwind('flex-row items-end gap-4'),
           }),
         ]}>
-        {renderExerciseImage()}
+        {/* {renderExerciseImage()} */}
         <Container
           style={[
             Platform.select({

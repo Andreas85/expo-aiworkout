@@ -31,14 +31,14 @@ const ActiveWorkoutNotes = (props: {
 
   const getContainerWebStyle = () => {
     if (isActiveRepExerciseCard) {
-      return isLargeScreen ? 'bottom-4 right-[65px]' : `bottom-4 right-28`;
+      return isLargeScreen ? 'bottom-4 right-[62px]' : `bottom-4 right-28`;
     }
     return isLargeScreen ? 'bottom-4 right-[75px]' : `bottom-4 right-[218px]`;
   };
 
   const getContainerNativeStyle = () => {
     if (isActiveRepExerciseCard) {
-      return 'bottom-4 right-[45px]';
+      return 'bottom-4 right-[58px]';
     }
     return 'bottom-4 right-[60px]';
   };

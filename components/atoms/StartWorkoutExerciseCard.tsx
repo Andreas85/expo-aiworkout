@@ -108,7 +108,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
         }),
       ]}
       key={item?._id}>
-      {!isEnabled && renderExerciseImage()}
+      {/* {!isEnabled && renderExerciseImage()} */}
       <Container
         style={[
           Platform.select({

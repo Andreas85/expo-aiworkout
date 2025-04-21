@@ -16,7 +16,7 @@ const WorkoutCardShort = (props: { item: ExerciseElement; isEnabled?: boolean })
       style={[
         Platform.select({
           web: tailwind(`flex-1 ${isLargeScreen ? 'py-[0.25rem]' : 'py-3'}  `),
-          native: tailwind('flex-1 py-[0.25rem]'),
+          native: tailwind(' py-[0.25rem]'),
         }),
       ]}
       key={item._id}>
@@ -24,7 +24,7 @@ const WorkoutCardShort = (props: { item: ExerciseElement; isEnabled?: boolean })
         style={[
           Platform.select({
             web: tailwind(`${isLargeScreen ? 'py-1' : 'py-2 pb-3'} flex-1 flex-row items-start`),
-            native: tailwind('flex-1 flex-row items-start justify-between gap-3 py-1  '),
+            native: tailwind('flex-row items-start justify-between gap-3 py-1  '),
           }),
           // tailwind('flex-1 flex-row items-start '),
         ]}>

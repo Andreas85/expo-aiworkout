@@ -26,15 +26,10 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
 
   const workoutDetail = useWorkoutDetailStore(state => state.workoutDetail);
   const hasExercise = useWorkoutDetailStore(state => state.hasExercise);
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
+  const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const { handleAddWorkoutSession } = useWorkoutSessionDetailsTracking();
   const { isLargeScreen, isMediumScreen } = useWebBreakPoints();
   const [loading, setLoading] = useState(false);
-
-  const toggleSwitch = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsEnabled(prevState => !prevState);
-  }, []);
 
   const [refreshing, setRefreshing] = useState(false);
   const queryClient = useQueryClient();
@@ -51,18 +46,6 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
       console.log('error', error);
     } finally {
       setRefreshing(false);
-    }
-  };
-  const renderVersionTab = () => {
-    if (hasExercise) {
-      return (
-        <CustomSwitch
-          isEnabled={isEnabled}
-          toggleSwitch={toggleSwitch}
-          label="Short Version"
-          containerStyle={[tailwind('my-0 ')]}
-        />
-      );
     }
   };
 
@@ -188,7 +171,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
               ]}
             />
           </Container>
-          {!isMediumScreen && renderVersionTab()}
+          {/* {!isMediumScreen && renderVersionTab()} */}
         </Container>
         {!isLargeScreen && (
           <TextContainer
@@ -205,7 +188,7 @@ const PublicWorkoutDetail = (props: { isPublicWorkout?: boolean }) => {
           />
         )}
 
-        {isMediumScreen && renderVersionTab()}
+        {/* {isMediumScreen && renderVersionTab()} */}
 
         <Container
           style={[

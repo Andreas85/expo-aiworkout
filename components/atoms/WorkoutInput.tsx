@@ -43,12 +43,12 @@ const WorkoutInput = (props: IWorkoutInput) => {
         containerStyle={[
           Platform.select({
             web: tailwind('w-full self-center border-none'),
-            native: tailwind('flex-1 self-center border-none '),
+            native: tailwind(' self-center border-none '),
           }),
         ]}
         containerStyleAppTextInput={Platform.select({
           web: tailwind(`${isMobileDeviceOnly && 'w-auto'} `),
-          native: tailwind(`w-auto flex-1 `),
+          native: tailwind(`w-auto  `),
         })}
         keyboardType="number-pad"
         autoCapitalize="none"
