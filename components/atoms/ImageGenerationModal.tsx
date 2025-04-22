@@ -19,8 +19,10 @@ import { Ionicons } from '@expo/vector-icons';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
 import { useFetchData } from '@/hooks/useFetchData';
-import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { REACT_QUERY_API_KEYS, USER_ROLE } from '@/utils/appConstants';
 import {
+  createImageService,
+  deleteImageService,
   generateWorkoutImageService,
   getImageService,
   updateWorkoutDataRequest,
@@ -34,6 +36,8 @@ import { useLocalSearchParams } from 'expo-router';
 import useImageUpload from '@/hooks/useImageUpload';
 import usePlatform from '@/hooks/usePlatform';
 import UploadButton from './UploadButton';
+import ConfirmationModal from '../modals/ConfirmationModal';
+import { useAuthStore } from '@/store/authStore';
 
 interface ImageGenerationModalProps {
   isVisible: boolean;
@@ -57,9 +61,13 @@ export default function ImageGenerationModal({
   const { slug } = useLocalSearchParams() as { slug: string };
   const queryClient = useQueryClient();
   const { isWeb } = usePlatform();
+  const userData = useAuthStore(state => state.userData);
   const { awsPreSignedURLUploadNative, awsPreSignedURLUploadWeb } = useImageUpload();
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const [errorMessage, setErrorMessage] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [deleteImageId, setDeleteImageId] = useState<string | null>(null);
+
   const { data: imageData, isLoading } = useFetchData({
     queryFn: getImageService,
     queryKey: [REACT_QUERY_API_KEYS.FETCHED_IMAGE],
@@ -97,6 +105,40 @@ export default function ImageGenerationModal({
     },
   });
 
+  const { mutate: mutateDeleteImageWorkout, isPending: isPendingDeleteImageWorkout } = useMutation({
+    mutationFn: deleteImageService,
+    onSuccess: data => {
+      // alert('HERE---');
+      console.log(data, 'datmutateDeleteImageWorkout');
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.FETCHED_IMAGE],
+      });
+      setShowConfirmModal(false);
+      setDeleteImageId(null);
+      setErrorMessage('');
+    },
+    onError: (error: string) => {
+      console.log(error);
+      setErrorMessage(error || 'Something went wrong');
+    },
+  });
+
+  const { mutate: mutateCreateImageService, isPending: isPendingCreateImageWorkout } = useMutation({
+    mutationFn: createImageService,
+    onSuccess: data => {
+      // alert('HERE---');
+      console.log(data, 'datmutateDeleteImageWorkout');
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.FETCHED_IMAGE],
+      });
+      setShowConfirmModal(false);
+      setDeleteImageId(null);
+    },
+    onError: (error: string) => {
+      console.log(error);
+    },
+  });
+
   const [activeTab, setActiveTab] = useState<'library' | 'generate' | 'upload'>('library');
   const { isLargeScreen } = useWebBreakPoints();
   const { isExtraSmallDevice, isMobileDevice } = useBreakPoints();
@@ -122,6 +164,12 @@ export default function ImageGenerationModal({
       // console.log(res, 'res');
       setUploadedImages(prev => [...prev, { ...file, url: res }]);
       setSelectedImageUrl(res); // Set the selected image URL to the uploaded image URL
+
+      //  here we are adding in asset library
+
+      mutateCreateImageService({
+        url: res,
+      });
     } catch (error: any) {
       console.log(error, 'error');
     } finally {
@@ -207,7 +255,7 @@ export default function ImageGenerationModal({
         onCancel={onClose}
         onFinish={handleFinish}
         finishDisabled={!selectedImageUrl}
-        isLoading={isPendingUpdateWorkout}
+        isLoading={isPendingUpdateWorkout || isPendingCreateImageWorkout}
       />
     ) : null;
   };
@@ -215,6 +263,27 @@ export default function ImageGenerationModal({
   const handleTabClick = (tab: 'library' | 'generate') => {
     setActiveTab(tab);
     setSelectedImageUrl(null); // Reset selected image ID when switching tabs
+  };
+
+  const handleConfirmDelete = () => {
+    const payload = {
+      id: deleteImageId || '',
+    };
+    console.log(payload, 'handleConfirmDeletepayload');
+    mutateDeleteImageWorkout(payload);
+  };
+
+  const handleCloseDelete = () => {
+    setShowConfirmModal(false);
+    setDeleteImageId(null);
+    setErrorMessage('');
+  };
+
+  const handleDelete = (id: string) => {
+    setDeleteImageId(id);
+    setShowConfirmModal(true);
+    // Handle delete action here, e.g., call an API to delete the image
+    // You can also pass the id to the confirmation modal if needed
   };
 
   const renderAssetLibraryContainer = useCallback(() => {
@@ -237,6 +306,8 @@ export default function ImageGenerationModal({
               url={asset.url}
               isSelected={selectedImageUrl === asset.url}
               onSelect={() => setSelectedImageUrl(asset.url)}
+              onDelete={() => handleDelete(asset._id)}
+              showDelete={userData?.roles?.includes(USER_ROLE.ADMIN)}
             />
           ))}
         </View>
@@ -245,98 +316,135 @@ export default function ImageGenerationModal({
   }, [imageData, isLoading, selectedImageUrl]);
 
   return (
-    <Modal
-      isVisible={isVisible}
-      backdropColor="white"
-      useNativeDriver
-      animationIn="fadeIn"
-      animationOut="fadeOut"
-      style={Platform.select({
-        web: isLargeScreen ? { margin: 0, justifyContent: 'flex-end' } : {},
-        native: { margin: 0, justifyContent: 'flex-end' }, // Full-screen modal
-      })}>
-      <View
+    <>
+      <Modal
+        isVisible={isVisible}
+        backdropColor="white"
+        useNativeDriver
+        animationIn="fadeIn"
+        animationOut="fadeOut"
         style={Platform.select({
-          web: isLargeScreen
-            ? styles.modalContainer
-            : tailwind('mx-auto h-full w-3/5 rounded-lg bg-NAVBAR_BACKGROUND p-4 pb-0'),
-          native: styles.modalContainer,
+          web: isLargeScreen ? { margin: 0, justifyContent: 'flex-end' } : {},
+          native: { margin: 0, justifyContent: 'flex-end' }, // Full-screen modal
         })}>
-        <View style={styles.modalContent}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Exercise Images - {workoutName}</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-          </View>
+        <View
+          style={Platform.select({
+            web: isLargeScreen
+              ? styles.modalContainer
+              : tailwind('mx-auto h-full w-3/5 rounded-lg bg-NAVBAR_BACKGROUND p-4 pb-0'),
+            native: styles.modalContainer,
+          })}>
+          <View style={styles.modalContent}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Exercise Images - {workoutName}</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
 
-          <View style={styles.tabs}>
-            <TabButton
-              title="Asset Library"
-              isActive={activeTab === 'library'}
-              onPress={() => handleTabClick('library')}
-            />
-            <TabButton
-              title="Generate Image"
-              isActive={activeTab === 'generate'}
-              onPress={() => handleTabClick('generate')}
-            />
-            <TabButton
-              title="Upload"
-              isActive={activeTab === 'upload'}
-              onPress={() => setActiveTab('upload')}
-            />
-          </View>
+            <View style={styles.tabs}>
+              <TabButton
+                title="Asset Library"
+                isActive={activeTab === 'library'}
+                onPress={() => handleTabClick('library')}
+              />
+              <TabButton
+                title="Generate Image"
+                isActive={activeTab === 'generate'}
+                onPress={() => handleTabClick('generate')}
+              />
+              <TabButton
+                title="Upload"
+                isActive={activeTab === 'upload'}
+                onPress={() => setActiveTab('upload')}
+              />
+            </View>
 
-          <ScrollView style={[scrollContainerStyle(), styles.libraryContainer]}>
-            {activeTab === 'library' && renderAssetLibraryContainer()}
-            {activeTab === 'generate' && (
-              <View style={styles.contentContainer}>
-                <View style={styles.generateContainer}>
-                  <Text style={styles.generateTitle}>Generate images with AI</Text>
-                  <TextInput
-                    style={styles.promptInput}
-                    placeholder="Describe the kind of image that you want"
-                    placeholderTextColor="#888888"
-                    value={prompt}
-                    onChangeText={setPrompt}
-                    multiline
-                    numberOfLines={3}
-                    textAlignVertical="top" // Aligns text to the top
-                  />
-                  <Text style={styles.promptHelper}>
-                    Describe the exercise, equipment, colors, style, and background. Faces and
-                    people aren’t supported.
-                  </Text>
-                  {errorMessage && (
-                    <TextContainer
-                      style={tailwind('text-3 mb-4 text-center text-red-400')}
-                      data={errorMessage}
+            <ScrollView style={[scrollContainerStyle(), styles.libraryContainer]}>
+              {activeTab === 'library' && renderAssetLibraryContainer()}
+              {activeTab === 'generate' && (
+                <View style={styles.contentContainer}>
+                  <View style={styles.generateContainer}>
+                    <Text style={styles.generateTitle}>Generate images with AI</Text>
+                    <TextInput
+                      style={styles.promptInput}
+                      placeholder="Describe the kind of image that you want"
+                      placeholderTextColor="#888888"
+                      value={prompt}
+                      onChangeText={setPrompt}
+                      multiline
+                      numberOfLines={3}
+                      textAlignVertical="top" // Aligns text to the top
                     />
-                  )}
-                  <ActionButton
-                    label={isGenerating ? 'Generating...' : 'Generate'}
-                    onPress={handleGenerate}
-                    disabled={!prompt.trim() || isGenerating}
-                    style={[
-                      styles.generateButton,
-                      (!prompt.trim() || isGenerating) && styles.generateButtonDisabled,
-                    ]}
+                    <Text style={styles.promptHelper}>
+                      Describe the exercise, equipment, colors, style, and background. Faces and
+                      people aren’t supported.
+                    </Text>
+                    {errorMessage && (
+                      <TextContainer
+                        style={tailwind('text-3 mb-4 text-center text-red-400')}
+                        data={errorMessage}
+                      />
+                    )}
+                    <ActionButton
+                      label={isGenerating ? 'Generating...' : 'Generate'}
+                      onPress={handleGenerate}
+                      disabled={!prompt.trim() || isGenerating}
+                      style={[
+                        styles.generateButton,
+                        (!prompt.trim() || isGenerating) && styles.generateButtonDisabled,
+                      ]}
+                    />
+
+                    {generatedImages.length > 0 && (
+                      <View style={styles.generatedImagesContainer}>
+                        <Text style={styles.generatedTitle}>Generated images</Text>
+
+                        <View style={styles.grid}>
+                          {generatedImages.map((url, index) => (
+                            <SelectableImage
+                              key={index}
+                              url={url}
+                              isSelected={selectedImageUrl === url}
+                              onSelect={() => {
+                                setSelectedImageUrl(url);
+                                // Handle selection of generated images
+                              }}
+                            />
+                          ))}
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              )}
+
+              {activeTab === 'upload' && (
+                <View style={styles.uploadContainer}>
+                  <Text style={styles.uploadTitle}>Upload your own image</Text>
+                  <Text style={styles.uploadHelper}>
+                    Select an image from your device to use as the workout image
+                  </Text>
+
+                  <UploadButton
+                    loader={loader}
+                    uploadedImages={uploadedImages}
+                    imageUploadRequest={handleFileUpdateChange}
                   />
-
-                  {generatedImages.length > 0 && (
+                  {uploadedImages.length > 0 && (
                     <View style={styles.generatedImagesContainer}>
-                      <Text style={styles.generatedTitle}>Generated images</Text>
-
+                      <Text style={styles.generatedTitle}>Uploaded images</Text>
+                      <Text style={styles.generatedHelper}>
+                        Select an image to use it for your exercise.
+                      </Text>
                       <View style={styles.grid}>
-                        {generatedImages.map((url, index) => (
+                        {uploadedImages.map(image => (
                           <SelectableImage
-                            key={index}
-                            url={url}
-                            isSelected={selectedImageUrl === url}
+                            key={image.id}
+                            url={image.url}
+                            isSelected={selectedImageUrl === image.url}
                             onSelect={() => {
-                              setSelectedImageUrl(url);
-                              // Handle selection of generated images
+                              setSelectedImageUrl(image.url);
                             }}
                           />
                         ))}
@@ -344,48 +452,24 @@ export default function ImageGenerationModal({
                     </View>
                   )}
                 </View>
-              </View>
-            )}
-
-            {activeTab === 'upload' && (
-              <View style={styles.uploadContainer}>
-                <Text style={styles.uploadTitle}>Upload your own image</Text>
-                <Text style={styles.uploadHelper}>
-                  Select an image from your device to use as the workout image
-                </Text>
-
-                <UploadButton
-                  loader={loader}
-                  uploadedImages={uploadedImages}
-                  imageUploadRequest={handleFileUpdateChange}
-                />
-                {uploadedImages.length > 0 && (
-                  <View style={styles.generatedImagesContainer}>
-                    <Text style={styles.generatedTitle}>Uploaded images</Text>
-                    <Text style={styles.generatedHelper}>
-                      Select an image to use it for your exercise.
-                    </Text>
-                    <View style={styles.grid}>
-                      {uploadedImages.map(image => (
-                        <SelectableImage
-                          key={image.id}
-                          url={image.url}
-                          isSelected={selectedImageUrl === image.url}
-                          onSelect={() => {
-                            setSelectedImageUrl(image.url);
-                          }}
-                        />
-                      ))}
-                    </View>
-                  </View>
-                )}
-              </View>
-            )}
-          </ScrollView>
-          {renderModalFooter()}
+              )}
+            </ScrollView>
+            {renderModalFooter()}
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+
+      <ConfirmationModal
+        isModalVisible={showConfirmModal}
+        closeModal={handleCloseDelete}
+        handleAction={handleConfirmDelete}
+        isLoading={isPendingDeleteImageWorkout}
+        isDeleteAction={true}
+        labelAction="Delete"
+        responseError={errorMessage}
+        message="Are you sure you want to delete this image? This action cannot be undone."
+      />
+    </>
   );
 }
 

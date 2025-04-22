@@ -431,12 +431,38 @@ export const getImageService = async () => {
   }
 };
 
+export const createImageService = async (payload: { url: string }) => {
+  try {
+    const URL = API_ENPOINTS.IMAGES;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: { url: payload.url, entityType: 'workout' },
+    });
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const deleteImageService = async (payload: { id: string }) => {
+  try {
+    const URL = API_ENPOINTS.IMAGES + `/${payload.id}`;
+    const { data } = await deleteRequest({
+      API: URL,
+    });
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
 export const generateWorkoutImageService = async (payload: { prompt: string }) => {
   try {
     const URL = API_ENPOINTS.GENERATED_IMAGES;
     const { data } = await postRequest({
       API: URL,
       DATA: { prompt: payload.prompt },
+      timeout: 30000, // 30 seconds
     });
     return data;
   } catch (error: any) {

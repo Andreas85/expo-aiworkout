@@ -15,6 +15,7 @@ interface IConfirmationModal {
   disabledAction?: boolean;
   isDeleteAction?: boolean;
   handleAction: () => void;
+  responseError?: string;
 }
 
 function ConfirmationModal(props: IConfirmationModal) {
@@ -28,6 +29,7 @@ function ConfirmationModal(props: IConfirmationModal) {
     labelAction,
     isDeleteAction,
     disabledAction,
+    responseError,
   } = props;
 
   return (
@@ -39,7 +41,13 @@ function ConfirmationModal(props: IConfirmationModal) {
         <Container>
           <Container className="w-full space-y-4" style={tailwind('gap-y-4')}>
             <TextContainer style={tailwind('text-center text-sm')} data={message} />
-
+            {responseError && (
+              <TextContainer
+                style={tailwind('text-3 text-center text-red-400')}
+                className="text-center text-sm !text-red-400"
+                data={responseError}
+              />
+            )}
             <Container style={tailwind('flex flex-row items-center justify-center gap-2')}>
               <ActionButton
                 label={'Cancel'}

@@ -1,34 +1,61 @@
-import useWebBreakPoints from '@/hooks/useWebBreakPoints';
-import { AntDesign } from '@expo/vector-icons';
 import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { AntDesign, Entypo } from '@expo/vector-icons';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 interface SelectableImageProps {
   url: string;
   isSelected: boolean;
   onSelect: () => void;
+  onDelete?: () => void;
+  showDelete?: boolean;
 }
 
-export default function SelectableImage({ url, isSelected, onSelect }: SelectableImageProps) {
+export default function SelectableImage({
+  url,
+  isSelected,
+  onSelect,
+  onDelete,
+  showDelete = false,
+}: SelectableImageProps) {
   const { isLargeScreen } = useWebBreakPoints();
+
+  const handleDelete = () => {
+    onDelete?.();
+  };
+
   return (
-    <View style={{ ...styles.container, width: isLargeScreen ? '50%' : '33%' }}>
-      <TouchableOpacity
-        onPress={onSelect}
-        style={[
-          styles.imageContainer,
-          Platform.select({
-            web: { cursor: 'pointer' },
-          }),
-        ]}>
-        <Image source={{ uri: url }} style={styles.image} />
-        <View style={styles.overlay}>
-          <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-            {isSelected && <AntDesign name="checksquare" size={16} color="#FFFFFF" />}
+    <>
+      <View style={{ ...styles.container, width: isLargeScreen ? '50%' : '33%' }}>
+        <TouchableOpacity
+          onPress={onSelect}
+          style={[
+            styles.imageContainer,
+            Platform.select({
+              web: { cursor: 'pointer' },
+            }),
+          ]}>
+          <Image source={{ uri: url }} style={styles.image} />
+          <View style={styles.overlay}>
+            <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
+              {isSelected && <AntDesign name="checksquare" size={16} color="#FFFFFF" />}
+            </View>
+            {showDelete && (
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={[
+                  styles.deleteButton,
+                  Platform.select({
+                    web: { cursor: 'pointer' },
+                  }),
+                ]}>
+                <Entypo name="trash" size={16} color="#FFFFFF" />
+              </TouchableOpacity>
+            )}
           </View>
-        </View>
-      </TouchableOpacity>
-    </View>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 }
 
@@ -66,8 +93,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkboxSelected: {
-    // backgroundColor: '#8B5CF6',
-    // borderColor: '#8B5CF6',
+    backgroundColor: '#8B5CF6',
+    borderColor: '#8B5CF6',
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     color: '#FFFFFF',
