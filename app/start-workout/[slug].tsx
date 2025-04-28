@@ -11,8 +11,10 @@ import { useWorkoutDetailStore } from '@/store/workoutdetail';
 import { fetchPublicWorkoutServiceById } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS, REACT_QUERY_STALE_TIME } from '@/utils/appConstants';
 import { getWorkoutSessionById } from '@/utils/workoutSessionHelper';
+import { useKeepAwake } from 'expo-keep-awake';
 
 const StartWorkoutDetail = () => {
+  useKeepAwake();
   const queryClient = useQueryClient();
   const { slug, sessionId } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();

@@ -15,8 +15,9 @@ import { hasValidData } from '@/utils/helper';
 const ActiveWorkoutNotes = (props: {
   item: ExerciseElement;
   isDraggableExerciseCard?: boolean;
+  isNonActiveCard?: boolean;
 }) => {
-  const { item, isDraggableExerciseCard = false } = props;
+  const { item, isDraggableExerciseCard = false, isNonActiveCard = false } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const { hideModal, showModal, openModal } = useModal();
   const { handlePause } = useTimer();
@@ -30,17 +31,38 @@ const ActiveWorkoutNotes = (props: {
   };
 
   const getContainerWebStyle = () => {
+    if (isNonActiveCard && isLargeScreen) {
+      return `bottom-0.6 right-12`;
+    }
     if (isActiveRepExerciseCard) {
-      return isLargeScreen ? 'bottom-4 right-[62px]' : `bottom-4 right-28`;
+      return isLargeScreen
+        ? 'bottom-4 right-[62px]'
+        : isNonActiveCard
+          ? `bottom-0.5 right-20`
+          : `bottom-4 right-28`;
     }
     return isLargeScreen ? 'bottom-4 right-[75px]' : `bottom-4 right-[218px]`;
   };
 
   const getContainerNativeStyle = () => {
+    if (isNonActiveCard && isLargeScreen) {
+      return `bottom-0.6 right-12`;
+    }
     if (isActiveRepExerciseCard) {
       return 'bottom-4 right-[58px]';
     }
     return 'bottom-4 right-[60px]';
+  };
+
+  const getIconSize = () => {
+    if (isNonActiveCard && isLargeScreen) {
+      return 24;
+    }
+    if (isDraggableExerciseCard) {
+      return 28;
+    } else {
+      return 38;
+    }
   };
   return (
     <>
@@ -56,7 +78,7 @@ const ActiveWorkoutNotes = (props: {
         <TouchableOpacity activeOpacity={1} onPress={handleActiveWorkoutIconClick}>
           <Foundation
             name="clipboard-notes"
-            size={isDraggableExerciseCard ? 28 : 38}
+            size={getIconSize()}
             color={hasNotes ? '#EBB866' : Colors.brandColor}
           />
         </TouchableOpacity>

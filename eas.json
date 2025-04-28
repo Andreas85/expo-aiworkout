@@ -10,6 +10,9 @@
       "channel": "development"
     },
     "preview": {
+      "android": {
+        "buildType": "app-bundle"
+      },
       "distribution": "internal",
       "channel": "preview",
       "resourceClass": "medium",

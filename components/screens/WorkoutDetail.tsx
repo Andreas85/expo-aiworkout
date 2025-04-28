@@ -4,7 +4,7 @@ import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { ActionButton } from '../atoms/ActionButton';
 import { SkypeIndicator } from 'react-native-indicators';
@@ -12,8 +12,8 @@ import { SkypeIndicator } from 'react-native-indicators';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
-import { AntDesign, Feather } from '@expo/vector-icons';
-import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import useModal from '@/hooks/useModal';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -34,10 +34,12 @@ import RenderWorkoutDetailStartWorkoutContainer from '../atoms/RenderWorkoutDeta
 import EditGenerateWorkout from '../modals/EditGenerateWorkout';
 import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
 import Colors from '@/constants/Colors';
-import StarsIcon from '../atoms/AiStarsIcon';
-import { ExerciseElement, Workout } from '@/services/interfaces';
+import { Workout } from '@/services/interfaces';
 import { WorkoutPlan } from '@/types';
+import WorkoutOptionsMenu from './WorkoutOptionsMenu';
+import ImageGenerationModal from '../atoms/ImageGenerationModal';
 import AIImageButton from '../atoms/AIImageButton';
+import StarsIcon from '../atoms/AiStarsIcon';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
@@ -49,6 +51,16 @@ const WorkoutDetail = () => {
   const { handleDeleteWorkoutForNonLoggedInUser, handleDuplicateWorkoutForNonLoggedInUser } =
     useWorkoutNonLoggedInUser();
   const { hideModal, showModal, openModal } = useModal();
+  const {
+    hideModal: hideModalMenu,
+    showModal: showModalMenu,
+    openModal: openModalMenu,
+  } = useModal();
+  const {
+    hideModal: hideModalUpdateImage,
+    showModal: showModalUpdateImage,
+    openModal: openModalUpdateImage,
+  } = useModal();
   const {
     hideModal: hideEditGeneratedWorkoutModal,
     openModal: openEditGeneratedWorkoutModal,
@@ -212,21 +224,25 @@ const WorkoutDetail = () => {
           <Container
             style={[
               tailwind(
-                `relative ${isExtraSmallScreenOnly ? 'w-full' : 'w-auto'} flex-row flex-wrap items-center gap-2 self-center`,
+                `relative ${isExtraSmallScreenOnly ? '' : 'w-auto'} flex-row flex-wrap items-center gap-2 self-center`,
               ),
             ]}>
-            <AIImageButton />
-            <ActionButton
-              label={'Regenerate Workout'}
-              onPress={handleEditGeneratedWorkoutClick}
-              style={[
-                Platform.select({
-                  web: tailwind('rounded-xl px-3'),
-                  native: tailwind('rounded-xl px-3'),
-                }),
-              ]}
-              left={<StarsIcon brandColor={Colors.white} />}
-            />
+            {!isLargeScreen && (
+              <>
+                <AIImageButton />
+                <ActionButton
+                  label={'Regenerate Workout'}
+                  onPress={handleEditGeneratedWorkoutClick}
+                  style={[
+                    Platform.select({
+                      web: tailwind('rounded-xl px-3'),
+                      native: tailwind('rounded-xl px-3'),
+                    }),
+                  ]}
+                  left={<StarsIcon brandColor={Colors.white} />}
+                />
+              </>
+            )}
             <ActionButton
               label={'Add Exercise'}
               onPress={showModalAddExercise}
@@ -238,6 +254,17 @@ const WorkoutDetail = () => {
               ]}
               left={<AntDesign name="pluscircleo" size={20} color="white" />}
             />
+            {isLargeScreen && (
+              <TouchableOpacity
+                style={{
+                  padding: 8,
+                  borderRadius: 8,
+                  marginLeft: 8,
+                }}
+                onPress={showModalMenu}>
+                <FontAwesome5 name="ellipsis-v" size={24} color={Colors.brandColor} />
+              </TouchableOpacity>
+            )}
           </Container>
         </Container>
         <Container
@@ -297,7 +324,6 @@ const WorkoutDetail = () => {
                 }),
               ]}
               onPress={showModal}
-              left={<Feather name="edit" color="#A27DE1" size={ICON_SIZE} />}
             />
           </Container>
         </Container>
@@ -369,6 +395,22 @@ const WorkoutDetail = () => {
           isVisible={openEditGeneratedWorkoutModal}
           toggleModal={hideEditGeneratedWorkoutModal}
           workoutDetail={workoutDetail as Workout}
+        />
+      )}
+      {openModalMenu && (
+        <WorkoutOptionsMenu
+          visible={openModalMenu}
+          onClose={hideModalMenu}
+          handleEditGeneratedWorkoutClick={handleEditGeneratedWorkoutClick}
+          showEditWorkout={showModal}
+          showModalUpdateImage={showModalUpdateImage}
+        />
+      )}
+      {openModalUpdateImage && (
+        <ImageGenerationModal
+          isVisible={openModalUpdateImage}
+          onClose={hideModalUpdateImage}
+          workoutName={workoutDetail?.name || ''}
         />
       )}
     </Container>

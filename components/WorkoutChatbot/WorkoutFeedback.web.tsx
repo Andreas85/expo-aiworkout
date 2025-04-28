@@ -42,7 +42,7 @@ export function WorkoutFeedbackView({
   const renderContainer = () => {
     if (isFirstItem) {
       return (
-        <div className="w-full min-w-[300px] space-y-3">
+        <div className="w-full min-w-[200px] space-y-3">
           <textarea
             value={feedback}
             onChange={e => setFeedback(e.target.value)}

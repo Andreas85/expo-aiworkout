@@ -99,6 +99,7 @@ const BaseTimer = (props: IBaseTimerProps) => {
 
         <StartWorkoutExerciseCard
           item={currentExercise}
+          isBaseTimer={true}
           onDecrementHandler={() => {}}
           onIncrementHandler={() => {}}
         />

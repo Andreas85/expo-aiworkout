@@ -9,20 +9,24 @@ import { IMAGES } from '@/utils/images';
 import { pluralise } from '@/utils/helper';
 import { Text } from '../Themed';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import ActiveWorkoutIcon from './ActiveWorkoutIcon';
+import ActiveWorkoutNotes from './ActiveWorkoutNotes';
+import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 
 interface StartWorkoutExerciseCardProps {
   item: ExerciseElement;
   isEnabled?: boolean;
   isRestCard?: boolean;
+  isBaseTimer?: boolean;
   onDecrementHandler: () => void;
   onIncrementHandler: () => void;
 }
 
 const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
-  const { item, isEnabled, isRestCard } = props;
+  const { item, isEnabled, isRestCard = false, isBaseTimer = false } = props;
   const { isLargeScreen } = useWebBreakPoints();
   const [hasReps, setHasReps] = useState<boolean>(false);
-
+  const isWorkoutOwner = useWorkoutSessionStore(state => state.isWorkoutOwner);
   useEffect(() => {
     setHasReps(!!item?.reps);
   }, [item]);
@@ -97,7 +101,7 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
         Platform.select({
           // web: tailwind(`flex-1 flex-row gap-4  rounded-lg bg-NAVBAR_BACKGROUND px-4 py-2`),
           web: [
-            { height: isLargeScreen ? '5.4375rem' : '183px' },
+            { minHeight: isLargeScreen ? '5.4375rem' : '183px' },
             tailwind(
               `flex-row  rounded-lg bg-NAVBAR_BACKGROUND ${isLargeScreen ? 'w-full  justify-center gap-[0.75rem] px-4' : 'w-full gap-12 px-12 '} py-2 opacity-75`,
             ),
@@ -114,13 +118,13 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           Platform.select({
             web: isLargeScreen
               ? tailwind(
-                  `flex-1 flex-col  ${isRestCard ? 'flex-2 items-center' : ' items-start'} justify-center gap-[0.75rem]`,
+                  `flex-1 flex-col  ${isRestCard ? 'flex-2 items-center' : ' items-start'} justify-center gap-[0.75rem] ${isWorkoutOwner && !isRestCard ? 'pb-8' : ''}`,
                 )
               : tailwind(
-                  ` flex-1 flex-col ${isRestCard ? 'items-center' : 'items-start'}  mx-auto w-[537px] justify-center gap-[1.25rem]`,
+                  ` flex-1 flex-col ${isRestCard ? 'items-center' : 'items-start'}  mx-auto w-[537px] justify-center gap-[1.25rem] `,
                 ),
             native: tailwind(
-              `flex-col justify-center ${isRestCard ? ' flex-1 items-center ' : 'flex-2  items-start '}  mx-auto `,
+              `flex-col justify-center ${isRestCard ? ' flex-1 items-center ' : 'flex-2  items-start '}  mx-auto ${isWorkoutOwner && !isRestCard ? 'pb-8' : ''}`,
             ),
           }),
         ]}>
@@ -161,6 +165,12 @@ const StartWorkoutExerciseCard = (props: StartWorkoutExerciseCardProps) => {
           ]}>
           {renderExerciseCardItemLabels()}
         </Container>
+        {!isRestCard && isWorkoutOwner && !isBaseTimer && (
+          <>
+            <ActiveWorkoutIcon item={item} isNonActiveCard={true} />
+            <ActiveWorkoutNotes item={item} isNonActiveCard={true} />
+          </>
+        )}
       </Container>
     </Container>
   );
