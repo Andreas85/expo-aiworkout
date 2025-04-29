@@ -12,8 +12,10 @@ import { useFetchData } from '@/hooks/useFetchData';
 import { getWorkoutSessionDetail } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
+import { useKeepAwake } from 'expo-keep-awake';
 
 const WorkoutSessionDetail = () => {
+  useKeepAwake();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { isLargeScreen } = useBreakPoints();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);

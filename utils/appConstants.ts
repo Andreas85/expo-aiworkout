@@ -82,6 +82,7 @@ export const STORAGES_KEYS = {
   WORKOUT_SESSION: 'workout-session',
   WORKOUTS_LIST: 'workouts-list',
   WORKOUT_EXERCISES: 'workout-exercises',
+  APP_TRACKING_PERMISSIONS: 'app-tracking-permissions',
 };
 
 export const STORAGE_EMITTER_KEYS = {

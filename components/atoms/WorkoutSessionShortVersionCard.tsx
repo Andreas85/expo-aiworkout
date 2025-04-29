@@ -23,7 +23,7 @@ const WorkoutSessionShortVersionCard = (props: {
       style={[
         Platform.select({
           web: tailwind('flex-1 flex-col'),
-          native: tailwind('mb-2 h-20 flex-col'),
+          native: tailwind('mb-2 min-h-20 flex-col'),
         }),
       ]}
       onPress={() => handleCardClick(item)}
