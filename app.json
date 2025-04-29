@@ -25,7 +25,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#252425"
       },
-      "permissions": [],
       "package": "com.uniteful.aifitnessjourney"
     },
     "web": {
@@ -36,18 +35,6 @@
     "plugins": [
       "expo-router",
       "expo-asset",
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
-        }
-      ],
-      [
-        "expo-av",
-        {
-          "microphonePermission": null
-        }
-      ],
       [
         "expo-build-properties",
         {

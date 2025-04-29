@@ -12,6 +12,12 @@ const Navbar = () => {
       <Stack.Screen name="workout-session/[slug]" options={{ headerShown: false }} />
       <Stack.Screen name="workout-session/[slug]/detail" options={{ headerShown: false }} />
       <Stack.Screen name="workout-session/[slug]/info" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="privacy"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 };

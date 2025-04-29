@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import WorkoutStatus from './WorkoutStatus';
 import { WorkoutSessionResponseData } from '@/services/interfaces';
 import { formatDateTime } from '@/utils/helper';
+import useBreakPoints from '@/hooks/useBreakPoints';
 
 const WorkoutSessionShortVersionCard = (props: {
   item: WorkoutSessionResponseData;
@@ -15,6 +16,7 @@ const WorkoutSessionShortVersionCard = (props: {
 }) => {
   const { item } = props;
   const { isLargeScreen } = useWebBreakPoints();
+  const { isExtraSmallDevice } = useBreakPoints();
   const handleCardClick = (item: any) => {
     router.push(`/workout-session/${item?._id}/info` as any);
   };
@@ -23,7 +25,7 @@ const WorkoutSessionShortVersionCard = (props: {
       style={[
         Platform.select({
           web: tailwind('flex-1 flex-col'),
-          native: tailwind('mb-2 min-h-20 flex-col'),
+          native: tailwind(`mb-2 flex-col ${isExtraSmallDevice ? 'min-h-22' : 'min-h-20'} `),
         }),
       ]}
       onPress={() => handleCardClick(item)}
