@@ -42,7 +42,7 @@ export function QuestionInput({ question, value, onChange, onSubmit }: QuestionI
   };
 
   const handleSubmit = () => {
-    // onChange(inputValue);
+    onChange(inputValue);
     onSubmit(inputValue);
   };
 
