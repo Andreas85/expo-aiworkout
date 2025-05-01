@@ -16,6 +16,7 @@
     "submit-dev-ios": "eas submit --profile development --platform ios",
     "submit-prod-ios": "eas submit --profile production --platform ios",
     "ota-preview": "eas update --channel preview",
+    "ota-production": "eas update --channel production",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",

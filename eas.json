@@ -40,8 +40,10 @@
       "distribution": "store",
       "channel": "production",
       "releaseChannel": "production",
+      "resourceClass": "medium",
       "env": {
-        "APP_ENV": "production"
+        "APP_ENV": "production",
+        "EXPO_PUBLIC_API_URL": "https://workout-app-backend1-daaf386ee119.herokuapp.com"
       }
     }
   },

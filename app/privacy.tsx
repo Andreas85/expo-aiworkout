@@ -15,9 +15,9 @@ Thank you for using **AI Fitness Journey**. Your privacy is important to us. Thi
 
 We may collect the following types of information:
 
-- **Personal Information** (such as name, email) – only if you choose to provide it.
-- **Device Information** – such as device type, operating system, and unique identifiers.
-- **Usage Data** – information about how you use the app (e.g., time spent, features used).
+- **Personal Information** (such as your name and email address) — only if you choose to provide it.
+- **Device Information** — such as device type, operating system, and unique identifiers.
+- **Usage Data** — information about how you use the app (e.g., time spent, features used).
 
 ## 2. How We Use Your Information
 
@@ -25,7 +25,7 @@ We use your data to:
 
 - Improve app functionality and user experience.
 - Provide personalized workout and fitness recommendations.
-- Monitor app performance and fix issues.
+- Monitor app performance and resolve technical issues.
 
 ## 3. Sharing Your Information
 
@@ -44,10 +44,15 @@ You can:
 
 - Stop using the app at any time.
 - Contact us to access or delete your personal data (if any).
+- Delete your account directly from the app by following these steps:
+  1. Go to your **Profile** section.
+  2. Tap on **Delete Profile**.
+  3. Confirm your choice when prompted.
+  4. Your account and personal data will be permanently deleted.
 
 ## 6. Children's Privacy
 
-We do not knowingly collect data from children under 13.
+We do not knowingly collect or solicit personal data from children under the age of 13.
 
 ## 7. Changes to This Policy
 
@@ -56,7 +61,7 @@ We may update this Privacy Policy. Any changes will be posted here with a new ef
 ## 8. Contact Us
 
 If you have any questions, please contact us at:  
-📧 andx84@gmail.com
+📧 Email: andx85@gmail.com
 `;
 
 export default function PrivacyScreen() {
