@@ -25,6 +25,7 @@ import { tailwind } from '@/utils/tailwind';
 import { WorkoutFeedbackView } from './WorkoutFeedback';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
+import { WorkoutHistoryView } from './WorkoutHistoryView';
 
 function InitializeChatBot(props: { toggleModal: () => void }) {
   const { toggleModal } = props;
@@ -59,7 +60,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
     showSummary,
     isPendingGenerateWorkout,
     responseError,
-
+    workoutPlanHistoryList,
     isWorkoutApproved,
     showFeedback,
     handleFeedback,
@@ -114,6 +115,7 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
             style={[
               isKeyboardVisible && isExtraSmallDevice ? { height: 200 } : scrollHeightStyle(),
             ]}
+            showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             onContentSizeChange={() => {
               scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -152,26 +154,20 @@ function InitializeChatBot(props: { toggleModal: () => void }) {
                 </TouchableOpacity>
               )}
 
-              {workoutPlan && (
+              {workoutPlanHistoryList?.length > 0 && (
                 <TouchableOpacity activeOpacity={1}>
-                  <ChatMessage isBot={true} wrapChildren={true}>
-                    <WorkoutPlanView
-                      plan={workoutPlan}
-                      showSaveButton={isWorkoutApproved}
-                      toggleModal={toggleModal}
-                    />
-                  </ChatMessage>
-
-                  {showFeedback && !isWorkoutApproved && (
-                    <ChatMessage isBot={true} wrapChildren={true}>
-                      <WorkoutFeedbackView onSubmit={handleFeedback} />
-                    </ChatMessage>
-                  )}
+                  <WorkoutHistoryView
+                    workoutHistory={workoutPlanHistoryList}
+                    toggleModal={toggleModal}
+                    showSaveButton={isWorkoutApproved}
+                    handleFeedback={handleFeedback}
+                    isPendingGenerateWorkout={isPendingGenerateWorkout}
+                  />
                 </TouchableOpacity>
               )}
             </>
           </ScrollView>
-          {!workoutPlan && currentQuestionId === 'end' && (
+          {!workoutPlan && currentQuestionId === 'end' && workoutPlanHistoryList?.length === 0 && (
             <TouchableOpacity activeOpacity={1}>
               {responseError && (
                 <TextContainer

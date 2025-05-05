@@ -14,7 +14,7 @@ import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import { updateExerciseProperty } from '@/utils/workoutSessionHelper';
 import { useLocalSearchParams, usePathname } from 'expo-router';
 import { ExerciseElement } from '@/services/interfaces';
-import { debouncedMutate } from '@/utils/helper';
+import { debouncedMutate, updateExerciseDataInWorkoutSession } from '@/utils/helper';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateExerciseNotesOfWorkoutRequest } from '@/services/workouts';
 import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
@@ -35,8 +35,10 @@ const ExerciseNotesModal = (props: IExerciseNotesModal) => {
   const pathname = usePathname();
   const { slug } = useLocalSearchParams() as { slug: string; sessionId?: string };
   const { updateExercisePropertyZustand } = useWorkoutSessionStore();
-  const { handleEditExerciseForNonLoggedInUser } = useWorkoutNonLoggedInUser();
   const { updateWorkoutExercises } = useWorkoutDetailStore();
+  const isWorkoutSessionDetailScreen = useWorkoutSessionStore(
+    state => state.isWorkoutSessionDetailScreen,
+  );
   const workoutSessionDetails = useWorkoutSessionStore(state => state.workoutSessionDetails);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const [notes, setNotes] = useState<string>('');
@@ -44,7 +46,18 @@ const ExerciseNotesModal = (props: IExerciseNotesModal) => {
   const { mutate: mutateUpdateExerciseToWorkoutRequest, isPending } = useMutation({
     mutationFn: updateExerciseNotesOfWorkoutRequest,
     onSuccess: async data => {
-      queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
+      const pathSegements = pathname.split('/');
+      if (pathSegements?.[1] === 'workout-session') {
+        const result = updateExerciseDataInWorkoutSession(
+          data?.data?.exercises,
+          item?.exerciseId ?? '',
+        );
+        updateExercisePropertyZustand(item.order, 'notes', result?.notes);
+      } else {
+        queryClient.invalidateQueries({
+          queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug],
+        });
+      }
       updateWorkoutExercises(data?.data?.exercises);
       toggleModal();
     },
@@ -146,7 +159,6 @@ const ExerciseNotesModal = (props: IExerciseNotesModal) => {
                   style={tailwind('mt-4  flex-row flex-wrap items-center justify-center gap-2')}>
                   <ActionButton
                     uppercase={true}
-                    disabled={!notes}
                     isLoading={isPending}
                     label={'Update Notes'}
                     onPress={handleSubmit}

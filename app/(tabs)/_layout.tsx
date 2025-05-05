@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
 import { Platform, Pressable } from 'react-native';
@@ -11,6 +11,9 @@ import { useAuthStore } from '@/store/authStore';
 import { StatusBar } from 'expo-status-bar';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { tailwind } from '@/utils/tailwind';
+import AllowTrackingInIos from '@/components/molecules/AllowTrackingInIos';
+import { getIsAppTrackingTransparencyPermissionAsked } from '@/utils/NotificationsHelper';
+import usePlatform from '@/hooks/usePlatform';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -20,10 +23,31 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+enum ScreenState {
+  APP_TRACKING,
+  REDIRECT_TABS,
+}
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { isAuthenticated } = useAuthStore();
   const { isLargeScreen } = useBreakPoints();
+  const [currentScreen, setCurrentScreen] = useState<ScreenState>(ScreenState.REDIRECT_TABS);
+  const { isIOS } = usePlatform();
+
+  const initializeAppFlow = async () => {
+    if (isIOS) {
+      const isAppTrackingAppPermissionAsked = await getIsAppTrackingTransparencyPermissionAsked();
+      if (!isAppTrackingAppPermissionAsked) {
+        setCurrentScreen(ScreenState.APP_TRACKING);
+        return;
+      }
+    }
+  };
+
+  useEffect(() => {
+    initializeAppFlow();
+  }, []);
+
   const renderer = () => {
     return (
       <Tabs
@@ -79,7 +103,7 @@ export default function TabLayout() {
             title: 'My exercise',
             headerShown: false,
             tabBarItemStyle: {
-              display: isAuthenticated ? 'flex' : 'none',
+              display: 'none',
               marginBottom: 5,
             },
             tabBarIcon: ({ color, size }) => (
@@ -196,6 +220,19 @@ export default function TabLayout() {
       </Tabs>
     );
   };
+
+  if (currentScreen === ScreenState.APP_TRACKING && isIOS) {
+    return (
+      <AllowTrackingInIos
+        setShowPermissionScreen={() => {
+          setCurrentScreen(ScreenState.REDIRECT_TABS);
+          console.log('setShowPermissionScreen');
+        }}
+        title={`Personalized Experience Awaits!`}
+        desc={`We value your privacy and want to provide you with the best tailored experience. By allowing tracking, you'll see content and recommendations that match your interests while helping us improve the app for you. You're always in control!`}
+      />
+    );
+  }
   return (
     <>
       {renderer()}

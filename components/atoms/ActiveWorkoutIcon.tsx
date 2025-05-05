@@ -10,8 +10,12 @@ import useModal from '@/hooks/useModal';
 import { useWorkoutSessionStore } from '@/store/workoutSessiondetail';
 import { ExerciseElement } from '@/services/interfaces';
 
-const ActiveWorkoutIcon = (props: { item: ExerciseElement; isDraggableExerciseCard?: boolean }) => {
-  const { item, isDraggableExerciseCard = false } = props;
+const ActiveWorkoutIcon = (props: {
+  item: ExerciseElement;
+  isDraggableExerciseCard?: boolean;
+  isNonActiveCard?: boolean;
+}) => {
+  const { item, isDraggableExerciseCard = false, isNonActiveCard = false } = props;
   const { hideModal, showModal, openModal } = useModal();
   const { isLargeScreen } = useWebBreakPoints();
   const isActiveRepExerciseCard = useWorkoutSessionStore(state => state.isActiveRepExerciseCard);
@@ -25,18 +29,48 @@ const ActiveWorkoutIcon = (props: { item: ExerciseElement; isDraggableExerciseCa
   };
 
   const getContainerWebStyle = () => {
+    if (isNonActiveCard && isLargeScreen) {
+      return `bottom-0 -right-1`;
+    }
+    if (isActiveRepExerciseCard) {
+      return isLargeScreen
+        ? 'bottom-4 right-[12px]'
+        : isNonActiveCard
+          ? `bottom-0 -right-1`
+          : `bottom-4 right-11`;
+    }
+    return isLargeScreen ? 'right-[12px] bottom-4' : `right-[160px] bottom-4`;
+  };
+
+  const getContainerNativeStyle = () => {
+    if (isNonActiveCard && isLargeScreen) {
+      return `bottom-0 -right-1`;
+    }
     if (isActiveRepExerciseCard) {
       return isLargeScreen ? 'bottom-4 right-[12px]' : `bottom-4 right-11`;
     }
     return isLargeScreen ? 'right-[12px] bottom-4' : `right-[160px] bottom-4`;
   };
 
-  const getContainerNativeStyle = () => {
-    if (isActiveRepExerciseCard) {
-      return isLargeScreen ? 'bottom-4 right-[12px]' : `bottom-4 right-11`;
+  const getIconSize = () => {
+    if (isNonActiveCard && isLargeScreen) {
+      return `aspect-square h-7 w-7`;
+    } else {
+      return 'aspect-square h-10 w-10';
     }
-    return isLargeScreen ? 'right-[12px] bottom-4' : `right-[160px] bottom-4`;
   };
+
+  const getIconSizeWeb = () => {
+    if (isNonActiveCard && isLargeScreen) {
+      return `aspect-square h-7 w-7`;
+    }
+    if (isLargeScreen) {
+      return `h-[2.5rem] w-[2.5rem]`;
+    } else {
+      return `h-[2.5rem] w-[2.5rem]`;
+    }
+  };
+
   return (
     <>
       <Container
@@ -56,9 +90,10 @@ const ActiveWorkoutIcon = (props: { item: ExerciseElement; isDraggableExerciseCa
               web: tailwind(
                 isDraggableExerciseCard
                   ? `aspect-square h-[2.5rem] w-[2.5rem]`
-                  : `aspect-square ${isLargeScreen ? 'h-[2.5rem] w-[2.5rem]' : 'h-[2.5rem] w-[2.5rem] '} `,
+                  : `aspect-square ${getIconSizeWeb()} `,
               ),
-              native: tailwind('aspect-square h-10 w-10'),
+              // native: tailwind('aspect-square h-10 w-10'),
+              native: tailwind(getIconSize()),
             })}
           />
         </TouchableOpacity>

@@ -2,6 +2,7 @@ const tintColorLight = '#2f95dc';
 const tintColorDark = '#fff';
 const brandColor = '#9C79C9';
 const brandColorDark = '#A27DE1';
+const brandColorDarker = '#4E3D79';
 export default {
   light: {
     text: '#000',
@@ -19,6 +20,7 @@ export default {
   },
   brandColor: brandColor,
   brandColorDark: brandColorDark,
+  brandColorDarker: brandColorDarker,
   white: '#fff',
   black: '#000',
   gray: '#808080',

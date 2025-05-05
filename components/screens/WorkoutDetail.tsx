@@ -4,7 +4,7 @@ import Container from '../atoms/Container';
 import TextContainer from '../atoms/TextContainer';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
 import { tailwind } from '@/utils/tailwind';
 import { ActionButton } from '../atoms/ActionButton';
 import { SkypeIndicator } from 'react-native-indicators';
@@ -12,8 +12,8 @@ import { SkypeIndicator } from 'react-native-indicators';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 import BackActionButton from '../atoms/BackActionButton';
 import LabelContainer from '../atoms/LabelContainer';
-import { AntDesign, Feather } from '@expo/vector-icons';
-import { ICON_SIZE, REACT_QUERY_API_KEYS } from '@/utils/appConstants';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
+import { REACT_QUERY_API_KEYS } from '@/utils/appConstants';
 import useModal from '@/hooks/useModal';
 import AddAndEditWorkoutModal from '../modals/AddAndEditWorkoutModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -31,16 +31,41 @@ import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
 import RenderWorkoutDetailController from '../atoms/RenderWorkoutDetailController';
 import RenderWorkoutDetailExercises from '../atoms/RenderWorkoutDetailExercises';
 import RenderWorkoutDetailStartWorkoutContainer from '../atoms/RenderWorkoutDetailStartWorkoutContainer';
+import EditGenerateWorkout from '../modals/EditGenerateWorkout';
+import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
+import Colors from '@/constants/Colors';
+import { Workout } from '@/services/interfaces';
+import { WorkoutPlan } from '@/types';
+import WorkoutOptionsMenu from './WorkoutOptionsMenu';
+import ImageGenerationModal from '../atoms/ImageGenerationModal';
+import AIImageButton from '../atoms/AIImageButton';
+import StarsIcon from '../atoms/AiStarsIcon';
 
 const WorkoutDetail = () => {
   const navigation = useNavigation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const { slug } = useLocalSearchParams() as any;
+  const { setGeneratedWorkoutPlan } = useGenerateWorkoutPlanStore();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const { handleDeleteWorkoutForNonLoggedInUser, handleDuplicateWorkoutForNonLoggedInUser } =
     useWorkoutNonLoggedInUser();
   const { hideModal, showModal, openModal } = useModal();
+  const {
+    hideModal: hideModalMenu,
+    showModal: showModalMenu,
+    openModal: openModalMenu,
+  } = useModal();
+  const {
+    hideModal: hideModalUpdateImage,
+    showModal: showModalUpdateImage,
+    openModal: openModalUpdateImage,
+  } = useModal();
+  const {
+    hideModal: hideEditGeneratedWorkoutModal,
+    openModal: openEditGeneratedWorkoutModal,
+    showModal: showEditGeneratedWorkoutModal,
+  } = useModal();
   const {
     hideModal: hideModalAddExercise,
     openModal: openModalAddExercise,
@@ -143,10 +168,17 @@ const WorkoutDetail = () => {
     }
   }, [workoutDetail]);
 
+  const handleEditGeneratedWorkoutClick = () => {
+    if (workoutDetail) {
+      setGeneratedWorkoutPlan(workoutDetail as unknown as WorkoutPlan);
+      showEditGeneratedWorkoutModal();
+    }
+  };
   const renderExcerciseLabel = () => {
     return (
       <>
-        <Container style={[tailwind('mb-2 flex-row items-center justify-between gap-2 ')]}>
+        <Container
+          style={[tailwind(`mb-2 flex-row flex-wrap items-center justify-between gap-2  `)]}>
           <Container style={[tailwind(``)]}>
             <TextContainer
               data={`Exercises `}
@@ -189,17 +221,51 @@ const WorkoutDetail = () => {
               />
             </Container>
           )}
-          <ActionButton
-            label={'Add Exercise'}
-            onPress={showModalAddExercise}
+          <Container
             style={[
-              Platform.select({
-                web: tailwind('rounded-xl px-3'),
-                native: tailwind('rounded-xl px-3'),
-              }),
-            ]}
-            left={<AntDesign name="pluscircleo" size={20} color="white" />}
-          />
+              tailwind(
+                `relative ${isExtraSmallScreenOnly ? '' : 'w-auto'} flex-row flex-wrap items-center gap-2 self-center`,
+              ),
+            ]}>
+            {!isLargeScreen && (
+              <>
+                <AIImageButton />
+                <ActionButton
+                  label={'Regenerate Workout'}
+                  onPress={handleEditGeneratedWorkoutClick}
+                  style={[
+                    Platform.select({
+                      web: tailwind('rounded-xl px-3'),
+                      native: tailwind('rounded-xl px-3'),
+                    }),
+                  ]}
+                  left={<StarsIcon brandColor={Colors.white} />}
+                />
+              </>
+            )}
+            <ActionButton
+              label={'Add Exercise'}
+              onPress={showModalAddExercise}
+              style={[
+                Platform.select({
+                  web: tailwind('rounded-xl px-3'),
+                  native: tailwind('rounded-xl px-3'),
+                }),
+              ]}
+              left={<AntDesign name="pluscircleo" size={20} color="white" />}
+            />
+            {isLargeScreen && (
+              <TouchableOpacity
+                style={{
+                  padding: 8,
+                  borderRadius: 8,
+                  marginLeft: 8,
+                }}
+                onPress={showModalMenu}>
+                <FontAwesome5 name="ellipsis-v" size={24} color={Colors.brandColor} />
+              </TouchableOpacity>
+            )}
+          </Container>
         </Container>
         <Container
           style={[
@@ -258,7 +324,6 @@ const WorkoutDetail = () => {
                 }),
               ]}
               onPress={showModal}
-              left={<Feather name="edit" color="#A27DE1" size={ICON_SIZE} />}
             />
           </Container>
         </Container>
@@ -276,7 +341,7 @@ const WorkoutDetail = () => {
           style={[
             Platform.select({
               web: tailwind(`
-                web:h-[100%] web:pb-[180px] mx-auto h-full w-full 
+                web:h-[100%] web:pb-[210px] mx-auto h-full w-full 
             `),
               native: tailwind('flex-1'),
             }),
@@ -324,6 +389,29 @@ const WorkoutDetail = () => {
       )}
       {openModalAddExercise && (
         <AddExercise isModalVisible={openModalAddExercise} closeModal={hideModalAddExercise} />
+      )}
+      {openEditGeneratedWorkoutModal && (
+        <EditGenerateWorkout
+          isVisible={openEditGeneratedWorkoutModal}
+          toggleModal={hideEditGeneratedWorkoutModal}
+          workoutDetail={workoutDetail as Workout}
+        />
+      )}
+      {openModalMenu && (
+        <WorkoutOptionsMenu
+          visible={openModalMenu}
+          onClose={hideModalMenu}
+          handleEditGeneratedWorkoutClick={handleEditGeneratedWorkoutClick}
+          showEditWorkout={showModal}
+          showModalUpdateImage={showModalUpdateImage}
+        />
+      )}
+      {openModalUpdateImage && (
+        <ImageGenerationModal
+          isVisible={openModalUpdateImage}
+          onClose={hideModalUpdateImage}
+          workoutName={workoutDetail?.name || ''}
+        />
       )}
     </Container>
   );

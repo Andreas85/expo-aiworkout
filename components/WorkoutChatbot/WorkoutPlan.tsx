@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { ActionButton } from '../atoms/ActionButton';
@@ -7,25 +7,29 @@ import TextContainer from '../atoms/TextContainer';
 import { generateSaveGeneratedWorkoutService } from '@/services/workouts';
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { WorkoutPlan } from '@/types';
 
 interface WorkoutPlanProps {
-  plan: {
-    exercises?: {
-      name: string;
-      sets: number;
-      reps: string;
-      rest: string;
-      duration?: string;
-      weight?: string;
-    }[];
-    name?: string;
-    notes?: string;
-  };
+  plan: WorkoutPlan;
   showSaveButton: boolean;
   toggleModal: () => void;
+  isLastItem?: boolean;
+  isRegenerateWorkout?: boolean;
+  handleUpdateWorkout?: () => void;
+  errorMessage?: string;
+  isPendingGenerateWorkout?: boolean;
 }
 
-export function WorkoutPlanView({ plan, showSaveButton, toggleModal }: WorkoutPlanProps) {
+export function WorkoutPlanView({
+  plan,
+  showSaveButton,
+  toggleModal,
+  isLastItem = false,
+  isRegenerateWorkout = false,
+  isPendingGenerateWorkout = false,
+  handleUpdateWorkout,
+  errorMessage,
+}: WorkoutPlanProps) {
   const [responseError, setResponseError] = useState<string>('');
   const { mutate: mutateSaveGenerateWorkout, isPending: isPendingSaveGenerateWorkout } =
     useMutation({
@@ -43,58 +47,63 @@ export function WorkoutPlanView({ plan, showSaveButton, toggleModal }: WorkoutPl
       },
     });
 
+  useEffect(() => {
+    if (errorMessage) {
+      setResponseError(errorMessage);
+    }
+  }, [errorMessage]);
+
   const handleSaveWorkout = async () => {
     console.log('Save workout plan');
+    if (isRegenerateWorkout) {
+      console.log('Regenerate workout plan:', plan);
+      handleUpdateWorkout?.();
+      return;
+    }
     mutateSaveGenerateWorkout(plan);
   };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <FontAwesome5 name="dumbbell" size={24} color="#6b46c1" />
-        <Text style={styles.title}>Your Personalized Workout Plan</Text>
+        <Text style={styles.title}>Your Personalized Workout Plan </Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Workout Details</Text>
         <View style={styles.detailsRow}>
           <Text style={styles.detailLabel}>Name:</Text>
-          <Text style={styles.detailText}>{plan.name}</Text>
+          <Text style={styles.detailText}>{plan?.name}</Text>
         </View>
-        {/* <View style={styles.detailsRow}>
-          <Text style={styles.detailLabel}>Frequency:</Text>
-          <Text style={styles.detailText}>{plan.frequency}</Text>
-        </View>
-        <View style={styles.detailsRow}>
-          <Text style={styles.detailLabel}>Duration:</Text>
-          <Text style={styles.detailText}>{plan.duration}</Text>
-        </View> */}
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Exercises</Text>
+        <Text style={styles.sectionTitle}>Exercises </Text>
         {plan?.exercises?.map((exercise, index) => (
           <View key={index} style={styles.exerciseCard}>
-            <Text style={styles.exerciseName}>{exercise.name}</Text>
+            <Text style={styles.exerciseName}>
+              {exercise.name || exercise?.exercise?.name || ''}
+            </Text>
             <View style={styles.exerciseDetails}>
               {exercise.reps ? (
-                <Text style={styles.exerciseText}>Reps: {exercise.reps}</Text>
+                <Text style={styles.exerciseText}>Reps: {exercise.reps || 0}</Text>
               ) : (
-                <Text style={styles.exerciseText}>Duration: {exercise.duration}</Text>
+                <Text style={styles.exerciseText}>Duration: {exercise.duration || 0}</Text>
               )}
-              <Text style={styles.exerciseText}>Rest: {exercise.rest}</Text>
-              <Text style={styles.exerciseText}>Weight: {exercise.weight}</Text>
+              <Text style={styles.exerciseText}>Rest: {exercise.rest || 0}</Text>
+              <Text style={styles.exerciseText}>Weight: {exercise.weight || 0}</Text>
             </View>
           </View>
         ))}
       </View>
 
-      {plan.notes && (
+      {plan?.notes && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Additional Notes</Text>
-          <Text style={styles.notesText}>{plan.notes}</Text>
+          <Text style={styles.notesText}>{plan?.notes}</Text>
         </View>
       )}
-      {responseError && (
+      {isLastItem && responseError && (
         <TextContainer
           style={tailwind('text-3 text-center text-red-400')}
           className="text-center text-sm !text-red-400"
@@ -102,11 +111,11 @@ export function WorkoutPlanView({ plan, showSaveButton, toggleModal }: WorkoutPl
         />
       )}
 
-      {showSaveButton && (
+      {isLastItem && showSaveButton && (
         <ActionButton
           label={'Save Workout Plan'}
           onPress={handleSaveWorkout}
-          isLoading={isPendingSaveGenerateWorkout}
+          isLoading={isPendingSaveGenerateWorkout || isPendingGenerateWorkout}
           style={tailwind('rounded-lg')}
         />
       )}

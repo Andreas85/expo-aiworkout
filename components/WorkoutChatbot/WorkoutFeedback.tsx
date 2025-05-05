@@ -1,40 +1,49 @@
 import { WorkoutFeedback } from '@/types';
 import { FontAwesome } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import TextContainer from '../atoms/TextContainer';
+import { tailwind } from '@/utils/tailwind';
 
 interface WorkoutFeedbackProps {
+  isEditGeneratedWorkout?: boolean;
+  isEditLoading?: boolean;
   onSubmit: (feedback: WorkoutFeedback) => void;
+  onSubmitRegenerate?: (data: string) => void;
+  errorMessage?: string;
+  isFirstItem?: boolean;
 }
 
-export function WorkoutFeedbackView({ onSubmit }: WorkoutFeedbackProps) {
+export function WorkoutFeedbackView({
+  onSubmit,
+  onSubmitRegenerate,
+  isEditGeneratedWorkout = false,
+  isEditLoading = false,
+  errorMessage = '',
+  isFirstItem = false,
+}: WorkoutFeedbackProps) {
   const [feedback, setFeedback] = useState('');
   const [showTextArea, setShowTextArea] = useState(false);
 
   const handleSubmit = () => {
+    if (isEditGeneratedWorkout) {
+      console.log('Feedback:Mobile', feedback);
+      onSubmitRegenerate?.(feedback);
+      return;
+    }
     onSubmit({ rating: 'needs_changes', feedback });
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>How's this workout plan?</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={() => onSubmit({ rating: 'good' })}
-          style={[styles.button, styles.goodButton]}>
-          <FontAwesome name="thumbs-o-up" size={20} color="#166534" />
-          <Text style={styles.goodText}>Looks Good!</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setShowTextArea(true)}
-          style={[styles.button, styles.neutralButton]}>
-          <FontAwesome name="thumbs-o-down" size={20} color="#374151" />
-          <Text style={styles.neutralText}>Needs Changes</Text>
-        </TouchableOpacity>
-      </View>
-
-      {showTextArea && (
+  const renderContainer = () => {
+    if (isFirstItem) {
+      return (
         <View style={styles.feedbackContainer}>
           <TextInput
             value={feedback}
@@ -43,13 +52,65 @@ export function WorkoutFeedbackView({ onSubmit }: WorkoutFeedbackProps) {
             style={styles.textArea}
             multiline
           />
-          <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-            <Text style={styles.submitText}>Submit Feedback</Text>
+
+          {errorMessage && (
+            <TextContainer
+              style={tailwind('text-3 text-center text-red-400')}
+              className="text-center text-sm !text-red-400"
+              data={errorMessage}
+            />
+          )}
+          <TouchableOpacity
+            onPress={handleSubmit}
+            style={[styles.submitButton, (!feedback || isEditLoading) && styles.submitDisabled]}
+            disabled={!feedback || isEditLoading}>
+            <Text style={styles.submitText}>
+              {isEditLoading ? <ActivityIndicator /> : 'Submit Feedback'}
+            </Text>
           </TouchableOpacity>
         </View>
-      )}
-    </View>
-  );
+      );
+    }
+
+    return (
+      <>
+        <View style={styles.container}>
+          <Text style={styles.title}>How's this workout plan?</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={() => onSubmit({ rating: 'good' })}
+              style={[styles.button, styles.goodButton]}>
+              <FontAwesome name="thumbs-o-up" size={20} color="#166534" />
+              <Text style={styles.goodText}>Looks Good!</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setShowTextArea(true)}
+              style={[styles.button, styles.neutralButton]}>
+              <FontAwesome name="thumbs-o-down" size={20} color="#374151" />
+              <Text style={styles.neutralText}>Needs Changes</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {showTextArea && (
+          <View style={styles.feedbackContainer}>
+            <TextInput
+              value={feedback}
+              onChangeText={setFeedback}
+              placeholder="Please tell us what you'd like to change..."
+              style={styles.textArea}
+              multiline
+            />
+            <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+              <Text style={styles.submitText}>Submit Feedback</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </>
+    );
+  };
+
+  return <View style={styles.container}>{renderContainer()}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -113,5 +174,8 @@ const styles = StyleSheet.create({
   submitText: {
     color: '#fff',
     fontWeight: '500',
+  },
+  submitDisabled: {
+    backgroundColor: '#93c5fd',
   },
 });

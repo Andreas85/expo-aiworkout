@@ -13,6 +13,7 @@ import {
   IPayloadWorkoutSessionsUpdateFinished,
   ICreateWorkoutCopy,
   ExerciseElement,
+  IGeneratedWorkoutImage,
 } from './interfaces';
 import { deleteRequest, getRequest, postRequest, putRequest } from '@/utils/axios';
 import { expandRestAsExercises, extractedErrorMessage } from '@/utils/helper';
@@ -334,6 +335,38 @@ export const generateWorkoutService = async (payload: { prompt?: any }) => {
     });
     return data;
   } catch (error: any) {
+    console.log('Error:', error);
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const reGenerateWorkoutService = async (payload: { prompt: string; id: string }) => {
+  try {
+    const { id, prompt } = payload;
+    const URL = `/workouts/${id}/re-generate`;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: { prompt },
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const updateGenerateWorkoutService = async (payload: {
+  exercises: ExerciseElement[];
+  id: string;
+}) => {
+  try {
+    const { id, exercises } = payload;
+    const URL = `/workouts/${id}/update-generated`;
+    const { data } = await putRequest({
+      API: URL,
+      DATA: { exercises },
+    });
+    return data;
+  } catch (error: any) {
     throw extractedErrorMessage(error?.response);
   }
 };
@@ -379,6 +412,57 @@ export const generateSaveGeneratedWorkoutService = async (payload: any) => {
     const { data } = await postRequest({
       API: URL,
       DATA: { ...payload },
+    });
+    return data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const getImageService = async () => {
+  try {
+    const URL = API_ENPOINTS.IMAGES + `?entityType=workout`;
+    const { data } = await getRequest({
+      API: URL,
+    });
+    return data?.data as IGeneratedWorkoutImage[];
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const createImageService = async (payload: { url: string }) => {
+  try {
+    const URL = API_ENPOINTS.IMAGES;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: { url: payload.url, entityType: 'workout' },
+    });
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const deleteImageService = async (payload: { id: string }) => {
+  try {
+    const URL = API_ENPOINTS.IMAGES + `/${payload.id}`;
+    const { data } = await deleteRequest({
+      API: URL,
+    });
+    return data?.data;
+  } catch (error: any) {
+    throw extractedErrorMessage(error?.response);
+  }
+};
+
+export const generateWorkoutImageService = async (payload: { prompt: string }) => {
+  try {
+    const URL = API_ENPOINTS.GENERATED_IMAGES;
+    const { data } = await postRequest({
+      API: URL,
+      DATA: { prompt: payload.prompt },
+      timeout: 30000, // 30 seconds
     });
     return data;
   } catch (error: any) {

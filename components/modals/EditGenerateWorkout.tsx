@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Platform,
   StyleSheet,
@@ -14,7 +14,6 @@ import Modal from 'react-native-modal';
 import { tailwind } from '@/utils/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 import useBreakPoints from '@/hooks/useBreakPoints';
-import InitializeChatBot from '../WorkoutChatbot/InitializeChatBot';
 import LabelContainer from '../atoms/LabelContainer';
 import Colors from '@/constants/Colors';
 import StarsIcon from '../atoms/AiStarsIcon';
@@ -24,12 +23,16 @@ import { ActionButton } from '../atoms/ActionButton';
 import { router } from 'expo-router';
 import { useKeyboardVisibility } from '@/hooks/useKeyboardVisibility';
 import useWebBreakPoints from '@/hooks/useWebBreakPoints';
+import UpdateGeneratedWorkout from '../WorkoutChatbot/UpdateGeneratedWorkout';
+import { Workout } from '@/services/interfaces';
 
-const GenerateWorkoutAiBot = ({
+const EditGenerateWorkout = ({
   isVisible,
   toggleModal,
+  workoutDetail,
 }: {
   isVisible: boolean;
+  workoutDetail: Workout;
   toggleModal: () => void;
 }) => {
   const { isExtraSmallDevice, isMobileDevice } = useBreakPoints();
@@ -64,7 +67,7 @@ const GenerateWorkoutAiBot = ({
 
   const renderWorkoutContainer = () => {
     if (isAuthenticated) {
-      return <InitializeChatBot toggleModal={toggleModal} />;
+      return <UpdateGeneratedWorkout toggleModal={toggleModal} workoutDetail={workoutDetail} />;
     }
     return (
       <Container style={tailwind('w-full items-center justify-center gap-y-4 self-center p-8')}>
@@ -103,7 +106,7 @@ const GenerateWorkoutAiBot = ({
 
           {/* Header */}
           <LabelContainer
-            label="Generate Workout"
+            label="Regenerate Workout"
             labelStyle={styles.header}
             right={<StarsIcon brandColor={Colors.brandColor} />}
           />
@@ -119,7 +122,7 @@ const GenerateWorkoutAiBot = ({
   );
 };
 
-export default GenerateWorkoutAiBot;
+export default EditGenerateWorkout;
 
 const styles = StyleSheet.create({
   modalContainer: {

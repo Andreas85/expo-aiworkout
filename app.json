@@ -25,9 +25,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#252425"
       },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
       "package": "com.uniteful.aifitnessjourney"
     },
     "web": {
@@ -39,17 +36,20 @@
       "expo-router",
       "expo-asset",
       [
-        "expo-image-picker",
+        "expo-build-properties",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourceslnReleaseBuilds": true,
+            "useLegacyPackaging": true,
+            "jsEngine": "hermes"
+          },
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ],
-      [
-        "expo-av",
-        {
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
-        }
-      ]
+      "expo-tracking-transparency"
     ],
     "experiments": {
       "typedRoutes": true

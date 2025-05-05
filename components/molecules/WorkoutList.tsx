@@ -6,6 +6,7 @@ import ImageContainer from '../atoms/ImageContainer';
 import TextContainer from '../atoms/TextContainer';
 import useBreakPoints from '@/hooks/useBreakPoints';
 import { IMAGES } from '@/utils/images';
+import usePlatform from '@/hooks/usePlatform';
 
 interface WorkoutListProps {
   data: any[];
@@ -29,7 +30,7 @@ const WorkoutList = ({
   isMyWorkout,
 }: WorkoutListProps) => {
   const { isMediumScreen } = useBreakPoints();
-
+  const { isWeb } = usePlatform();
   // Memoize the renderItem to avoid re-renders
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
@@ -69,7 +70,7 @@ const WorkoutList = ({
             ]}>
             {!isEnabled && (
               <ImageContainer
-                source={IMAGES.fitness}
+                source={item?.image || IMAGES.fitness}
                 styleNative={[tailwind(`aspect-square w-full self-center rounded-2xl`)]}
                 contentFit="fill"
               />
@@ -96,9 +97,9 @@ const WorkoutList = ({
       numColumns={numColumns}
       keyExtractor={item => item?._id || keyName}
       key={`${numColumns}-${isEnabled}`}
-      initialNumToRender={4}
-      maxToRenderPerBatch={5}
-      updateCellsBatchingPeriod={50}
+      initialNumToRender={isWeb ? undefined : 4}
+      maxToRenderPerBatch={isWeb ? undefined : 5}
+      updateCellsBatchingPeriod={isWeb ? undefined : 50}
       renderItem={renderItem}
       refreshing={isPending}
       onRefresh={onRefresh}

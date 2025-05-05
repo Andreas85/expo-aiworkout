@@ -112,8 +112,14 @@ export const getRequest = async ({ API = '' }: IRequest): Promise<AxiosResponse>
   return axiosInstance.get(API);
 };
 
-export const postRequest = async ({ API = '', DATA = {} }: IRequest): Promise<AxiosResponse> => {
-  return axiosInstance.post(API, DATA);
+export const postRequest = async ({
+  API = '',
+  DATA = {},
+  timeout = undefined,
+}: IRequest): Promise<AxiosResponse> => {
+  return axiosInstance.post(API, DATA, {
+    timeout: timeout ?? axiosInstance.defaults.timeout,
+  });
 };
 
 export const putRequest = async ({ API = '', DATA = {} }: IRequest) => {

@@ -16,4 +16,7 @@ export const API_ENPOINTS = {
   ME: '/me',
   WORKOUT_GENERATE: '/workouts/generate',
   SAVE_WORKOUT_GENERATE: '/workouts/save-generated',
+  IMAGES: '/images',
+  GENERATED_IMAGES: '/workouts/generate-image',
+  AWS_SIGNED_URL: '/images/s3url',
 };

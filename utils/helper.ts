@@ -228,3 +228,69 @@ export function navigateToWorkoutDetail(isPrivate: boolean, workoutId: string) {
 export const debouncedMutate = debounce((mutateFn, payload) => {
   mutateFn(payload);
 }, 500);
+
+export const updateExerciseDataInWorkoutSession = (
+  updatedExerciseList: ExerciseElement[],
+  exerciseId: string,
+): ExerciseElement | undefined => {
+  const updatedExercise = updatedExerciseList.find(
+    (exercise: ExerciseElement) => exercise._id === exerciseId,
+  );
+
+  //  Please do error handling
+  if (!updatedExercise) {
+    console.log('Exercise not found in updated list');
+    return;
+  }
+  return updatedExercise;
+};
+
+export const formatDateTime = (date: string | Date): string => {
+  try {
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) {
+      console.warn('Invalid date value:', date);
+      return 'Invalid Date';
+    }
+
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    }).format(d);
+
+    const formattedTime = new Intl.DateTimeFormat('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      // second: '2-digit',
+      hour12: true,
+    }).format(d);
+
+    return `${formattedDate} ${formattedTime}`;
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
+};
+
+export const hasValidData = (obj: Record<string, any>, key: string) => {
+  return (
+    Object.prototype.hasOwnProperty.call(obj, key) &&
+    obj[key] !== null &&
+    obj[key] !== undefined &&
+    obj[key] !== ''
+  );
+};
+
+export const base64ToBlob = (base64Data: string, contentType: string): Blob => {
+  const byteCharacters = atob(base64Data.split(',')[1]);
+  const byteArrays = [];
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArrays.push(byteCharacters.charCodeAt(i));
+  }
+
+  const byteArray = new Uint8Array(byteArrays);
+  return new Blob([byteArray], { type: contentType });
+};

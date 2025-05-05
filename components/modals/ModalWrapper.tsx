@@ -36,7 +36,6 @@ function ModalWrapper(props: IAddAndEditWorkoutModalProps) {
             flex: 1,
             justifyContent: 'center',
             position: 'relative',
-            // paddingHorizontal: 16,
           }}>
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -58,9 +57,11 @@ function ModalWrapper(props: IAddAndEditWorkoutModalProps) {
               })}>
               {/* Close Button */}
               {isCrossIconVisible && (
-                <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} color="#fff" />
-                </TouchableOpacity>
+                <View style={styles.closeButtonContainer}>
+                  <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+                    <Ionicons name="close" size={24} color="#fff" />
+                  </TouchableOpacity>
+                </View>
               )}
               {headerTitle && (
                 <Container style={tailwind('mb-4 flex items-center justify-center')}>
@@ -80,10 +81,14 @@ function ModalWrapper(props: IAddAndEditWorkoutModalProps) {
 export default ModalWrapper;
 
 const styles = StyleSheet.create({
+  closeButtonContainer: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 10, // Ensures it is clickable
+    padding: 10, // Makes it easier to tap
+  },
   closeButton: {
     alignSelf: 'flex-end',
-    position: 'absolute',
-    top: 16,
-    right: 10,
   },
 });

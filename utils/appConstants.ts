@@ -19,7 +19,7 @@ export const NAVBAR_TABS: INavbarTabs[] = [
 ];
 
 export const ERROR_MESSAGE = {
-  SOMETHING_WENT_WRONG: 'Something went wront',
+  SOMETHING_WENT_WRONG: 'Something went wrong',
 };
 
 export const USER_ROLE = {
@@ -50,7 +50,7 @@ export const WORKOUT_TABS: ITabItem[] = [
 
 export const headerOptions: ITabItem[] = [
   { key: 'workout', value: 'Workout', path: '/(tabs)/(workout)/workouts' },
-  { key: 'my-exercise', value: 'My Exercise', path: '/(tabs)/my-exercise' },
+  // { key: 'my-exercise', value: 'My Exercise', path: '/(tabs)/my-exercise' },
   { key: 'workout-sessions', value: 'Workout Session', path: '/(tabs)/workout-sessions' },
   { key: 'profile', value: 'Profile', path: '/(tabs)/profile' },
 ];
@@ -65,6 +65,7 @@ export const REACT_QUERY_API_KEYS = {
   WORKOUT_SESSION_USER: 'workout-session-user',
   WORKOUT_SESSION_USER_DETAILS: 'workout-session-user-details',
   ME: 'me',
+  FETCHED_IMAGE: 'fetched-image',
 };
 
 export const REACT_QUERY_STALE_TIME = {
@@ -81,6 +82,7 @@ export const STORAGES_KEYS = {
   WORKOUT_SESSION: 'workout-session',
   WORKOUTS_LIST: 'workouts-list',
   WORKOUT_EXERCISES: 'workout-exercises',
+  APP_TRACKING_PERMISSIONS: 'app-tracking-permissions',
 };
 
 export const STORAGE_EMITTER_KEYS = {

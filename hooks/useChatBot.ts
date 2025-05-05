@@ -1,16 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { UserResponse, WorkoutFeedback, WorkoutPlan } from '@/types';
-import { generateSaveGeneratedWorkoutService, generateWorkoutService } from '@/services/workouts';
+import { UserResponse, WorkoutFeedback, WorkoutHistory, WorkoutPlan } from '@/types';
+import {
+  generateWorkoutService,
+  reGenerateWorkoutService,
+  updateGenerateWorkoutService,
+} from '@/services/workouts';
 import { questions } from '@/components/WorkoutChatbot/questions';
 import usePlatform from './usePlatform';
 import { formatFitnessData } from '@/utils/AiWorkoutPlanHelper';
 import { ScrollView } from 'react-native';
-import { router } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
+import { useGenerateWorkoutPlanStore } from '@/store/generateWorkoutPlanStore';
+import { useWorkoutDetailStore } from '@/store/workoutdetail';
+import { generateBigNumberId } from '@/utils/helper';
+import { ExerciseElement } from '@/services/interfaces';
 
 export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void) => {
   const { isWeb } = usePlatform();
+  const { slug } = useLocalSearchParams() as { slug: string };
   const [currentQuestionId, setCurrentQuestionId] = useState('entry');
+  const { setGeneratedWorkoutPlan } = useGenerateWorkoutPlanStore();
+  const { setWorkoutDetail } = useWorkoutDetailStore();
 
   const [responses, setResponses] = useState<UserResponse[]>([]);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
@@ -25,10 +36,27 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     feedback: '',
   });
 
+  const [workoutPlanHistoryList, setWorkoutPlanHistoryList] = useState<WorkoutHistory[]>([]);
+
   const { mutate: mutateGenerateWorkout, isPending: isPendingGenerateWorkout } = useMutation({
     mutationFn: generateWorkoutService,
-    onSuccess: data => {
+    onSuccess: (data, variables) => {
       setWorkoutPlan(data?.data);
+      setGeneratedWorkoutPlan(data?.data);
+      const feedback = variables?.prompt?.feedback || ''; // Optional initial feedback
+      const workoutHistoryPayload = {
+        workoutPlan: data?.data,
+        feedback: feedback || '', // Optional initial feedback
+      };
+      console.log('Workout generated', { workoutHistoryPayload, variables, currentFeedback });
+      // addToWorkoutHistory(workoutHistoryPayload);
+      setWorkoutPlanHistoryList(() => {
+        const existingHistory = workoutPlanHistoryList || [];
+        return [
+          ...existingHistory,
+          { historyId: generateBigNumberId(), feedback: '', workoutPlan: data?.data },
+        ]; // Append the new workout to the history
+      }); // Set the workout plan history to the newly generated workout
       setResponseError('');
     },
     onError: (error: string) => {
@@ -36,6 +64,42 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
       setResponseError(error);
     },
   });
+
+  const { mutate: mutateRegenerateWorkout, isPending: isPendingRegenerateWorkout } = useMutation({
+    mutationFn: reGenerateWorkoutService,
+    onSuccess: (data, variables) => {
+      setWorkoutPlanHistoryList(() => {
+        const existingHistory = workoutPlanHistoryList || [];
+        return [
+          ...existingHistory,
+          { historyId: generateBigNumberId(), feedback: '', workoutPlan: data?.data },
+        ]; // Append the new workout to the history
+      }); // Set the workout plan history to the newly generated workout
+
+      setResponseError('');
+    },
+    onError: (error: string) => {
+      console.warn('Workout generation error:', error);
+      setResponseError(error);
+    },
+  });
+
+  const { mutate: mutateUpdateGenerateWorkout, isPending: isPendingUpdateGenerateWorkout } =
+    useMutation({
+      mutationFn: updateGenerateWorkoutService,
+      onSuccess: data => {
+        console.log('Workout saved', data);
+
+        setWorkoutDetail(data?.data);
+        toggleModal?.();
+        // setGeneratedWorkoutPlan(data?.data);
+        setResponseError('');
+      },
+      onError: (error: string) => {
+        console.log('Workout mutateUpdateGenerateWorkout error:', error);
+        setResponseError(error);
+      },
+    });
 
   const messageEndScrollToBottomInWeb = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -129,19 +193,57 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     setShowFeedback(true);
   };
 
-  const handleFeedback = async (feedback: WorkoutFeedback) => {
+  const handleFeedback = async (feedback: WorkoutFeedback, workoutHistoryId?: string) => {
     if (feedback.rating === 'good') {
       setIsWorkoutApproved(true);
     } else {
+      console.log('Feedback:', feedback, 'API callhere');
       setCurrentFeedback(feedback);
       // Reset workout and regenerate with feedback
       setWorkoutPlan(null);
+      setGeneratedWorkoutPlan(null);
       setShowFeedback(false);
+      setWorkoutPlanHistoryList((prev: any) => {
+        // Find the existing workout history entry based on workoutHistoryId
+        const updatedHistory = prev.map((item: any) =>
+          item.historyId === workoutHistoryId
+            ? { ...item, feedback: feedback.feedback, workoutPlan: item?.workoutPlan } // Update the feedback
+            : item,
+        );
 
+        return updatedHistory;
+      });
       handleGenerateWorkout(true, feedback.feedback); // Regenerate workout with feedback
-
       setShowFeedback(true);
     }
+  };
+
+  const handleRegenerateWorkout = (feedback: string, workoutHistoryId?: string) => {
+    setWorkoutPlanHistoryList((prev: any) => {
+      // Find the existing workout history entry based on workoutHistoryId
+      const updatedHistory = prev.map((item: any) =>
+        item.historyId === workoutHistoryId
+          ? { ...item, feedback: feedback, workoutPlan: item?.workoutPlan } // Update the feedback
+          : item,
+      );
+      return updatedHistory;
+    });
+    mutateRegenerateWorkout({ prompt: feedback, id: slug });
+  };
+
+  const handleUpdateWorkout = () => {
+    const workoutHistory = workoutPlanHistoryList?.at(-1);
+    if (!workoutHistory?.workoutPlan.exercises) {
+      console.error('Exercises are undefined. Cannot update workout.');
+      return;
+    }
+
+    const payload = {
+      id: slug,
+      exercises: workoutHistory.workoutPlan.exercises as unknown as ExerciseElement[],
+    };
+    // console.log('handleUpdateWorkout', { payload });
+    mutateUpdateGenerateWorkout(payload);
   };
 
   return {
@@ -155,6 +257,9 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     currentQuestionId,
     isWorkoutApproved,
     showFeedback,
+    isPendingRegenerateWorkout,
+    isPendingUpdateGenerateWorkout,
+    workoutPlanHistoryList,
     handleFeedback,
     scrollToBottom,
     handleAnswer,
@@ -162,5 +267,8 @@ export const useChatBot = (toggleModal?: () => void, scrollToBottom?: () => void
     getCurrentResponse,
     goBack,
     generateWorkout,
+    handleRegenerateWorkout,
+    setWorkoutPlanHistoryList,
+    handleUpdateWorkout,
   };
 };
