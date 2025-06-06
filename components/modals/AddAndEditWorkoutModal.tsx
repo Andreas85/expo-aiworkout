@@ -21,6 +21,8 @@ const validationSchema = yup.object().shape({
   workoutName: yup.string().required('Workout name is required'),
 });
 
+const LOGO_URL = 'https://uniteful-bucket.s3.eu-west-2.amazonaws.com/Logo%2041-1749195492763.png';
+
 function AddAndEditWorkoutModal(props: {
   isModalVisible: boolean;
   closeModal: () => void;
@@ -36,12 +38,33 @@ function AddAndEditWorkoutModal(props: {
   const workoutname = useWorkoutDetailStore(state => state.workoutDetail)?.name ?? '';
   const { setWorkoutDetail } = useWorkoutDetailStore();
   const [responseError, setResponseError] = useState<string>();
+  const { mutate: mutateUpdatedWorkout, isPending: isPendingUpdateWorkout } = useMutation({
+    mutationFn: updateWorkoutDataRequest,
+    onSuccess: data => {
+      // alert('HERE---');
+      queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      });
+      setWorkoutDetail(data?.data);
+      closeModal();
+    },
+    onError: (error: string) => {
+      setResponseError(error);
+    },
+  });
 
   const { mutate: mutateAddWorkout, isPending } = useMutation({
     mutationFn: addWorkoutService,
     onSuccess: async (data: any) => {
       queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
+      });
+      mutateUpdatedWorkout({
+        formData: {
+          name: data?.data?.name,
+          image: LOGO_URL,
+        },
+        queryParams: { id: data?.data?._id },
       });
       router.push(`/workout/${data?.data?._id}`);
       closeModal();
@@ -57,23 +80,6 @@ function AddAndEditWorkoutModal(props: {
     setWorkoutDetail(result);
     closeModal();
   };
-
-  const { mutate: mutateUpdatedWorkout, isPending: isPendingUpdateWorkout } = useMutation({
-    mutationFn: updateWorkoutDataRequest,
-    onSuccess: data => {
-      // alert('HERE---');
-      queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT],
-      });
-      // queryClient.setQueryData([REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug], data?.data);
-      // queryClient.invalidateQueries({ queryKey: [REACT_QUERY_API_KEYS.MY_WORKOUT_DETAILS, slug] });
-      setWorkoutDetail(data?.data);
-      closeModal();
-    },
-    onError: (error: string) => {
-      setResponseError(error);
-    },
-  });
 
   const handleEditWorkoutNonLoggedIn = async (values: { workoutName: string }) => {
     const { workoutName } = values;
