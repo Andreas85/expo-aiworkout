@@ -209,6 +209,19 @@ function AddExercise(props: {
     await addWorkoutExercises(data);
   };
 
+  const handleToggleSwitch = (setFieldValue: any, values: any) => {
+    try {
+      setFieldValue('isDuration', !values.isDuration, false);
+      if (!values.isDuration) {
+        setFieldValue('reps', '', false);
+      } else {
+        setFieldValue('duration', '', false);
+      }
+    } catch (error) {
+      console.error('Error toggling switch:', error);
+    }
+  };
+
   return (
     <>
       <ModalWrapper
@@ -271,7 +284,7 @@ function AddExercise(props: {
                       }}>
                       <CustomSwitch
                         isEnabled={values?.isDuration}
-                        toggleSwitch={handleChange('isDuration')}
+                        toggleSwitch={() => handleToggleSwitch(setFieldValue, values)}
                         hasRightLabel={true}
                         labelRight={'Duration'}
                         label={'Reps'}
