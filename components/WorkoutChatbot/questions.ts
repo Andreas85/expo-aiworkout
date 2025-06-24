@@ -55,7 +55,7 @@ export const questions: Questions = {
   },
   body_focus: {
     question: 'Do you want to focus on a specific body part?',
-    type: 'single-select',
+    type: 'multi-select',
     options: [
       { label: 'Full body', next: 'additional_info' },
       { label: 'Chest', next: 'additional_info' },
