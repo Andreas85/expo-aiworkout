@@ -27,7 +27,7 @@ const Header = () => {
   const renderActionButtonAndLinks = () => {
     if (!isAuthenticated) {
       const unauthenticatedLinks: any[] = [
-        { key: 'workouts', path: '/workouts', value: 'Workouts' },
+        { key: 'workouts', path: '/(tabs)/(workout)/workouts/public', value: 'Workouts' },
         { key: 'workout-sessions', path: '/workout-sessions', value: 'Workout Session' },
       ];
 
