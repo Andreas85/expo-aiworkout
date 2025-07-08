@@ -42,7 +42,9 @@
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourceslnReleaseBuilds": true,
             "useLegacyPackaging": true,
-            "jsEngine": "hermes"
+            "jsEngine": "hermes",
+            "targetSdkVersion": 35,
+            "compileSdkVersion": 35
           },
           "ios": {
             "useFrameworks": "static"
