@@ -34,15 +34,12 @@ export default function TabLayout() {
             // Disable the static render of the header on web
             // to prevent a hydration error in React Navigation v6.
             headerShown: useClientOnlyValue(false, true),
-            tabBarItemStyle: {
-              marginBottom: 5,
-            },
             tabBarInactiveTintColor: '#fff',
             tabBarStyle: Platform.select({
               // web: tailwind(
               //   `${isLargeScreen ? '' : `bg-BACKGROUND absolute left-0 right-0 top-0 mx-auto flex  w-full flex-row items-center  justify-between ${isLargeScreen ? 'px-80' : 'px-96'}`}`,
               // ),
-              web: tailwind(`${isLargeScreen ? '' : `hidden`}`),
+              web: tailwind(`${isLargeScreen ? 'h-14' : `hidden`}`),
             }),
           }}>
           <Tabs.Screen
@@ -50,7 +47,7 @@ export default function TabLayout() {
             options={{
               title: 'Workout',
               headerTransparent: true,
-              unmountOnBlur: true,
+              freezeOnBlur: true,
               headerShown: false,
               tabBarLabelPosition: isLargeScreen ? 'below-icon' : 'beside-icon',
               // tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
@@ -186,7 +183,7 @@ export default function TabLayout() {
               headerTransparent: true,
 
               headerShown: false,
-              unmountOnBlur: true,
+              freezeOnBlur: true,
               tabBarItemStyle: {
                 display: isAuthenticated ? 'none' : 'flex',
                 marginBottom: 5,

@@ -8,12 +8,13 @@ interface IKeyboardView {
   nativeStyle?: StyleProp<ViewStyle>;
 }
 
-const KeyboardView = (props: IKeyboardView) => {
-  const { children, nativeStyle } = props;
+const KeyboardView = ({ children, nativeStyle }: IKeyboardView) => {
   return (
     <KeyboardAwareScrollView
-      keyboardShouldPersistTaps="always"
-      style={[tailwind('my-4'), nativeStyle]}>
+      keyboardShouldPersistTaps="handled"
+      enableOnAndroid
+      style={[tailwind('my-4'), nativeStyle]} // ✅ full height
+    >
       {children}
     </KeyboardAwareScrollView>
   );

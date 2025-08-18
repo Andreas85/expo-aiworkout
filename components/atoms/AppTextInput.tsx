@@ -53,9 +53,7 @@ export function AppTextInput({
         )}
         <TextInput
           style={[
-            tailwind(
-              'text-4 w-full flex-1 border border-b-stone-50 border-l-transparent border-r-transparent border-t-transparent p-3 font-medium text-white',
-            ),
+            tailwind('text-4 w-full flex-1  p-3 font-medium text-white'),
             { outlineStyle: 'none' },
             testInputStyle,
           ]}

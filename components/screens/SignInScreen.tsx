@@ -19,6 +19,7 @@ import { formatTimeForMinutes } from '@/utils/helper';
 import React from 'react';
 import KeyboardView from '../atoms/KeyboardView';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { StyleHelper } from '@/utils/StyleHelper';
 
 interface Values {
   email: string;
@@ -159,6 +160,7 @@ export default function SignInIndexPage() {
                 placeholderTextColor={'#fff'}
                 autoCapitalize="none"
                 containerStyle={{ marginBottom: 20 }}
+                testInputStyle={StyleHelper.testInputStyle}
               />
               {responseError && (
                 <TextContainer

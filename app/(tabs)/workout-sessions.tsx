@@ -82,7 +82,7 @@ export default function WorkoutSessionScreen() {
   };
 
   return (
-    <SafeAreaView style={[tailwind('flex-1')]}>
+    <SafeAreaView style={[tailwind('flex-1')]} edges={['top']}>
       <GradientBackground
         styleNative={Platform.select({
           web: tailwind(isLargeScreen ? 'mt-0' : 'mt-24'),

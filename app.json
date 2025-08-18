@@ -70,6 +70,24 @@
     },
     "updates": {
       "url": "https://u.expo.dev/3cfa1088-6c78-4df6-82e2-030e312d20ad"
+    },
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-element-dropdown",
+          "react-native-toast-notifications",
+          "react-native-indicators",
+          "@codler/react-native-keyboard-aware-scroll-view",
+          "@dev-plugins/react-query",
+          "eslint",
+          "lucide-react",
+          "pauseable",
+          "react-cropper",
+          "react-sortablejs",
+          "sortablejs",
+          "uuid"
+        ]
+      }
     }
   }
 }

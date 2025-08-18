@@ -32,6 +32,7 @@ import {
   getWorkoutExercisesList,
   IWorkoutExercisesHelper,
 } from '@/utils/workoutExercisesHelper';
+import { StyleHelper } from '@/utils/StyleHelper';
 
 const ERROR_MESSAGE = {
   EXERCISE_REQ: 'Exercise name is required if less than 3 characters.',
@@ -309,6 +310,7 @@ function AddExercise(props: {
                         placeholderTextColor={'#fff'}
                         keyboardType="numeric"
                         containerStyle={{ marginBottom: 20 }}
+                        testInputStyle={StyleHelper.testInputStyle}
                       />
                     )}
                     <AppTextInput
@@ -318,6 +320,7 @@ function AddExercise(props: {
                       placeholderTextColor={'#fff'}
                       keyboardType="numeric"
                       containerStyle={{ marginBottom: 20 }}
+                      testInputStyle={StyleHelper.testInputStyle}
                     />
                     <AppTextInput
                       value={values.rest}
@@ -326,6 +329,7 @@ function AddExercise(props: {
                       placeholderTextColor={'#fff'}
                       keyboardType="numeric"
                       containerStyle={{ marginBottom: 20 }}
+                      testInputStyle={StyleHelper.testInputStyle}
                     />
                     <AppTextInput
                       value={values.duration}
@@ -337,6 +341,7 @@ function AddExercise(props: {
                       placeholderTextColor={'#fff'}
                       keyboardType="numeric"
                       containerStyle={{ marginBottom: 20 }}
+                      testInputStyle={StyleHelper.testInputStyle}
                     />
 
                     {responseError && (
