@@ -36,7 +36,7 @@ export default function Layout() {
     }
   }, [isAuthenticated]);
   return (
-    <SafeAreaView style={[tailwind('flex-1')]}>
+    <SafeAreaView style={[tailwind('flex-1')]} edges={['top']}>
       <GradientBackground
         styleWeb="!mt-0"
         styleNative={[
@@ -45,17 +45,17 @@ export default function Layout() {
             native: tailwind('flex-1'),
           }),
         ]}>
-        <Container style={[tailwind('flex-1'), { marginTop: insets.bottom }]}>
+        <Container style={[tailwind('flex-1')]}>
           <Tab.Navigator
-            sceneContainerStyle={Platform.select({
-              web: tailwind('bg-transparent '),
-              native: tailwind('flex-1 bg-transparent'),
-            })}
             // initialRouteName="workout"
             screenOptions={({ route }) => {
               // console.log(route, 'route');
 
               return {
+                sceneStyle: Platform.select({
+                  web: tailwind('bg-transparent '),
+                  native: tailwind('flex-1 bg-transparent'),
+                }),
                 tabBarStyle: Platform.select({
                   web: tailwind(
                     `rounded-t-4 mx-auto 

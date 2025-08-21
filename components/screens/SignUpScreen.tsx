@@ -20,6 +20,7 @@ import React from 'react';
 import KeyboardView from '../atoms/KeyboardView';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { IRegister } from '@/services/interfaces';
+import { StyleHelper } from '@/utils/StyleHelper';
 
 const validationSchema = yup.object().shape({
   firstName: yup.string().required('Field is required'),
@@ -186,6 +187,7 @@ export default function SignupIndexPage() {
                 placeholderTextColor={'#fff'}
                 autoCapitalize="none"
                 containerStyle={{ marginBottom: 20 }}
+                testInputStyle={StyleHelper.testInputStyle}
               />
               <AppTextInput
                 value={values.lastName}
@@ -196,6 +198,7 @@ export default function SignupIndexPage() {
                 placeholderTextColor={'#fff'}
                 autoCapitalize="none"
                 containerStyle={{ marginBottom: 20 }}
+                testInputStyle={StyleHelper.testInputStyle}
               />
               <AppTextInput
                 value={values.email}
@@ -206,6 +209,7 @@ export default function SignupIndexPage() {
                 placeholderTextColor={'#fff'}
                 autoCapitalize="none"
                 containerStyle={{ marginBottom: 20 }}
+                testInputStyle={StyleHelper.testInputStyle}
               />
               {responseError && (
                 <TextContainer

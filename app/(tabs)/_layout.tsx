@@ -72,7 +72,7 @@ export default function TabLayout() {
           options={{
             title: 'Workout',
             headerTransparent: true,
-            unmountOnBlur: true,
+            freezeOnBlur: true,
             headerShown: false,
             tabBarLabelPosition: isLargeScreen ? 'below-icon' : 'beside-icon',
             // tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
@@ -209,7 +209,7 @@ export default function TabLayout() {
             title: 'Sign in/ Sign up',
             headerTransparent: true,
             headerShown: false,
-            unmountOnBlur: true,
+            freezeOnBlur: true,
             tabBarItemStyle: {
               display: isAuthenticated ? 'none' : 'flex',
               marginBottom: 5,

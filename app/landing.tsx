@@ -1,11 +1,15 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { tailwind } from '@/utils/tailwind';
 import Container from '@/components/atoms/Container';
 import GradientBackground from '@/components/atoms/GradientBackground';
+import usePlatform from '@/hooks/usePlatform';
+import useWebBreakPoints from '@/hooks/useWebBreakPoints';
 
 const LandingPage = () => {
+  const { isWeb } = usePlatform()
+  const { isLargeScreen } = useWebBreakPoints();
   const handleGetStarted = () => {
     router.push('/(tabs)/(auth)/signup');
   };
@@ -19,8 +23,13 @@ const LandingPage = () => {
   };
 
   return (
-    <GradientBackground>
-      <ScrollView 
+
+    <GradientBackground
+      styleNative={Platform.select({
+        web: tailwind(isLargeScreen ? 'mt-0' : 'mt-24'),
+      })}
+    >
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={tailwind('pb-8')}
       >
@@ -32,7 +41,7 @@ const LandingPage = () => {
             <Text style={tailwind('text-white text-5xl font-bold text-center mb-4')}>
               AI Fitness Journey
             </Text>
-            
+
             {/* Subtitle */}
             <Text style={tailwind('text-white/90 text-xl text-center mb-6 leading-7')}>
               Smarter workouts. Simpler progress.
@@ -52,7 +61,7 @@ const LandingPage = () => {
             <View style={tailwind('mb-16')}>
               <View style={tailwind('flex-row items-start space-x-4 mb-6')}>
                 <Text style={tailwind('text-4xl')}>🏋️</Text>
-                <View style={tailwind('flex-1')}>
+                <View style={tailwind(isWeb ? 'flex-1' : '')}>
                   <Text style={tailwind('text-white text-2xl font-bold mb-2')}>
                     Build Your Workouts
                   </Text>
@@ -138,6 +147,7 @@ const LandingPage = () => {
         </View>
       </ScrollView>
     </GradientBackground>
+
   );
 };
 

@@ -22,6 +22,7 @@ import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import React from 'react';
 import * as Updates from 'expo-updates';
 import { interactionStore } from '@/store/interactionStore';
+import { Slot } from 'expo-router';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -82,6 +83,8 @@ function RootLayoutNav() {
   const { setHasInteracted } = interactionStore();
   const colorScheme = useColorScheme();
   const { isLargeScreen } = useWebBreakPoints();
+  const renderNavbar = () => (Platform.OS === 'web' ? null : <Navbar />);
+  const renderSlot = () => (Platform.OS === 'web' ? <Slot /> : null);
 
   const renderRoot = () => {
     return (
@@ -94,7 +97,8 @@ function RootLayoutNav() {
               native: tailwind('flex-1'),
             }),
           ]}>
-          <Navbar />
+          {renderNavbar()}
+          {renderSlot()}
         </Container>
       </>
     );
@@ -155,7 +159,6 @@ function RootLayoutNav() {
   useEffect(() => {
     checkForUpdates();
     const subscription = AppState.addEventListener('change', onAppStateChange);
-
     return () => subscription.remove();
   }, []);
 

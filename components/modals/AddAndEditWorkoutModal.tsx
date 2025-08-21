@@ -16,6 +16,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { getWorkoutDetail } from '@/utils/workoutStorageOperationHelper';
 import useWorkoutNonLoggedInUser from '@/hooks/useWorkoutNonLoggedInUser';
+import { StyleHelper } from '@/utils/StyleHelper';
 
 const validationSchema = yup.object().shape({
   workoutName: yup.string().required('Workout name is required'),
@@ -135,6 +136,7 @@ function AddAndEditWorkoutModal(props: {
                   errorMessage={errors?.workoutName}
                   placeholderTextColor={'#fff'}
                   containerStyle={{ marginBottom: 20 }}
+                  testInputStyle={StyleHelper.testInputStyle}
                 />
                 {responseError && (
                   <TextContainer
